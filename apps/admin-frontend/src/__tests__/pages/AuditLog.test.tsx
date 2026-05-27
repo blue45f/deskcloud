@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AuditLog } from '../../pages/AuditLog';
 import { useStore } from '../../lib/store';
+import { AuditLog } from '../../pages/AuditLog';
 import { renderWithRouter, resetStore } from '../test-utils';
 
 const originalFetch = globalThis.fetch;

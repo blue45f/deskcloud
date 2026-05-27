@@ -1,9 +1,9 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Sites } from '../../pages/Sites';
 import { useStore } from '../../lib/store';
 import type { Site } from '../../lib/types';
+import { Sites } from '../../pages/Sites';
 import { renderWithRouter, resetStore } from '../test-utils';
 
 const originalFetch = globalThis.fetch;

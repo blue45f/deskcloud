@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { AuthGate } from '../components/AuthGate';
 import { RoutesEditor } from '../components/RoutesEditor';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 import type { ScopedRoute, Tenant, TenantPlan } from '../lib/types';
 import { generateApiKey } from './Tenants';

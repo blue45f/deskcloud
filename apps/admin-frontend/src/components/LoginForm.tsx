@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 
 export function LoginForm() {

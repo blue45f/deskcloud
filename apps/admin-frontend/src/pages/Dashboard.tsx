@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthGate } from '../components/AuthGate';
 import { CardGridSkeleton } from '../components/Skeleton';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 import type { SiteInfo } from '../lib/types';
 

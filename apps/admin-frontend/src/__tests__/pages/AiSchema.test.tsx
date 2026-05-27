@@ -1,8 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { AiSchema } from '../../pages/AiSchema';
 import { useStore } from '../../lib/store';
+import { AiSchema } from '../../pages/AiSchema';
 import { renderWithRouter, resetStore } from '../test-utils';
 
 const originalFetch = globalThis.fetch;

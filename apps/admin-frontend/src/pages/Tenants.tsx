@@ -2,7 +2,7 @@ import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthGate } from '../components/AuthGate';
 import { Modal } from '../components/Modal';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 import type { Tenant, TenantPlan } from '../lib/types';
 
@@ -177,7 +177,7 @@ function TenantsBody() {
                     </span>
                   </td>
                   <td className="px-3 py-2 font-mono text-[11px] text-slate-500 dark:text-slate-400 whitespace-nowrap">
-                    <span aria-label="masked key">
+                    <span title="masked key">
                       {tn.apiKey.slice(0, 8)}…{tn.apiKey.slice(-4)}
                     </span>
                     <button

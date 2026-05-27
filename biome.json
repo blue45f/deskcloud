@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.15/schema.json",
   "vcs": {
     "enabled": true,
     "clientKind": "git",
@@ -37,9 +37,19 @@
       "suspicious": {
         "noConsole": {
           "level": "warn",
-          "options": { "allow": ["error", "warn", "info", "log"] }
+          "options": { "allow": ["error", "warn", "info", "log", "clear"] }
         },
+        "noArrayIndexKey": "warn",
         "noExplicitAny": "warn"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "warn"
+      },
+      "a11y": {
+        "noAutofocus": "warn",
+        "noLabelWithoutControl": "warn",
+        "noStaticElementInteractions": "warn",
+        "useKeyWithClickEvents": "warn"
       },
       "complexity": {
         "noForEach": "off"

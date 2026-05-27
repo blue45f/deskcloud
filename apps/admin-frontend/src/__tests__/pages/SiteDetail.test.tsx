@@ -1,10 +1,9 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { render } from '@testing-library/react';
-import { SiteDetail } from '../../pages/SiteDetail';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStore } from '../../lib/store';
 import type { Site } from '../../lib/types';
+import { SiteDetail } from '../../pages/SiteDetail';
 import { resetStore } from '../test-utils';
 
 const SITE: Site = {

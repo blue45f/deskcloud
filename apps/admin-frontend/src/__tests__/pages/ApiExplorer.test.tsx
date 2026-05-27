@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
-import { ApiExplorer } from '../../pages/ApiExplorer';
 import type { PublicInfo } from '../../lib/types';
+import { ApiExplorer } from '../../pages/ApiExplorer';
 import { renderWithRouter, resetStore } from '../test-utils';
 
 const RENDER_ONLY: PublicInfo = {

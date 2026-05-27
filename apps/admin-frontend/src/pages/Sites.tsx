@@ -2,7 +2,7 @@ import { type FormEvent, useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthGate } from '../components/AuthGate';
 import { Modal } from '../components/Modal';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 import type { Site } from '../lib/types';
 

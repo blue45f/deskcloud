@@ -1,4 +1,4 @@
-import { render, type RenderOptions, type RenderResult } from '@testing-library/react';
+import { type RenderOptions, type RenderResult, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { MemoryRouter, type MemoryRouterProps, Outlet, Route, Routes } from 'react-router-dom';
 import { useStore } from '../lib/store';

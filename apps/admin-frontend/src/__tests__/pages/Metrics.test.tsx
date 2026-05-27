@@ -1,7 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Metrics } from '../../pages/Metrics';
 import { useStore } from '../../lib/store';
+import { Metrics } from '../../pages/Metrics';
 import { mockTextFetch, renderWithRouter, resetStore } from '../test-utils';
 
 const PROM = `# HELP gateway_cache_events_total ...

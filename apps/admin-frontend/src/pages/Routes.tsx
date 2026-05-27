@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthGate } from '../components/AuthGate';
 import { RoutesEditor } from '../components/RoutesEditor';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 import type { ScopedRoute } from '../lib/types';
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AuthGate } from '../components/AuthGate';
-import { api, ApiError } from '../lib/api';
+import { ApiError, api } from '../lib/api';
 import { useStore } from '../lib/store';
 import type { AuditEvent } from '../lib/types';
 

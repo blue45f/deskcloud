@@ -1,8 +1,8 @@
 import { screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Dashboard } from '../../pages/Dashboard';
 import { useStore } from '../../lib/store';
 import type { SiteInfo } from '../../lib/types';
+import { Dashboard } from '../../pages/Dashboard';
 import { mockJsonFetch, renderWithRouter, resetStore } from '../test-utils';
 
 const SITE: SiteInfo = {
