@@ -190,15 +190,15 @@ describe('render — route overrides', () => {
     expect(capture.waitSelector).toBe('#product-loaded');
   });
 
-  it('honours waitMs > 0 (uses real setTimeout, so keep it tiny)', async () => {
+  it('honours waitMs > 0 by scheduling the configured delay', async () => {
+    const setTimeoutSpy = vi.spyOn(globalThis, 'setTimeout');
     mockWithPage([{}]);
-    const t0 = Date.now();
     await render({
-      url: 'https://www.example.com/slow/',
+      url: 'https://93.184.216.34/slow/',
       headers: {},
       route: { pattern: '^/slow/', waitMs: 10 },
     });
-    expect(Date.now() - t0).toBeGreaterThanOrEqual(10);
+    expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 10);
   });
 
   it('attaches x-prerender-route header to output', async () => {
