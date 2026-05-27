@@ -88,10 +88,7 @@ function LighthouseBody() {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {labels.map((l) => (
-              <div
-                key={l.key}
-                className="bg-slate-50 dark:bg-slate-800 rounded p-4 text-center"
-              >
+              <div key={l.key} className="bg-slate-50 dark:bg-slate-800 rounded p-4 text-center">
                 <div className="text-xs text-slate-500 dark:text-slate-400">{l.label}</div>
                 <div
                   className={`mt-2 text-3xl font-bold ${lighthouseScoreColor(result.scores[l.key])}`}

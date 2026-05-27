@@ -63,7 +63,9 @@ function AuditLogBody() {
   return (
     <section className="space-y-4" data-testid="page-audit">
       <div className="bg-amber-50 dark:bg-amber-950 dark:border-amber-900 border border-amber-200 rounded-lg p-4 text-sm">
-        <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-1">{t('audit.title')}</h3>
+        <h3 className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+          {t('audit.title')}
+        </h3>
         <p className="text-amber-800 dark:text-amber-300">{t('audit.desc')}</p>
       </div>
 
@@ -107,10 +109,7 @@ function AuditLogBody() {
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {events.map((e, i) => (
-              <tr
-                key={`${e.ts}-${i}`}
-                className="hover:bg-slate-50 dark:hover:bg-slate-800"
-              >
+              <tr key={`${e.ts}-${i}`} className="hover:bg-slate-50 dark:hover:bg-slate-800">
                 <td className="px-3 py-2 font-mono text-xs whitespace-nowrap">
                   {e.ts?.slice(11, 19) ?? '-'}
                 </td>

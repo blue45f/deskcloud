@@ -31,17 +31,19 @@ function VisualDiffBody() {
     setRunning(true);
     setResult(null);
     try {
-      const r = await api<{ ok: true; result: VisualDiffResult }>('POST', '/admin/api/visual-diff', {
-        url: url.trim(),
-        mode,
-        threshold,
-        fullPage,
-      });
+      const r = await api<{ ok: true; result: VisualDiffResult }>(
+        'POST',
+        '/admin/api/visual-diff',
+        {
+          url: url.trim(),
+          mode,
+          threshold,
+          fullPage,
+        },
+      );
       setResult(r.result);
       pushToast(
-        r.result.baselineCreated
-          ? 'baseline 저장됨'
-          : `diff ${r.result.diffPercent.toFixed(2)}%`,
+        r.result.baselineCreated ? 'baseline 저장됨' : `diff ${r.result.diffPercent.toFixed(2)}%`,
         'success',
       );
     } catch (e) {
@@ -56,7 +58,9 @@ function VisualDiffBody() {
   return (
     <section className="space-y-4" data-testid="page-visual">
       <div className="bg-purple-50 dark:bg-purple-950 dark:border-purple-900 border border-purple-200 rounded-lg p-4 text-sm">
-        <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-1">{t('visual.title')}</h3>
+        <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-1">
+          {t('visual.title')}
+        </h3>
         <p className="text-purple-800 dark:text-purple-300">{t('visual.desc')}</p>
       </div>
 
@@ -139,12 +143,16 @@ function VisualDiffBody() {
               </div>
             </div>
             <div className="bg-slate-50 dark:bg-slate-800 rounded p-3">
-              <div className="text-xs text-slate-500 dark:text-slate-400">{t('visual.duration')}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">
+                {t('visual.duration')}
+              </div>
               <div className="font-mono">{result.durationMs}ms</div>
             </div>
           </div>
           {result.baselineCreated ? (
-            <div className="text-xs text-emerald-600 dark:text-emerald-400">{t('visual.created')}</div>
+            <div className="text-xs text-emerald-600 dark:text-emerald-400">
+              {t('visual.created')}
+            </div>
           ) : null}
           <div className="text-xs text-slate-500 dark:text-slate-400">
             baseline path: <code>{result.baselinePath}</code>

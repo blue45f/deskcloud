@@ -15,7 +15,10 @@ const BOT_UAS = [
     value:
       'Mozilla/5.0 (Linux; Android 6.0.1; Nexus 5X Build/MMB29P) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Mobile Safari/537.36 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
   },
-  { name: 'Bingbot', value: 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)' },
+  {
+    name: 'Bingbot',
+    value: 'Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)',
+  },
   { name: 'Naver Yeti', value: 'Mozilla/5.0 (compatible; Yeti/1.1; +http://naver.me/spd)' },
   { name: 'Twitterbot', value: 'Twitterbot/1.0' },
   { name: 'facebookexternalhit', value: 'facebookexternalhit/1.1' },

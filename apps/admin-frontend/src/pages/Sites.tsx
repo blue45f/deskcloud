@@ -102,7 +102,9 @@ function SitesBody() {
   return (
     <section className="space-y-4" data-testid="page-sites">
       <div className="bg-blue-50 dark:bg-indigo-950 dark:border-indigo-900 border border-blue-200 rounded-lg p-4 text-sm">
-        <h3 className="font-semibold text-blue-900 dark:text-indigo-200 mb-1">{t('sites.title')}</h3>
+        <h3 className="font-semibold text-blue-900 dark:text-indigo-200 mb-1">
+          {t('sites.title')}
+        </h3>
         <p className="text-blue-800 dark:text-indigo-300">{t('sites.intro')}</p>
       </div>
 
@@ -214,9 +216,7 @@ function SitesBody() {
         </div>
       )}
 
-      {editing ? (
-        <SiteForm site={editing} onCancel={() => setEditing(null)} onSave={save} />
-      ) : null}
+      {editing ? <SiteForm site={editing} onCancel={() => setEditing(null)} onSave={save} /> : null}
     </section>
   );
 }

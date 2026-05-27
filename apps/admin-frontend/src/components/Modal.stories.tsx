@@ -47,7 +47,7 @@ export const ExtraLarge: Story = {
       <div className="space-y-3 text-sm">
         <p>Larger modals are used for the routes editor and site/tenant detail forms.</p>
         <pre className="bg-slate-100 dark:bg-slate-800 rounded p-3 text-xs">
-{`{
+          {`{
   "pattern": "^/products/[0-9]+",
   "ttlMs": 60000,
   "waitUntil": "networkidle0"

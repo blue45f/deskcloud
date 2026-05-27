@@ -28,7 +28,11 @@ afterEach(() => {
 
 describe('Modal', () => {
   it('does not render when closed', () => {
-    render(<Modal open={false} onClose={() => undefined} title="x">child</Modal>);
+    render(
+      <Modal open={false} onClose={() => undefined} title="x">
+        child
+      </Modal>,
+    );
     expect(screen.queryByTestId('modal')).not.toBeInTheDocument();
   });
 
@@ -45,9 +49,17 @@ describe('Modal', () => {
 
   it('locks body scroll while open and restores on close', () => {
     document.body.style.overflow = 'auto';
-    const { rerender } = render(<Modal open onClose={() => undefined} title="x">y</Modal>);
+    const { rerender } = render(
+      <Modal open onClose={() => undefined} title="x">
+        y
+      </Modal>,
+    );
     expect(document.body.style.overflow).toBe('hidden');
-    rerender(<Modal open={false} onClose={() => undefined} title="x">y</Modal>);
+    rerender(
+      <Modal open={false} onClose={() => undefined} title="x">
+        y
+      </Modal>,
+    );
     expect(document.body.style.overflow).toBe('auto');
   });
 

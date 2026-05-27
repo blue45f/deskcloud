@@ -6,7 +6,11 @@ import { ToastContainer } from './ToastContainer';
 /**
  * Helper — replaces the live toast list with a fixed set so the story is deterministic.
  */
-function SeedToasts({ items }: { items: Array<{ kind: 'success' | 'error' | 'warn' | 'info'; message: string }> }) {
+function SeedToasts({
+  items,
+}: {
+  items: Array<{ kind: 'success' | 'error' | 'warn' | 'info'; message: string }>;
+}) {
   useEffect(() => {
     const icons: Record<string, string> = {
       success: '✓',

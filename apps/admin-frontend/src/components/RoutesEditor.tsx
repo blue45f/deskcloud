@@ -26,12 +26,7 @@ export type RoutesEditorProps = {
   reorderable?: boolean;
 };
 
-export function RoutesEditor({
-  routes,
-  onChange,
-  labels,
-  reorderable = true,
-}: RoutesEditorProps) {
+export function RoutesEditor({ routes, onChange, labels, reorderable = true }: RoutesEditorProps) {
   const t = useStore((s) => s.t);
   const pushToast = useStore((s) => s.pushToast);
   const [filter, setFilter] = useState('');
@@ -181,8 +176,7 @@ export function RoutesEditor({
                       value={r.waitUntil ?? ''}
                       onChange={(e) =>
                         update(i, {
-                          waitUntil:
-                            (e.target.value as ScopedRoute['waitUntil']) || undefined,
+                          waitUntil: (e.target.value as ScopedRoute['waitUntil']) || undefined,
                         })
                       }
                     >

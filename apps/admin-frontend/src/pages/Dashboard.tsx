@@ -64,11 +64,7 @@ function DashboardBody() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card label="mode" value={info.mode} detail={info.origin || '(origin 미설정)'} />
-        <Card
-          label="routes"
-          value={String(info.site?.routes ?? 0)}
-          detail="런타임 활성"
-        />
+        <Card label="routes" value={String(info.site?.routes ?? 0)} detail="런타임 활성" />
         <Card
           label="cache"
           value={`${Math.floor((info.cache?.ttlMs ?? 0) / 60_000)}m TTL`}

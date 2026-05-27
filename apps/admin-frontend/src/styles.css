@@ -7,8 +7,13 @@
 }
 
 @layer utilities {
-  [x-cloak] { display: none !important; }
-  pre { white-space: pre-wrap; word-break: break-word; }
+  [x-cloak] {
+    display: none !important;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
 }
 
 /* Sidebar nav active state */
@@ -31,11 +36,20 @@
   animation: slide-out 200ms ease-in forwards;
 }
 @keyframes slide-in {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 @keyframes slide-out {
-  to { transform: translateY(20px); opacity: 0; }
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
 }
 
 /* Drag-reorder feedback */
@@ -61,8 +75,13 @@
   animation: skeleton-pulse 1.4s ease-in-out infinite;
 }
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 /*

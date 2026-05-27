@@ -80,9 +80,7 @@ export function Sidebar({ publicMode }: SidebarProps) {
           </div>
         ) : null}
         <div className="flex items-center gap-2">
-          <span
-            className={`w-2 h-2 rounded-full ${authed ? 'bg-emerald-400' : 'bg-slate-500'}`}
-          />
+          <span className={`w-2 h-2 rounded-full ${authed ? 'bg-emerald-400' : 'bg-slate-500'}`} />
           <span>{authed ? t('auth.authenticated') : t('auth.unauthenticated')}</span>
           {authed ? (
             <button

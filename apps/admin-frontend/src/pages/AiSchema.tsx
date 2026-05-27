@@ -46,7 +46,9 @@ function AiSchemaBody() {
   return (
     <section className="space-y-4" data-testid="page-ai">
       <div className="bg-emerald-50 dark:bg-emerald-950 dark:border-emerald-900 border border-emerald-200 rounded-lg p-4 text-sm">
-        <h3 className="font-semibold text-emerald-900 dark:text-emerald-200 mb-1">{t('ai.title')}</h3>
+        <h3 className="font-semibold text-emerald-900 dark:text-emerald-200 mb-1">
+          {t('ai.title')}
+        </h3>
         <p className="text-emerald-800 dark:text-emerald-300">{t('ai.desc')}</p>
       </div>
 

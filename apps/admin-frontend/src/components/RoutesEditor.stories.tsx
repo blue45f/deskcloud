@@ -47,7 +47,13 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Renders the editor with a local `useState` so changes round-trip during demos. */
-function Stateful({ initial, reorderable = true }: { initial: ScopedRoute[]; reorderable?: boolean }) {
+function Stateful({
+  initial,
+  reorderable = true,
+}: {
+  initial: ScopedRoute[];
+  reorderable?: boolean;
+}) {
   const [routes, setRoutes] = useState(initial);
   return (
     <div className="space-y-3">

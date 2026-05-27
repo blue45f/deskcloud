@@ -33,7 +33,8 @@ export function Welcome() {
         <ol className="text-sm space-y-3 text-slate-700 dark:text-slate-200">
           <li>
             <span className="font-bold mr-2">1</span>
-            좌측 메뉴에서 원하는 작업을 선택. 인증이 필요한 페이지는 우측 상단에 토큰 입력 박스가 표시됩니다.
+            좌측 메뉴에서 원하는 작업을 선택. 인증이 필요한 페이지는 우측 상단에 토큰 입력 박스가
+            표시됩니다.
           </li>
           <li>
             <span className="font-bold mr-2">2</span>

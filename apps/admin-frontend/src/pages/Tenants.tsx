@@ -109,7 +109,9 @@ function TenantsBody() {
   return (
     <section className="space-y-4" data-testid="page-tenants">
       <div className="bg-purple-50 dark:bg-purple-950 dark:border-purple-900 border border-purple-200 rounded-lg p-4 text-sm">
-        <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-1">{t('tenants.title')}</h3>
+        <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-1">
+          {t('tenants.title')}
+        </h3>
         <p className="text-purple-800 dark:text-purple-300">{t('tenants.intro')}</p>
       </div>
 

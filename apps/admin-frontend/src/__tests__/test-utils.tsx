@@ -10,7 +10,10 @@ import type { PublicInfo } from '../lib/types';
  */
 export function renderWithRouter(
   ui: ReactElement,
-  opts: { initialEntries?: MemoryRouterProps['initialEntries']; publicInfo?: PublicInfo | null } = {},
+  opts: {
+    initialEntries?: MemoryRouterProps['initialEntries'];
+    publicInfo?: PublicInfo | null;
+  } = {},
   options?: RenderOptions,
 ): RenderResult {
   const { initialEntries = ['/'], publicInfo = null } = opts;

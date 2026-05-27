@@ -62,8 +62,8 @@ setAiSchemaAdapter(createAnthropicSchemaAdapter({
   model: 'claude-opus-4-7',
 }));`}</pre>
         <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-          OpenAI / Groq / Ollama 도 동일한 인터페이스로{' '}
-          <code>@heejun/spa-seo-gateway-openai</code> 패키지에서 제공.
+          OpenAI / Groq / Ollama 도 동일한 인터페이스로 <code>@heejun/spa-seo-gateway-openai</code>{' '}
+          패키지에서 제공.
         </p>
       </Block>
 

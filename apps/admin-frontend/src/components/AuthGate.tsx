@@ -10,7 +10,8 @@ export function AuthGate({ children }: { children: ReactNode }) {
   if (!adminEnabled) {
     return (
       <div className="bg-amber-50 dark:bg-amber-950 dark:border-amber-900 border border-amber-200 rounded p-4 text-sm">
-        <strong>admin disabled</strong> — 환경변수 <code>ADMIN_TOKEN</code> 을 설정하고 게이트웨이를 재시작하세요.
+        <strong>admin disabled</strong> — 환경변수 <code>ADMIN_TOKEN</code> 을 설정하고 게이트웨이를
+        재시작하세요.
       </div>
     );
   }

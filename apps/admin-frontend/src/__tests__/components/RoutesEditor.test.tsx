@@ -41,9 +41,7 @@ describe('RoutesEditor', () => {
   });
 
   it('updating pattern input updates the row', () => {
-    renderWithRouter(
-      <ControlledEditor initial={[{ pattern: '^/old', ignore: false }]} />,
-    );
+    renderWithRouter(<ControlledEditor initial={[{ pattern: '^/old', ignore: false }]} />);
     const patternInput = screen.getByDisplayValue('^/old') as HTMLInputElement;
     fireEvent.change(patternInput, { target: { value: '^/new' } });
     const state = JSON.parse(screen.getByTestId('state').textContent || '[]');
@@ -51,14 +49,7 @@ describe('RoutesEditor', () => {
   });
 
   it('delete button removes the row', () => {
-    renderWithRouter(
-      <ControlledEditor
-        initial={[
-          { pattern: '^/a' },
-          { pattern: '^/b' },
-        ]}
-      />,
-    );
+    renderWithRouter(<ControlledEditor initial={[{ pattern: '^/a' }, { pattern: '^/b' }]} />);
     // 첫 번째 row 의 delete 버튼 클릭. delete 라벨 i18n key 'btn.delete'.
     const deleteBtns = screen
       .getAllByRole('button')
@@ -72,12 +63,7 @@ describe('RoutesEditor', () => {
 
   it('filter input narrows visible rows', () => {
     renderWithRouter(
-      <ControlledEditor
-        initial={[
-          { pattern: '^/products/.+' },
-          { pattern: '^/blog/.+' },
-        ]}
-      />,
+      <ControlledEditor initial={[{ pattern: '^/products/.+' }, { pattern: '^/blog/.+' }]} />,
     );
     expect(screen.getByDisplayValue('^/products/.+')).toBeInTheDocument();
     expect(screen.getByDisplayValue('^/blog/.+')).toBeInTheDocument();

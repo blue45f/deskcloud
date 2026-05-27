@@ -71,7 +71,11 @@ function MetricsBody() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card label="cache hit ratio" value={parsed.cards.hitRatio} detail={`hit ${parsed.cards.cacheHits} / miss ${parsed.cards.cacheMisses}`} />
+        <Card
+          label="cache hit ratio"
+          value={parsed.cards.hitRatio}
+          detail={`hit ${parsed.cards.cacheHits} / miss ${parsed.cards.cacheMisses}`}
+        />
         <Card label="inflight" value={String(parsed.cards.inflight)} detail="현재 렌더 중" />
         <Card label="cache hits" value={parsed.cards.cacheHits} detail="누적" />
         <Card label="cache misses" value={parsed.cards.cacheMisses} detail="누적" />
