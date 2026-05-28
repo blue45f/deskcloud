@@ -11,14 +11,14 @@ const LANG_KEY = 'seo-admin-lang';
 
 function detectInitialTheme(): Theme {
   if (typeof window === 'undefined') return 'light';
-  const saved = localStorage.getItem(THEME_KEY) as Theme | null;
+  const saved = window.localStorage?.getItem(THEME_KEY) as Theme | null;
   if (saved === 'dark' || saved === 'light') return saved;
   return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 function detectInitialLang(): Lang {
   if (typeof window === 'undefined') return 'ko';
-  const saved = localStorage.getItem(LANG_KEY) as Lang | null;
+  const saved = window.localStorage?.getItem(LANG_KEY) as Lang | null;
   if (saved === 'ko' || saved === 'en') return saved;
   return navigator.language?.startsWith('ko') ? 'ko' : 'en';
 }
@@ -77,7 +77,7 @@ export const useStore = create<State & Actions>((set, get) => ({
   sidebarOpen: typeof window !== 'undefined' ? window.innerWidth >= 768 : true,
   cmdPaletteOpen: false,
   shortcutsOpen: false,
-  tourSeen: typeof window !== 'undefined' ? localStorage.getItem(TOUR_KEY) === '1' : true,
+  tourSeen: typeof window !== 'undefined' ? window.localStorage?.getItem(TOUR_KEY) === '1' : true,
   tourStep: 0,
   toasts: [],
   globalError: '',
@@ -97,14 +97,14 @@ export const useStore = create<State & Actions>((set, get) => ({
     const next: Theme = get().theme === 'dark' ? 'light' : 'dark';
     if (typeof document !== 'undefined') {
       document.documentElement.classList.toggle('dark', next === 'dark');
-      localStorage.setItem(THEME_KEY, next);
+      window.localStorage?.setItem(THEME_KEY, next);
     }
     set({ theme: next });
   },
 
   toggleLang() {
     const next: Lang = get().lang === 'ko' ? 'en' : 'ko';
-    if (typeof window !== 'undefined') localStorage.setItem(LANG_KEY, next);
+    if (typeof window !== 'undefined') window.localStorage?.setItem(LANG_KEY, next);
     set({ lang: next });
   },
 
@@ -133,7 +133,7 @@ export const useStore = create<State & Actions>((set, get) => ({
     set({ tourStep: 0, tourSeen: false });
   },
   endTour() {
-    if (typeof window !== 'undefined') localStorage.setItem(TOUR_KEY, '1');
+    if (typeof window !== 'undefined') window.localStorage?.setItem(TOUR_KEY, '1');
     set({ tourSeen: true, tourStep: -1 });
   },
   tourNext() {
