@@ -2,6 +2,28 @@
 
 날짜는 한국 시간(KST). 모든 커밋은 [GitHub history](https://github.com/blue45f/spa-seo-gateway/commits/main) 참고.
 
+## v1.15.0 — 2026-05-28
+
+🧪 **테스트 강화 + 커밋 품질 게이트 추가**.
+
+### 커버리지 개선 (PR #34)
+- `packages/core/src/runtime-config.ts` 라인 커버리지 **100%** 달성
+  - `persistRoutesToFile()` with `GATEWAY_CONFIG_FILE` 환경 변수 (line 46)
+  - `persistRoutesToFile()` write error → `{ ok: false }` 반환 (line 67)
+- 전체 gateway 테스트: 552 → **554** (lines 98.79%, up from 98.67%)
+
+### Commitlint 추가 (PR #34)
+- `@commitlint/cli` + `@commitlint/config-conventional` devDep 추가
+- `.husky/commit-msg`: 모든 커밋에 Conventional Commits 형식 강제
+- `commitlint.config.cjs`: `.js` 대신 `.cjs` 사용 (`"type": "module"` 패키지와 호환)
+- `.husky/pre-push`: 3줄 inline → `pnpm run verify:push` 으로 단순화
+- `apps/admin-frontend`: `typecheck` script 추가 (`tsc -b --noEmit`)
+
+### Verified
+- 703 total tests pass (554 gateway + 149 admin-frontend)
+- Coverage: lines 98.79%, branches 89.45%
+- biome 0 warnings / pnpm audit 0 vulnerabilities
+
 ## v1.14.2 — 2026-05-28
 
 🔧 **Node 26 전반 일관성 + localStorage 호환성 픽스**.
