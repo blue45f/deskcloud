@@ -17,6 +17,7 @@ import {
 import { FileTenantStore, registerMultiTenant } from '@heejun/spa-seo-gateway-multi-tenant';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { registerRoutes } from './routes.js';
+import { registerSecurityHeaders } from './security-headers.js';
 
 /**
  * Build the Fastify app with all middleware and routes wired up — but do NOT
@@ -48,6 +49,11 @@ export async function buildApp(
     origin: true,
     credentials: false,
   });
+
+  // Baseline security response headers (nosniff, referrer-policy, frame guard
+  // for /admin). Registered before routes so it covers every reply. Cast mirrors
+  // the other register* calls (Pino logger generic vs plain FastifyInstance).
+  registerSecurityHeaders(app as unknown as Parameters<typeof registerSecurityHeaders>[0]);
 
   if (config.rateLimit.enabled) {
     await app.register(rateLimit, {

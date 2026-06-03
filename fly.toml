@@ -1,0 +1,54 @@
+# fly.toml — declarative config for the spa-seo-gateway BACKEND (the render server).
+#
+# This deploys the long-running container defined by the repo's root `Dockerfile`
+# (Fastify + Puppeteer/Chromium, listening on PORT=3000). The frontend tiers
+# (admin-frontend + demo) deploy separately to Netlify/Vercel — see
+# docs/DEPLOYMENT.md.
+#
+# First-time setup (manual, maintainer dashboard/CLI steps):
+#   fly launch --no-deploy --copy-config --name spa-seo-gateway   # creates the app
+#   fly secrets set ADMIN_TOKEN=<strong-secret>                   # admin API auth
+#   fly secrets set REDIS_URL=redis://...  REDIS_CACHE_ENABLED=true   # optional
+#   fly deploy                                                    # or via CI (see deploy-fly.yml)
+#
+# CI deploy is wired in .github/workflows/deploy-fly.yml and SKIPS automatically
+# when the FLY_API_TOKEN GitHub secret is not set (mirrors deploy-netlify.yml).
+
+app = "spa-seo-gateway"
+primary_region = "nrt"           # Tokyo — change to your closest region
+kill_signal = "SIGTERM"          # main.ts does a 30s graceful drain on SIGTERM
+kill_timeout = 60                # match terminationGracePeriodSeconds guidance in docs
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  HOST = "0.0.0.0"
+  PORT = "3000"
+  NODE_ENV = "production"
+  GATEWAY_MODE = "render-only"
+  LOG_PRETTY = "false"           # JSON logs for shipping (pino → stdout)
+  # PUPPETEER_EXECUTABLE_PATH is baked into the Dockerfile runtime stage.
+  # Secrets (ADMIN_TOKEN, REDIS_URL, ...) are injected via `fly secrets set`,
+  # NOT here — never commit secrets to fly.toml.
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "suspend" # suspend instead of stop to keep warm-ish; set to "off" for always-on
+  auto_start_machines = true
+  min_machines_running = 1       # avoid cold starts re-launching Chromium (see DEPLOYMENT.md)
+  processes = ["app"]
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "20s"         # Chromium pool warmup headroom
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  # Chromium needs RAM + shared memory headroom. 1 shared CPU / 2GB is the
+  # documented starting point; bump for higher pool sizes (POOL_MAX).
+  size = "shared-cpu-1x"
+  memory = "2gb"
