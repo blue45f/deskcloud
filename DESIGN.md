@@ -100,6 +100,9 @@ Storybook via `@storybook/addon-themes`). CSS variables swap; component code rar
   inputs, nav, rail controls).
 - **Bypass blocks**: a skip-to-content link (visible on focus) jumps past the nav to `<main>`
   (`id="main-content"`).
+- **SPA route changes**: client navigation isn't a page load, so `RouteAnnouncer` (a hidden
+  `role="status"` `aria-live` region) speaks the new page, focus moves to `<main>`, and
+  `document.title` updates per route — initial mount never steals focus. (WCAG 2.4.3 / 4.1.3.)
 - **Motion**: all animation/transition is disabled under `prefers-reduced-motion: reduce`.
 - **Semantics**: roles, `aria-*`, and `aria-current` are preserved; decorative icons are
   `aria-hidden`; status is never conveyed by color alone (text label + icon accompany it).
