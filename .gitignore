@@ -25,3 +25,9 @@ storybook-static/
 
 # Playwright MCP scratch artifacts
 .playwright-mcp/
+
+# Playwright (a11y) run artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

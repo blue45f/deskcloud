@@ -286,13 +286,15 @@
     accent-color: var(--color-accent);
   }
 
-  /* accent text link */
+  /* accent text link — underlined by default so inline links stay distinguishable
+     without relying on color (WCAG 1.4.1 / link-in-text-block). */
   .link {
     color: var(--color-accent);
+    text-decoration: underline;
     text-underline-offset: 2px;
   }
   .link:hover {
-    text-decoration: underline;
+    text-decoration-thickness: 2px;
   }
   /* keyboard focus — outline handles inline/wrapped links better than a box ring */
   .link:focus-visible {
@@ -360,6 +362,12 @@
 }
 .nav-item.active {
   background: var(--color-accent);
+  color: var(--color-accent-fg);
+}
+/* "public" badge is green (AA on the dark rail), but the active item paints an
+   accent background where green drops to ~3:1. In the active state, inherit the
+   accent foreground so the badge keeps WCAG AA contrast. */
+.nav-item.active .text-ok-rail {
   color: var(--color-accent-fg);
 }
 
