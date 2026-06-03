@@ -7,6 +7,7 @@ import type { PublicInfo } from '../lib/types';
 import { ErrorBoundary } from './ErrorBoundary';
 import { Header } from './Header';
 import { MobileMenu } from './MobileMenu';
+import { RouteAnnouncer } from './RouteAnnouncer';
 import { Sidebar } from './Sidebar';
 
 export function Layout() {
@@ -41,6 +42,8 @@ export function Layout() {
   // ⌘S 와 Escape 는 페이지 별 / App 레벨에서 자체 처리하므로 root div 에 핸들러 불필요.
   return (
     <div className="flex min-h-screen">
+      {/* SPA 라우트 전환 시 포커스 이동 + SR 안내 + document.title 갱신 (A11y) */}
+      <RouteAnnouncer />
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-[200] focus:rounded-md focus:bg-accent focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-accent-fg"

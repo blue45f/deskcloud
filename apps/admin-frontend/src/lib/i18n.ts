@@ -404,6 +404,9 @@ const ko: Strings = {
   'test.responseHeaders': '응답 헤더',
   'shortcuts.title': '키보드 단축키',
   'a11y.skipToContent': '메인 콘텐츠로 건너뛰기',
+  'a11y.routeChanged': '{page} 페이지로 이동했습니다',
+  'a11y.routeUnknown': '페이지',
+  'app.title': 'spa-seo-gateway 관리자',
 
   // Tour
   'tour.skip': '건너뛰기',
@@ -827,6 +830,9 @@ const en: Strings = {
   'test.responseHeaders': 'Response headers',
   'shortcuts.title': 'Keyboard shortcuts',
   'a11y.skipToContent': 'Skip to main content',
+  'a11y.routeChanged': 'Navigated to {page}',
+  'a11y.routeUnknown': 'Page',
+  'app.title': 'spa-seo-gateway admin',
 
   // Tour
   'tour.skip': 'Skip',
