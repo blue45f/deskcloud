@@ -30,6 +30,17 @@ jobs:
         run: PUPPETEER_SKIP_DOWNLOAD=true pnpm install --frozen-lockfile
       - name: Verify
         run: pnpm run verify
+      - name: Install Playwright browser (chromium)
+        run: pnpm --filter @spa-seo-gateway/admin-frontend exec playwright install --with-deps chromium
+      - name: Accessibility (axe) gate
+        run: pnpm --filter @spa-seo-gateway/admin-frontend run test:a11y
+      - name: Upload a11y report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: a11y-report
+          path: apps/admin-frontend/playwright-report/
+          retention-days: 7
 
   docker:
     name: Build and publish image
