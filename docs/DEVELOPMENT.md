@@ -22,6 +22,14 @@
 2. 계약 변경이 API/스키마에 영향을 주면 문서와 테스트 계획을 함께 갱신합니다.
 3. `pnpm run verify`는 `validate:architecture`가 선행된 상태여야 합니다.
 
+## 보안 응답 헤더 (게이트웨이)
+게이트웨이는 모든 응답에 기본 보안 헤더를 부여합니다 (`apps/gateway/src/security-headers.ts`, `buildApp()` 의 `onSend` 훅).
+- 전역: `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-DNS-Prefetch-Control: off`
+- `/admin/*` 추가: `X-Frame-Options: SAMEORIGIN`, `Cross-Origin-Resource-Policy: same-origin`
+- CSP 는 의도적으로 미설정(렌더 출력이 임의 origin SPA 를 미러링하므로). HSTS 는 CDN/프록시에서 종단.
+- 회귀 테스트: `tests/gateway-security-headers.test.ts`. 헤더 추가/변경 시 함께 갱신.
+- 배포 시크릿/티어 정본은 `docs/DEPLOYMENT.md` §0 참고.
+
 ## PR 체크리스트
 - 변경 범위 요약
 - 영향 받는 도메인

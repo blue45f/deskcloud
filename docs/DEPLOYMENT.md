@@ -1,6 +1,67 @@
 # Deployment
 
-게이트웨이를 운영 환경에 배포하는 패턴 모음.
+이 저장소는 **3개 티어**로 배포됩니다. 각 티어가 어디로 가는지부터 정리합니다.
+
+## 0. 배포 아키텍처 (티어별 위치)
+
+```
+┌─────────────────────────────┐   ┌────────────────────────────────┐
+│ FRONTEND (정적)               │   │ BACKEND (장기 실행 컨테이너)       │
+│ apps/admin-frontend (Vite)   │   │ apps/gateway (Fastify+Puppeteer)│
+│ apps/demo (정적 번들)          │   │ → Docker → GHCR → Fly/CloudRun  │
+│ → Netlify / Vercel           │   │   /ECS/K8s, PORT=3000           │
+└─────────────────────────────┘   └────────────────────────────────┘
+            ▲                                   ▲
+            │ deploy-netlify.yml                │ ci.yml(docker) + deploy-fly.yml
+            │ (NETLIFY_* 시크릿 게이트)            │ (FLY_API_TOKEN 게이트)
+
+┌──────────────────────────────────────────────────────────────────┐
+│ LIBRARIES  packages/* (@heejun/spa-seo-gateway-core 등)            │
+│ → npm 퍼블리시 (수동 / 릴리스 워크플로). 런타임 배포 아님.            │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+| 티어 | 산출물 | 빌드 커맨드 | 배포처 | CI 워크플로 |
+|------|--------|------------|--------|------------|
+| **Frontend** | `apps/demo/public` 정적 번들 | `pnpm --filter @spa-seo-gateway/admin-frontend run build && pnpm --filter @spa-seo-gateway/demo run build` | Netlify(주) / Vercel | `.github/workflows/deploy-netlify.yml`, `vercel.json` |
+| **Backend** | `Dockerfile` 컨테이너 이미지 (`apps/gateway/dist/main.js`, PORT 3000) | `docker build .` → `pnpm run build` (멀티스테이지) | GHCR + Fly.io(또는 Cloud Run/ECS/K8s) | `.github/workflows/ci.yml`(docker job → GHCR), `.github/workflows/deploy-fly.yml`(Fly), `fly.toml` |
+| **Libraries** | `packages/*/dist` | `pnpm run build` | npm (수동) | — |
+
+### 필수 환경변수 / 시크릿
+
+**Backend (게이트웨이 런타임)** — 전체 목록은 `.env.example` 참고. 운영 핵심:
+
+| 변수 | 용도 | 비고 |
+|------|------|------|
+| `HOST` / `PORT` | 리슨 주소 | 기본 `0.0.0.0:3000` (컨테이너 호스트가 PORT 주입 가능) |
+| `GATEWAY_MODE` | `render-only` / `proxy` / `cms` / `saas` | |
+| `ORIGIN_URL` | SPA origin | proxy 모드 필수 |
+| `ADMIN_TOKEN` | 관리자 API(`x-admin-token`) | **강한 시크릿. fly secrets / K8s Secret 로 주입** |
+| `REDIS_URL` / `REDIS_CACHE_ENABLED` | 분산 캐시 | 멀티 노드 시 필수 |
+| `PUPPETEER_EXECUTABLE_PATH` | 시스템 chromium | Dockerfile runtime 단계에 이미 설정됨 |
+
+**GitHub Actions 시크릿** (없으면 해당 deploy job 이 **자동 skip** — 빨간 X 안 뜸):
+
+| 시크릿 | 사용 워크플로 | 없을 때 동작 |
+|--------|--------------|-------------|
+| `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID` | `deploy-netlify.yml` | 프론트 배포 skip |
+| `FLY_API_TOKEN` | `deploy-fly.yml` | 백엔드 배포 skip |
+| `GITHUB_TOKEN` (자동) | `ci.yml` docker job | GHCR push (시크릿 불필요) |
+
+### Preview vs Production
+
+- **Frontend**: `deploy-netlify.yml` 은 `main` 푸시 시 `--prod` 로 프로덕션만 배포. PR 프리뷰가 필요하면 Netlify 의 Git 연동(또는 `vercel.json`+Vercel Git 연동)을 사용하면 PR 마다 자동 프리뷰 URL 이 생성됨 (별도 워크플로 불필요).
+- **Backend**: `ci.yml` 의 docker job 이 `main` 푸시마다 `ghcr.io/<repo>:latest` + `:<short-sha>` 를 발행. `deploy-fly.yml` 은 게이트웨이 관련 경로 변경 시 Fly 로 배포. 스테이징은 Fly 의 별도 app(예: `spa-seo-gateway-staging`) 으로 `fly.toml` 을 복제하거나 `--app` 플래그로 분리 권장.
+
+### 메인테이너가 대시보드에서 직접 해야 하는 수동 단계
+
+CI deploy 스텝은 시크릿이 없으면 skip 되므로, 최초 1회는 수동 설정이 필요합니다.
+
+1. **Netlify**: 사이트 생성 → Site ID 확보 → GitHub repo 시크릿에 `NETLIFY_AUTH_TOKEN`, `NETLIFY_SITE_ID` 등록. (또는 Vercel 프로젝트를 import 하고 `vercel.json` 의 buildCommand/outputDirectory 를 그대로 사용.)
+2. **Fly.io**: `fly launch --no-deploy --copy-config --name spa-seo-gateway` → `fly secrets set ADMIN_TOKEN=... REDIS_URL=...` → `fly tokens create deploy` 로 토큰 발급 후 GitHub repo 시크릿 `FLY_API_TOKEN` 등록. 이후 `deploy-fly.yml` 이 자동 동작.
+3. **GHCR**: 추가 설정 불필요(`GITHUB_TOKEN` 자동). 외부 클러스터에서 pull 하려면 패키지를 public 으로 전환하거나 imagePullSecret 설정.
+
+> 아래 섹션들은 **호스트별 상세 패턴**입니다. 위 표가 "어디에 무엇이 가는가"의 정본이고, 아래는 그 구현 디테일입니다.
 
 ## 1. Docker Compose (권장 시작점)
 
@@ -265,15 +326,31 @@ import chromium from '@sparticuz/chromium-min';
 
 ## 6. CI/CD
 
-`.github/workflows/ci.yml` 이 미리 셋업되어 있음:
-- PR/push 마다: lint + typecheck + build + test + 스키마 생성
-- main 푸시 시: multi-arch (amd64+arm64) Docker 빌드 + GHCR push
+세 워크플로가 티어별 배포를 담당하며, **deploy 워크플로는 시크릿이 없으면 모든 스텝을 skip** 합니다 (포크/외부 기여자 보호).
 
-`ghcr.io/<org>/spa-seo-gateway:latest` 또는 `:short-sha` 로 이미지 pull.
+### `.github/workflows/ci.yml` — 품질 게이트 + 백엔드 이미지
+
+- `quality` job: 모든 PR/push 에서 `pnpm run verify` (= `validate:architecture` + `format:check` + lint + typecheck + build + test + schema:gen).
+- `docker` job: `main` 푸시 시에만, multi-arch (amd64+arm64) Docker 빌드 + GHCR push → `ghcr.io/<repo>:latest`, `:<short-sha>`. `GITHUB_TOKEN` 자동 사용(별도 시크릿 불필요).
+
+### `.github/workflows/deploy-netlify.yml` — 프론트엔드 (정적)
+
+- `apps/admin-frontend` / `apps/demo` / `packages/{core,admin-ui}` 변경 시 `main` 에서 트리거.
+- admin-frontend + demo 빌드 → `netlify deploy --prod --dir apps/demo/public`.
+- `NETLIFY_AUTH_TOKEN` 또는 `NETLIFY_SITE_ID` 미설정 시 전 스텝 skip.
+
+### `.github/workflows/deploy-fly.yml` — 백엔드 (게이트웨이 컨테이너)
+
+- 게이트웨이/코어/Dockerfile/`fly.toml` 변경 시 `main` 에서 트리거.
+- `flyctl deploy --remote-only --config fly.toml` (원격 빌드, 위 Dockerfile 사용).
+- `FLY_API_TOKEN` 미설정 시 전 스텝 skip — Netlify 워크플로와 동일한 게이트 패턴.
+
+> GHCR 이미지를 직접 끌어 쓰는 호스트(Cloud Run/ECS/K8s)는 `deploy-fly.yml` 없이 `ghcr.io/<repo>:latest` 만 pull 하면 됩니다. Fly 는 declarative IaC(`fly.toml`) 경로의 예시입니다.
 
 ## 7. 운영 체크리스트
 
-- [ ] `ADMIN_TOKEN` 강한 시크릿. K8s Secret / AWS SSM / Vault 사용
+- [ ] `ADMIN_TOKEN` 강한 시크릿. K8s Secret / AWS SSM / Vault / `fly secrets` 사용
+- [ ] 보안 응답 헤더는 게이트웨이가 자동 부여 (nosniff/referrer-policy/admin frame guard, `apps/gateway/src/security-headers.ts`). TLS 종단(CDN/프록시)에서 HSTS 추가 권장
 - [ ] Redis 활성. 멀티 노드 시 필수
 - [ ] CDN 에서 봇 분기 (게이트웨이가 사람 트래픽 받지 않도록)
 - [ ] Liveness probe = `/health`, Readiness probe = `/health/deep` (실 렌더 확인)
