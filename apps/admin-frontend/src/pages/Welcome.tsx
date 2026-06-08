@@ -62,7 +62,12 @@ Human ──→ Edge/CDN ──→ origin (gateway: 204 or proxy)`;
 export function Welcome() {
   const { publicInfo } = useOutletContext<Ctx>();
   const t = useStore((s) => s.t);
-  const [demoChecks, setDemoChecks] = useState({ test: false, routes: false, warm: false, metrics: false });
+  const [demoChecks, setDemoChecks] = useState({
+    test: false,
+    routes: false,
+    warm: false,
+    metrics: false,
+  });
   const demoRate = Math.round((Object.values(demoChecks).filter(Boolean).length / 4) * 100);
 
   return (
@@ -116,9 +121,13 @@ export function Welcome() {
       <div className="panel p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">Demo readiness</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
+              Demo readiness
+            </p>
             <h3 className="mt-1 font-semibold text-ink">운영 데모 체크리스트</h3>
-            <p className="mt-1 text-sm text-ink-muted">테스트 렌더, 라우트 편집, 워밍, 메트릭 확인을 한 흐름으로 점검합니다.</p>
+            <p className="mt-1 text-sm text-ink-muted">
+              테스트 렌더, 라우트 편집, 워밍, 메트릭 확인을 한 흐름으로 점검합니다.
+            </p>
           </div>
           <span className="font-mono text-sm text-ink">{demoRate}%</span>
         </div>
@@ -133,7 +142,9 @@ export function Welcome() {
               <input
                 type="checkbox"
                 checked={demoChecks[key as keyof typeof demoChecks]}
-                onChange={(event) => setDemoChecks((current) => ({ ...current, [key]: event.target.checked }))}
+                onChange={(event) =>
+                  setDemoChecks((current) => ({ ...current, [key]: event.target.checked }))
+                }
               />
               <span>{label}</span>
             </label>
