@@ -133,7 +133,7 @@ export function Welcome() {
         </div>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-4 gap-2 text-sm">
           {[
-            ['test', '렌더 테스트'],
+            ['test', '테스트 렌더 완료'],
             ['routes', '라우트 규칙'],
             ['warm', '캐시 워밍'],
             ['metrics', '메트릭 확인'],
