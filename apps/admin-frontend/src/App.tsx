@@ -21,23 +21,50 @@ const CHUNK_RETRY_KEY = 'seo-admin-chunk-retry';
  * 동적 import 실패 시 1회 전체 새로고침 후 재시도 — 배포로 청크 해시가 바뀐 stale 탭 복구.
  * sessionStorage 가드가 새로고침 루프를 막고, 성공 로드 시 가드를 풀어 다음 배포에 대비한다.
  */
+// sessionStorage 는 샌드박스 iframe / 엄격 프라이버시 모드에서 '접근 자체'가 SecurityError 를
+// 던질 수 있다 — 가드를 못 읽으면 '이미 재시도함'으로 취급해 새로고침 루프를 원천 차단한다.
+function hasRetryGuard(): boolean {
+  try {
+    return window.sessionStorage.getItem(CHUNK_RETRY_KEY) !== null;
+  } catch {
+    return true;
+  }
+}
+
+function armRetryGuard(): boolean {
+  try {
+    window.sessionStorage.setItem(CHUNK_RETRY_KEY, '1');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function clearRetryGuard(): void {
+  try {
+    window.sessionStorage.removeItem(CHUNK_RETRY_KEY);
+  } catch {
+    // 스토리지 접근 불가 환경 — 가드 자체가 없으니 지울 것도 없다
+  }
+}
+
 // biome-ignore lint/suspicious/noExplicitAny: mirrors React.lazy's own ComponentType<any> bound
 function lazyRetry<T extends ComponentType<any>>(load: () => Promise<{ default: T }>) {
   return lazy(() =>
     load()
       .then((module) => {
-        window.sessionStorage?.removeItem(CHUNK_RETRY_KEY);
+        clearRetryGuard();
         return module;
       })
       .catch((error: unknown) => {
-        if (!window.sessionStorage?.getItem(CHUNK_RETRY_KEY)) {
-          window.sessionStorage?.setItem(CHUNK_RETRY_KEY, '1');
+        // 가드를 기록할 수 있을 때만 새로고침 — 기록 실패 시 reload 하면 무한 루프가 된다
+        if (!hasRetryGuard() && armRetryGuard()) {
           window.location.reload();
           // 새로고침이 끼어들 때까지 Suspense fallback 유지
           return new Promise<{ default: T }>(() => {});
         }
         // 이미 한 번 새로고침한 세션 — 가드를 풀고 ErrorBoundary 로 전달
-        window.sessionStorage.removeItem(CHUNK_RETRY_KEY);
+        clearRetryGuard();
         throw error;
       }),
   );

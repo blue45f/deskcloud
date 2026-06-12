@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
+import { MemoryRouter, useNavigate } from 'react-router-dom';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { DialogHost } from '../../components/DialogHost';
 import { confirmDialog, promptDialog, useDialogStore } from '../../lib/dialog';
@@ -102,6 +103,8 @@ describe('DialogHost', () => {
     const input = screen.getByTestId('dialog-prompt-input') as HTMLInputElement;
     expect(input.value).toBe('https://old.example.com');
     expect(input.placeholder).toBe('https://...');
+    // 입력 필드의 접근 가능한 이름 = 다이얼로그 제목 (aria-labelledby)
+    expect(screen.getByRole('textbox', { name: 'URL 무효화' })).toBe(input);
     fireEvent.change(input, { target: { value: 'https://www.example.com/posts/1' } });
     fireEvent.click(screen.getByTestId('dialog-confirm'));
     await expect(result).resolves.toBe('https://www.example.com/posts/1');
@@ -139,6 +142,43 @@ describe('DialogHost', () => {
     expect(screen.queryByRole('alert')).not.toBeInTheDocument(); // 입력 시 에러 해제
     fireEvent.click(screen.getByTestId('dialog-confirm'));
     await expect(result).resolves.toBe('https://ok.example.com');
+  });
+
+  it('prompt: an empty-string validate message still blocks, with the default required text', () => {
+    render(<DialogHost />);
+    act(() => {
+      void promptDialog({ title: 'URL 무효화', validate: () => '' });
+    });
+    fireEvent.click(screen.getByTestId('dialog-confirm'));
+    // 계약: 문자열 반환 = 실패. '' 는 기본 안내 문구로 보완된다.
+    expect(screen.getByRole('alert')).toHaveTextContent('값을 입력해 주세요.');
+    expect(screen.getByTestId('app-dialog')).toBeInTheDocument();
+  });
+
+  it('cancels the pending dialog when the route changes', async () => {
+    function NavigateAway() {
+      const navigate = useNavigate();
+      return (
+        <button type="button" data-testid="go-elsewhere" onClick={() => navigate('/elsewhere')}>
+          이동
+        </button>
+      );
+    }
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <DialogHost />
+        <NavigateAway />
+      </MemoryRouter>,
+    );
+    let result: Promise<boolean> = Promise.resolve(true);
+    act(() => {
+      result = confirmDialog({ title: '사이트를 삭제할까요?', danger: true });
+    });
+    expect(screen.getByTestId('app-dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('go-elsewhere'));
+    // 페이지를 떠나면 떠 있던 파괴적 확인은 취소로 정리된다
+    await expect(result).resolves.toBe(false);
+    expect(screen.queryByTestId('app-dialog')).not.toBeInTheDocument();
   });
 
   it('replaces a pending request: the previous promise settles as cancelled', async () => {

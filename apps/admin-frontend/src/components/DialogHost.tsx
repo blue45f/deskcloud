@@ -1,4 +1,5 @@
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
+import { useInRouterContext, useLocation } from 'react-router-dom';
 import { type DialogRequest, settleDialog, useDialogStore } from '../lib/dialog';
 import { useStore } from '../lib/store';
 
@@ -45,8 +46,9 @@ function DialogModal({ request }: { request: DialogRequest }) {
     e.preventDefault();
     if (request.kind === 'prompt') {
       const message = request.options.validate?.(value);
-      if (message) {
-        setError(message);
+      // 계약: 문자열 반환 = 실패. 빈 문자열도 실패로 보고 기본 안내 문구로 보완한다.
+      if (typeof message === 'string') {
+        setError(message || t('dialog.input.required'));
         return;
       }
     }
@@ -55,6 +57,8 @@ function DialogModal({ request }: { request: DialogRequest }) {
 
   const danger = request.kind === 'confirm' && request.options.danger;
   const { title, description, confirmLabel, cancelLabel } = request.options;
+  // 라우트가 바뀌면 떠 있는 다이얼로그를 취소 — 떠난 페이지의 파괴적 액션이 이어지는 것을 막는다.
+  const inRouter = useInRouterContext();
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: Escape is handled natively by <dialog> (cancel → close); the click handler only adds mouse-only backdrop dismiss
@@ -70,6 +74,7 @@ function DialogModal({ request }: { request: DialogRequest }) {
         if (e.target === e.currentTarget) requestClose('cancel');
       }}
     >
+      {inRouter ? <RouteChangeCanceller onRouteChange={() => requestClose('cancel')} /> : null}
       <form onSubmit={handleSubmit}>
         <div className="px-5 py-4 space-y-2">
           <h2 id={titleId} className="font-semibold text-ink">
@@ -87,6 +92,7 @@ function DialogModal({ request }: { request: DialogRequest }) {
                 className="input w-full px-3 py-2 text-sm"
                 value={value}
                 placeholder={request.options.placeholder}
+                aria-labelledby={titleId}
                 aria-invalid={error ? true : undefined}
                 aria-describedby={error ? errorId : undefined}
                 data-testid="dialog-prompt-input"
@@ -123,4 +129,18 @@ function DialogModal({ request }: { request: DialogRequest }) {
       </form>
     </dialog>
   );
+}
+
+/** 라우터 컨텍스트 안에서만 렌더 — location 이 처음 값에서 바뀌는 순간 한 번 알린다. */
+function RouteChangeCanceller({ onRouteChange }: { onRouteChange: () => void }) {
+  const location = useLocation();
+  const initialKeyRef = useRef(location.key);
+  const notifiedRef = useRef(false);
+  useEffect(() => {
+    if (location.key !== initialKeyRef.current && !notifiedRef.current) {
+      notifiedRef.current = true;
+      onRouteChange();
+    }
+  });
+  return null;
 }
