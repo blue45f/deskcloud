@@ -7,14 +7,17 @@ type EmptyStateProps = {
   hint?: ReactNode
   /** Override the default mark. */
   icon?: ReactNode
+  /** Optional next-step affordance (e.g. a "create the first one" button). */
+  action?: ReactNode
   'data-testid'?: string
 }
 
 /**
  * Centered empty state. Teaches the interface instead of stating "nothing here":
- * a quiet mark, the condition, and an optional next-step hint. Tokens only.
+ * a quiet mark, the condition, an optional next-step hint, and an optional
+ * action that lets the user act on that next step in place. Tokens only.
  */
-export function EmptyState({ title, hint, icon, ...rest }: EmptyStateProps) {
+export function EmptyState({ title, hint, icon, action, ...rest }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-10 text-center" {...rest}>
       <span className="mb-3 text-ink-subtle" aria-hidden="true">
@@ -22,6 +25,7 @@ export function EmptyState({ title, hint, icon, ...rest }: EmptyStateProps) {
       </span>
       <p className="text-sm font-medium text-ink-muted">{title}</p>
       {hint ? <p className="mt-1 max-w-sm text-xs text-ink-subtle">{hint}</p> : null}
+      {action ? <div className="mt-4">{action}</div> : null}
     </div>
   )
 }

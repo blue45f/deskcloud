@@ -339,6 +339,20 @@ const ko: Strings = {
   'tenants.detail.rotate': 'API key 회전',
   'tenants.detail.rotate.confirm.title': 'API key 를 새로 발급할까요?',
   'tenants.detail.rotate.confirm.desc': '이전 키는 즉시 무효화됩니다.',
+  'tenants.filter.placeholder': 'ID / 이름 / origin 필터...',
+  'tenants.filter.none': '필터와 일치하는 테넌트가 없습니다.',
+  'tenants.empty.cta': '첫 테넌트 추가',
+  'tenants.summary.total': '총',
+  'tenants.summary.enabled': '활성',
+  'list.summary.shown': '표시 중',
+
+  // Sites/Tenants shared list affordances
+  'sites.filter.placeholder': 'ID / 이름 / origin 필터...',
+  'sites.filter.none': '필터와 일치하는 사이트가 없습니다.',
+  'sites.empty.cta': '첫 사이트 추가',
+  'sites.summary.total': '총',
+  'sites.summary.enabled': '활성',
+  'sites.summary.routes': '라우트',
 
   // Help
   'help.title': '도움말: 자주 묻는 질문',
@@ -792,6 +806,20 @@ const en: Strings = {
   'tenants.detail.rotate': 'Rotate API key',
   'tenants.detail.rotate.confirm.title': 'Issue a new API key?',
   'tenants.detail.rotate.confirm.desc': 'The previous key is invalidated immediately.',
+  'tenants.filter.placeholder': 'Filter by id / name / origin...',
+  'tenants.filter.none': 'No tenants match the filter.',
+  'tenants.empty.cta': 'Add the first tenant',
+  'tenants.summary.total': 'Total',
+  'tenants.summary.enabled': 'Enabled',
+  'list.summary.shown': 'Shown',
+
+  // Sites/Tenants shared list affordances
+  'sites.filter.placeholder': 'Filter by id / name / origin...',
+  'sites.filter.none': 'No sites match the filter.',
+  'sites.empty.cta': 'Add the first site',
+  'sites.summary.total': 'Total',
+  'sites.summary.enabled': 'Enabled',
+  'sites.summary.routes': 'Routes',
 
   // Help
   'help.title': 'Help: frequently asked questions',

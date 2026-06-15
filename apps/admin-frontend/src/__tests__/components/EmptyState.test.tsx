@@ -26,4 +26,14 @@ describe('EmptyState', () => {
     render(<EmptyState title="x" data-testid="empty-foo" />)
     expect(screen.getByTestId('empty-foo')).toBeInTheDocument()
   })
+
+  it('renders an optional action affordance', () => {
+    render(<EmptyState title="x" action={<button type="button">첫 항목 추가</button>} />)
+    expect(screen.getByRole('button', { name: '첫 항목 추가' })).toBeInTheDocument()
+  })
+
+  it('omits the action wrapper when no action is given', () => {
+    const { container } = render(<EmptyState title="x" />)
+    expect(container.querySelector('button')).toBeNull()
+  })
 })

@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -67,10 +67,72 @@ describe('Tenants page (SaaS)', () => {
     renderWithRouter(<Tenants />)
     await waitFor(() => expect(screen.getByText('ACME Corp')).toBeInTheDocument())
     expect(screen.getByText('Startup Inc')).toBeInTheDocument()
-    expect(screen.getByText('pro')).toBeInTheDocument()
-    expect(screen.getByText('free')).toBeInTheDocument()
+    // plan pills live in the table; the summary bar also lists plan labels, so
+    // scope the assertion to the row cell to keep it about the pill.
+    const table = screen.getByRole('table')
+    expect(within(table).getByText('pro')).toBeInTheDocument()
+    expect(within(table).getByText('free')).toBeInTheDocument()
     // 마스킹 처리 — 전체 키가 노출되지 않아야 함.
     expect(screen.queryByText(TENANTS[0]!.apiKey)).not.toBeInTheDocument()
+  })
+
+  it('shows an at-a-glance summary with plan breakdown', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, tenants: TENANTS }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    renderWithRouter(<Tenants />)
+    const summary = await screen.findByTestId('list-summary')
+    // total 2, enabled 1 (startup disabled), pro 1, free 1
+    expect(within(summary).getByText('2')).toBeInTheDocument()
+    expect(within(summary).getAllByText('1').length).toBeGreaterThanOrEqual(1)
+    expect(within(summary).getByText('enterprise')).toBeInTheDocument()
+  })
+
+  it('filters the list by id / name / origin', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, tenants: TENANTS }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    const user = userEvent.setup()
+    renderWithRouter(<Tenants />)
+    await waitFor(() => expect(screen.getByText('ACME Corp')).toBeInTheDocument())
+    const search = screen.getByPlaceholderText('ID / 이름 / origin 필터...')
+    await user.type(search, 'startup')
+    expect(screen.getByText('Startup Inc')).toBeInTheDocument()
+    expect(screen.queryByText('ACME Corp')).not.toBeInTheDocument()
+  })
+
+  it('shows a filter-empty message when nothing matches', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, tenants: TENANTS }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    const user = userEvent.setup()
+    renderWithRouter(<Tenants />)
+    await waitFor(() => expect(screen.getByText('ACME Corp')).toBeInTheDocument())
+    await user.type(screen.getByPlaceholderText('ID / 이름 / origin 필터...'), 'zzz-no-match')
+    expect(screen.getByText('필터와 일치하는 테넌트가 없습니다.')).toBeInTheDocument()
+  })
+
+  it('empty state offers a create-first CTA that opens the form', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, tenants: [] }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    const user = userEvent.setup()
+    renderWithRouter(<Tenants />)
+    const cta = await screen.findByRole('button', { name: '첫 테넌트 추가' })
+    await user.click(cta)
+    expect(await screen.findByTestId('tenant-form')).toBeInTheDocument()
   })
 
   it('add modal generates an API key by default', async () => {
