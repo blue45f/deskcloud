@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { AuthGate } from '../components/AuthGate'
 import { EmptyState } from '../components/EmptyState'
 import { Field } from '../components/Field'
+import { ListSummary } from '../components/ListSummary'
 import { Modal } from '../components/Modal'
 import { api, errorMessage } from '../lib/api'
 import { useDialog } from '../lib/dialog'
@@ -41,6 +42,7 @@ function SitesBody() {
     id: string
     action: 'warm' | 'remove' | 'invalidate'
   } | null>(null)
+  const [filter, setFilter] = useState('')
 
   const [isMobile, setIsMobile] = useState(false)
 
@@ -75,6 +77,25 @@ function SitesBody() {
   useEffect(() => {
     setError(error ? errorMessage(error) : '')
   }, [error, setError])
+
+  // 클라이언트 측 필터(id/이름/origin) + at-a-glance 카운트. 원본 fetch 는 건드리지 않는다.
+  const q = filter.trim().toLowerCase()
+  const visible = useMemo(
+    () =>
+      q
+        ? sites.filter((s) => [s.id, s.name, s.origin].some((f) => f.toLowerCase().includes(q)))
+        : sites,
+    [sites, q]
+  )
+  const counts = useMemo(() => {
+    let enabled = 0
+    let routes = 0
+    for (const s of sites) {
+      if (s.enabled) enabled += 1
+      routes += s.routes.length
+    }
+    return { total: sites.length, enabled, routes }
+  }, [sites])
 
   async function save(site: Site) {
     try {
@@ -160,7 +181,17 @@ function SitesBody() {
         <p className="text-ink-muted">{t('sites.intro')}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {sites.length > 0 ? (
+        <ListSummary
+          stats={[
+            { label: t('sites.summary.total'), value: counts.total, tone: 'accent' },
+            { label: t('sites.summary.enabled'), value: counts.enabled, tone: 'ok' },
+            { label: t('sites.summary.routes'), value: counts.routes, tone: 'neutral' },
+          ]}
+        />
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           className="btn-ghost px-3 py-2 text-sm"
@@ -169,6 +200,16 @@ function SitesBody() {
         >
           {t('btn.refresh')}
         </button>
+        {sites.length > 0 ? (
+          <input
+            type="search"
+            className="input min-w-48 flex-1 px-3 py-2 text-sm sm:max-w-xs"
+            placeholder={t('sites.filter.placeholder')}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            aria-label={t('sites.filter.placeholder')}
+          />
+        ) : null}
         <button
           type="button"
           className="btn-primary ml-auto px-3 py-2 text-sm font-medium"
@@ -180,12 +221,28 @@ function SitesBody() {
 
       {sites.length === 0 ? (
         <div className="panel">
-          <EmptyState title={t('sites.empty')} hint={t('sites.empty.hint')} />
+          <EmptyState
+            title={t('sites.empty')}
+            hint={t('sites.empty.hint')}
+            action={
+              <button
+                type="button"
+                className="btn-primary px-3 py-2 text-sm font-medium"
+                onClick={() => setEditing({ ...EMPTY_SITE })}
+              >
+                {t('sites.empty.cta')}
+              </button>
+            }
+          />
+        </div>
+      ) : visible.length === 0 ? (
+        <div className="panel">
+          <EmptyState title={t('sites.filter.none')} />
         </div>
       ) : isMobile ? (
         /* Mobile Card View */
         <div className="space-y-4">
-          {sites.map((s) => (
+          {visible.map((s) => (
             <div key={s.id} className="panel p-4 space-y-3 bg-panel">
               <div className="flex items-center justify-between border-b border-line pb-2">
                 <span className="font-mono text-xs font-semibold">
@@ -271,7 +328,7 @@ function SitesBody() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {sites.map((s) => (
+              {visible.map((s) => (
                 <tr key={s.id} className="hover:bg-panel-2">
                   <td className="px-3 py-2 font-mono text-xs">
                     <Link to={`/sites/${encodeURIComponent(s.id)}`} className="link">

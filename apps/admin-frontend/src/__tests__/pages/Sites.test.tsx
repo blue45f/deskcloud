@@ -55,6 +55,64 @@ describe('Sites page (CMS)', () => {
     expect(screen.getAllByText('OFF').length).toBeGreaterThan(0)
   })
 
+  it('shows an at-a-glance summary with total / enabled / routes', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, sites: SITES }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    renderWithRouter(<Sites />)
+    const summary = await screen.findByTestId('list-summary')
+    // total 2, enabled 1, routes 1 (docs has 1, blog has 0)
+    expect(within(summary).getByText('총')).toBeInTheDocument()
+    expect(within(summary).getByText('라우트')).toBeInTheDocument()
+    expect(within(summary).getByText('2')).toBeInTheDocument()
+  })
+
+  it('filters the list by id / name / origin', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, sites: SITES }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    const user = userEvent.setup()
+    renderWithRouter(<Sites />)
+    await waitFor(() => expect(screen.getByText('docs')).toBeInTheDocument())
+    await user.type(screen.getByPlaceholderText('ID / 이름 / origin 필터...'), 'blog')
+    expect(screen.getByText('Blog')).toBeInTheDocument()
+    expect(screen.queryByText('Docs')).not.toBeInTheDocument()
+  })
+
+  it('shows a filter-empty message when nothing matches', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, sites: SITES }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    const user = userEvent.setup()
+    renderWithRouter(<Sites />)
+    await waitFor(() => expect(screen.getByText('docs')).toBeInTheDocument())
+    await user.type(screen.getByPlaceholderText('ID / 이름 / origin 필터...'), 'nope-zzz')
+    expect(screen.getByText('필터와 일치하는 사이트가 없습니다.')).toBeInTheDocument()
+  })
+
+  it('empty state offers a create-first CTA that opens the form', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true, sites: [] }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      })
+    )
+    const user = userEvent.setup()
+    renderWithRouter(<Sites />)
+    const cta = await screen.findByRole('button', { name: '첫 사이트 추가' })
+    await user.click(cta)
+    expect(await screen.findByTestId('site-form')).toBeInTheDocument()
+  })
+
   it('opens add modal with empty form', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(
       new Response(JSON.stringify({ ok: true, sites: [] }), {

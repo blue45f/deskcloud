@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { AuthGate } from '../components/AuthGate'
 import { EmptyState } from '../components/EmptyState'
 import { Field } from '../components/Field'
+import { ListSummary } from '../components/ListSummary'
 import { Modal } from '../components/Modal'
 import { api, errorMessage } from '../lib/api'
 import { generateApiKey } from '../lib/apikey'
@@ -48,6 +49,7 @@ function TenantsBody() {
   const [editing, setEditing] = useState<Tenant | null>(null)
   // 삭제 in-flight 인 행 id — 중복 클릭/동시 DELETE 차단 (전역 loading 재사용 금지)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [filter, setFilter] = useState('')
 
   const [isMobile, setIsMobile] = useState(false)
 
@@ -82,6 +84,28 @@ function TenantsBody() {
   useEffect(() => {
     setError(error ? errorMessage(error) : '')
   }, [error, setError])
+
+  // 클라이언트 측 필터(id/이름/origin) + at-a-glance 카운트. 목록이 채워진 데모에서
+  // 빠르게 좁히고 plan 분포를 한눈에 보여준다. 원본 fetch 는 건드리지 않는다.
+  const q = filter.trim().toLowerCase()
+  const visible = useMemo(
+    () =>
+      q
+        ? tenants.filter((tn) =>
+            [tn.id, tn.name, tn.origin].some((f) => f.toLowerCase().includes(q))
+          )
+        : tenants,
+    [tenants, q]
+  )
+  const counts = useMemo(() => {
+    const byPlan: Record<TenantPlan, number> = { free: 0, pro: 0, enterprise: 0 }
+    let enabled = 0
+    for (const tn of tenants) {
+      byPlan[tn.plan] += 1
+      if (tn.enabled) enabled += 1
+    }
+    return { total: tenants.length, enabled, byPlan }
+  }, [tenants])
 
   async function save(tenant: Tenant) {
     try {
@@ -133,7 +157,19 @@ function TenantsBody() {
         <p className="text-ink-muted">{t('tenants.intro')}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {tenants.length > 0 ? (
+        <ListSummary
+          stats={[
+            { label: t('tenants.summary.total'), value: counts.total, tone: 'accent' },
+            { label: t('tenants.summary.enabled'), value: counts.enabled, tone: 'ok' },
+            { label: 'free', value: counts.byPlan.free, tone: 'neutral' },
+            { label: 'pro', value: counts.byPlan.pro, tone: 'ok' },
+            { label: 'enterprise', value: counts.byPlan.enterprise, tone: 'warn' },
+          ]}
+        />
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           className="btn-ghost px-3 py-2 text-sm"
@@ -142,6 +178,16 @@ function TenantsBody() {
         >
           {t('btn.refresh')}
         </button>
+        {tenants.length > 0 ? (
+          <input
+            type="search"
+            className="input min-w-48 flex-1 px-3 py-2 text-sm sm:max-w-xs"
+            placeholder={t('tenants.filter.placeholder')}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            aria-label={t('tenants.filter.placeholder')}
+          />
+        ) : null}
         <button
           type="button"
           className="btn-primary ml-auto px-3 py-2 text-sm font-medium"
@@ -153,12 +199,28 @@ function TenantsBody() {
 
       {tenants.length === 0 ? (
         <div className="panel">
-          <EmptyState title={t('tenants.empty')} hint={t('tenants.empty.hint')} />
+          <EmptyState
+            title={t('tenants.empty')}
+            hint={t('tenants.empty.hint')}
+            action={
+              <button
+                type="button"
+                className="btn-primary px-3 py-2 text-sm font-medium"
+                onClick={() => setEditing({ ...EMPTY_TENANT, apiKey: generateApiKey() })}
+              >
+                {t('tenants.empty.cta')}
+              </button>
+            }
+          />
+        </div>
+      ) : visible.length === 0 ? (
+        <div className="panel">
+          <EmptyState title={t('tenants.filter.none')} />
         </div>
       ) : isMobile ? (
         /* Mobile Card View */
         <div className="space-y-4">
-          {tenants.map((tn) => (
+          {visible.map((tn) => (
             <div key={tn.id} className="panel p-4 space-y-3 bg-panel">
               <div className="flex items-center justify-between border-b border-line pb-2">
                 <span className="font-mono text-xs font-semibold">
@@ -241,7 +303,7 @@ function TenantsBody() {
               </tr>
             </thead>
             <tbody className="divide-y divide-line">
-              {tenants.map((tn) => (
+              {visible.map((tn) => (
                 <tr key={tn.id} className="hover:bg-panel-2">
                   <td className="px-3 py-2 font-mono text-xs">
                     <Link to={`/tenants/${encodeURIComponent(tn.id)}`} className="link">

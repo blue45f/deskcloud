@@ -30,3 +30,15 @@ export const WithHint: Story = {
 export const TitleOnly: Story = {
   args: { hint: undefined },
 }
+
+export const WithAction: Story = {
+  args: {
+    title: '아직 등록된 테넌트가 없습니다',
+    hint: '테넌트를 추가하면 apiKey · host 로 식별되는 고객별 설정을 관리할 수 있습니다.',
+    action: (
+      <button type="button" className="btn-primary px-3 py-2 text-sm font-medium">
+        첫 테넌트 추가
+      </button>
+    ),
+  },
+}
