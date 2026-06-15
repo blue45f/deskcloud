@@ -1,0 +1,13 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# pnpm 11: 빌드 스크립트가 있는 패키지는 명시적으로 승인해야 설치가 통과합니다.
+# (설치 시 ERR_PNPM_IGNORED_BUILDS가 나면 해당 패키지를 여기에 추가)
+allowBuilds:
+  esbuild: true
+  '@electric-sql/pglite': true
+  '@nestjs/core': true
+  '@swc/core': true
+  unrs-resolver: true
+  '@scarf/scarf': false

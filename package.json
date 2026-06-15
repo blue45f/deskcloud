@@ -1,0 +1,30 @@
+{
+  "name": "desk-platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "@desk/platform — DeskCloud 플랫폼 코어. 모든 Desk SaaS(TermsDesk/SurveyDesk/ChangelogDesk/…)가 공유하는 멀티테넌트 + 빌링/수익화 기반. packages/core(멀티테넌트 프리미티브·가드·사용량) + packages/billing(플랜·어댑터·집행) + apps/api(중앙 계정/빌링 서비스) + apps/web(가격·테넌트 빌링 대시보드).",
+  "type": "module",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.16.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build:libs": "pnpm --filter @desk/shared --filter @desk/core --filter @desk/billing run build",
+    "dev": "pnpm run build:libs && pnpm -r --parallel --stream run dev",
+    "build": "pnpm -r run build",
+    "lint": "eslint .",
+    "typecheck": "pnpm run build:libs && pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "pnpm run typecheck && pnpm run test && pnpm run build",
+    "ci": "pnpm run verify",
+    "db:seed": "pnpm --filter @desk/api run db:seed"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
+  }
+}
