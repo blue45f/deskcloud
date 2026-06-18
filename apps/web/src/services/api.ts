@@ -60,7 +60,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     })
   } catch (e) {
     throw new ApiError(
-      `API 서버에 연결하지 못했습니다 (${(e as Error).message}). API(:6090)가 떠 있는지 확인하세요.`,
+      `서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요. (${(e as Error).message})`,
       0
     )
   }
@@ -137,7 +137,11 @@ export function fetchSubscription(): Promise<SubscriptionDto> {
 
 /** 체크아웃 시작 — 스텁 checkoutUrl. 실제 청구 없음. */
 export function startCheckout(input: CheckoutInput): Promise<CheckoutResponseDto> {
-  return request<CheckoutResponseDto>('billing/checkout', { method: 'POST', body: input, auth: true })
+  return request<CheckoutResponseDto>('billing/checkout', {
+    method: 'POST',
+    body: input,
+    auth: true,
+  })
 }
 
 /** 구독 취소 → Free 복귀. */

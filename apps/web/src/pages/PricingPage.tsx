@@ -159,8 +159,8 @@ export default function PricingPage() {
 
       {isError ? (
         <Banner tone="info" className="mx-auto mt-6 max-w-2xl text-center">
-          API(:6090)에 연결하지 못해 정적 가격표를 표시합니다. <code>pnpm dev</code> 로 API 를
-          띄우면 단일 소스(@desk/billing)로 동기화됩니다.
+          실시간 요금을 불러오지 못해 표준 요금표를 표시합니다. 플랜·한도는 동일하며, 콘솔 연결 시
+          단일 소스(@desk/billing)로 동기화됩니다.
         </Banner>
       ) : null}
 
