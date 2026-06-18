@@ -13,10 +13,11 @@ import { cn } from '@/utils/cn'
 const controlBase =
   'w-full rounded-md border border-border bg-bg px-3 text-sm text-text shadow-xs outline-none transition-colors placeholder:text-text-subtle hover:border-border-strong focus-visible:border-accent-strong focus-visible:ring-2 focus-visible:ring-accent-strong/30 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-danger aria-[invalid=true]:focus-visible:ring-danger/30'
 
-export function Label({ className, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
-  // 라벨-컨트롤 연관(htmlFor↔id)은 호출부(Field)의 계약 — 프리미티브에서는 정적 검증 불가.
+export function Label({ className, htmlFor, ...props }: LabelHTMLAttributes<HTMLLabelElement>) {
+  // 라벨-컨트롤 연관은 htmlFor↔id 계약(호출부 Field 가 동일 id 를 컨트롤에 전달).
   return (
     <label
+      htmlFor={htmlFor}
       className={cn('mb-1.5 block text-[0.8125rem] font-medium text-text', className)}
       {...props}
     />
@@ -29,23 +30,28 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
   }
 )
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(
-  function Textarea({ className, ...props }, ref) {
-    return (
-      <textarea
-        ref={ref}
-        className={cn(controlBase, 'min-h-24 resize-y py-2 leading-relaxed', className)}
-        {...props}
-      />
-    )
-  }
-)
+export const Textarea = forwardRef<
+  HTMLTextAreaElement,
+  TextareaHTMLAttributes<HTMLTextAreaElement>
+>(function Textarea({ className, ...props }, ref) {
+  return (
+    <textarea
+      ref={ref}
+      className={cn(controlBase, 'min-h-24 resize-y py-2 leading-relaxed', className)}
+      {...props}
+    />
+  )
+})
 
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(
   function Select({ className, children, ...props }, ref) {
     return (
       <div className="relative">
-        <select ref={ref} className={cn(controlBase, 'h-9 appearance-none pr-9', className)} {...props}>
+        <select
+          ref={ref}
+          className={cn(controlBase, 'h-9 appearance-none pr-9', className)}
+          {...props}
+        >
           {children}
         </select>
         <ChevronDown

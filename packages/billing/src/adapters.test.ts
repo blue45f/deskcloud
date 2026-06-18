@@ -1,15 +1,31 @@
 import { describe, expect, it } from 'vitest'
 
-import type { BillingAdapter } from './adapter'
 import { createBillingAdapter, shouldShowBadge } from './factory'
 import { StripeBillingAdapter, stripePriceIdForPlan } from './stripe-adapter'
 import { StubBillingAdapter, normalizeEvent } from './stub-adapter'
 import { TossBillingAdapter } from './toss-adapter'
 
+import type { BillingAdapter } from './adapter'
+
 const ADAPTERS: { name: string; make: () => BillingAdapter; sigHeader: string; sig: string }[] = [
-  { name: 'stub', make: () => new StubBillingAdapter(), sigHeader: 'x-stub-signature', sig: 'stub-ok' },
-  { name: 'toss', make: () => new TossBillingAdapter(), sigHeader: 'x-toss-signature', sig: 'toss-stub-ok' },
-  { name: 'stripe', make: () => new StripeBillingAdapter(), sigHeader: 'stripe-signature', sig: 'whsec_stub_ok' },
+  {
+    name: 'stub',
+    make: () => new StubBillingAdapter(),
+    sigHeader: 'x-stub-signature',
+    sig: 'stub-ok',
+  },
+  {
+    name: 'toss',
+    make: () => new TossBillingAdapter(),
+    sigHeader: 'x-toss-signature',
+    sig: 'toss-stub-ok',
+  },
+  {
+    name: 'stripe',
+    make: () => new StripeBillingAdapter(),
+    sigHeader: 'stripe-signature',
+    sig: 'whsec_stub_ok',
+  },
 ]
 
 describe.each(ADAPTERS)('$name 어댑터 (TEST/STUB, 실제 청구 없음)', ({ make, sigHeader, sig }) => {
@@ -65,10 +81,7 @@ describe('실키 차단(안전장치)', () => {
 
 describe('normalizeEvent — 제공자 타입 매핑', () => {
   it('Stripe customer.subscription.deleted → canceled', () => {
-    const ev = normalizeEvent(
-      { type: 'customer.subscription.deleted', tenantId: 't1' },
-      'stripe'
-    )
+    const ev = normalizeEvent({ type: 'customer.subscription.deleted', tenantId: 't1' }, 'stripe')
     expect(ev!.event).toBe('canceled')
   })
   it('Toss PAYMENT_CONFIRMED → activated', () => {

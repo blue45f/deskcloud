@@ -14,6 +14,7 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from 
 import { Link } from 'react-router-dom'
 
 import { useTheme } from '@/app/ThemeContext'
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge, PlanBadge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -41,7 +42,6 @@ import { Meter } from '@/components/ui/meter'
 import { StatCard } from '@/components/ui/stat-card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip } from '@/components/ui/tooltip'
-import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { cn } from '@/utils/cn'
 
@@ -58,13 +58,19 @@ const NAV = [
   { id: 'components', label: '컴포넌트' },
 ] as const
 
-/** getComputedStyle 으로 토큰을 즉시 해석한다. 테마 토글마다 다시 읽도록 nonce 의존. */
-function useResolvedToken(cssVar: string, nonce: number): string {
+/**
+ * getComputedStyle 으로 토큰을 해석한다. 테마 토글마다 다시 읽도록 themeKey 의존.
+ * 계산된 스타일은 레이아웃 이후에 안정적이므로 rAF 로 한 프레임 뒤 읽는다(이펙트
+ * 본문에서 동기 setState 를 피해 cascading render 도 방지).
+ */
+function useResolvedToken(cssVar: string, themeKey: string): string {
   const [value, setValue] = useState('')
   useEffect(() => {
-    const raw = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim()
-    setValue(raw)
-  }, [cssVar, nonce])
+    const id = requestAnimationFrame(() => {
+      setValue(getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim())
+    })
+    return () => cancelAnimationFrame(id)
+  }, [cssVar, themeKey])
   return value
 }
 
@@ -124,15 +130,15 @@ function Demo({
 function ColorSwatch({
   cssVar,
   name,
-  nonce,
+  themeKey,
   className,
 }: {
   cssVar: string
   name: string
-  nonce: number
+  themeKey: string
   className?: string
 }) {
-  const resolved = useResolvedToken(cssVar, nonce)
+  const resolved = useResolvedToken(cssVar, themeKey)
   return (
     <div className="flex items-center gap-3">
       <span
@@ -210,9 +216,6 @@ const BTN_VARIANTS = ['primary', 'secondary', 'outline', 'ghost', 'accent', 'dan
 export default function DesignPage() {
   useDocumentTitle('디자인 시스템')
   const { resolved, toggle } = useTheme()
-  const [nonce, setNonce] = useState(0)
-  useEffect(() => setNonce((n) => n + 1), [resolved])
-
   const [active, setActive] = useState<string>(NAV[0].id)
   const switchId = useId()
   const motionRef = useRef<HTMLDivElement>(null)
@@ -330,7 +333,7 @@ export default function DesignPage() {
                 <h3 className="mb-3 text-[0.8125rem] font-semibold text-text">강조 (accent)</h3>
                 <div className="space-y-2.5">
                   {ACCENT_TOKENS.map((t) => (
-                    <ColorSwatch key={t.v} cssVar={t.v} name={t.n} nonce={nonce} />
+                    <ColorSwatch key={t.v} cssVar={t.v} name={t.n} themeKey={resolved} />
                   ))}
                 </div>
               </div>
@@ -338,7 +341,7 @@ export default function DesignPage() {
                 <h3 className="mb-3 text-[0.8125rem] font-semibold text-text">표면 · 경계</h3>
                 <div className="space-y-2.5">
                   {SURFACE_TOKENS.map((t) => (
-                    <ColorSwatch key={t.v} cssVar={t.v} name={t.n} nonce={nonce} />
+                    <ColorSwatch key={t.v} cssVar={t.v} name={t.n} themeKey={resolved} />
                   ))}
                 </div>
               </div>
@@ -346,16 +349,23 @@ export default function DesignPage() {
                 <h3 className="mb-3 text-[0.8125rem] font-semibold text-text">텍스트 · 잉크</h3>
                 <div className="space-y-2.5">
                   {TEXT_TOKENS.map((t) => (
-                    <ColorSwatch key={t.v} cssVar={t.v} name={t.n} nonce={nonce} />
+                    <ColorSwatch key={t.v} cssVar={t.v} name={t.n} themeKey={resolved} />
                   ))}
                 </div>
               </div>
               <div>
-                <h3 className="mb-3 text-[0.8125rem] font-semibold text-text">의미색 (base + soft)</h3>
+                <h3 className="mb-3 text-[0.8125rem] font-semibold text-text">
+                  의미색 (base + soft)
+                </h3>
                 <div className="space-y-2.5">
                   {SEMANTIC.map((s) => (
                     <div key={s.n} className="flex items-center gap-2">
-                      <ColorSwatch cssVar={s.base} name={s.n} nonce={nonce} className="size-9" />
+                      <ColorSwatch
+                        cssVar={s.base}
+                        name={s.n}
+                        themeKey={resolved}
+                        className="size-9"
+                      />
                       <span
                         className="size-9 shrink-0 rounded-md border border-border-strong/40"
                         style={{ background: `var(${s.soft})` }}
@@ -424,7 +434,11 @@ export default function DesignPage() {
                 <div className="space-y-2.5">
                   {SPACE_STEPS.map((s) => (
                     <div key={s.label} className="flex items-center gap-3">
-                      <span className="h-3 rounded-sm bg-accent" style={{ width: s.w }} aria-hidden />
+                      <span
+                        className="h-3 rounded-sm bg-accent"
+                        style={{ width: s.w }}
+                        aria-hidden
+                      />
                       <span className="font-mono text-xs text-text-subtle">{s.label}</span>
                     </div>
                   ))}
@@ -452,7 +466,10 @@ export default function DesignPage() {
                 <div className="grid grid-cols-2 gap-4">
                   {SHADOWS.map((s) => (
                     <div key={s.label} className="flex flex-col items-center gap-2">
-                      <span className={cn('h-14 w-full rounded-lg bg-surface', s.cls)} aria-hidden />
+                      <span
+                        className={cn('h-14 w-full rounded-lg bg-surface', s.cls)}
+                        aria-hidden
+                      />
                       <span className="font-mono text-[0.6875rem] text-text-subtle">{s.label}</span>
                     </div>
                   ))}
@@ -551,8 +568,7 @@ export default function DesignPage() {
                   업그레이드
                 </Button>
                 <Button variant="secondary" size="sm">
-                  <RotateCw className="size-4" />
-                  키 회전
+                  <RotateCw className="size-4" />키 회전
                 </Button>
                 <Button asChild variant="outline" size="sm">
                   <Link to="/catalog">
@@ -596,7 +612,9 @@ export default function DesignPage() {
             </Demo>
 
             {/* Stat cards + Meter */}
-            <h3 className="mt-12 mb-3 text-base font-semibold text-text">지표 카드 · 사용량 미터</h3>
+            <h3 className="mt-12 mb-3 text-base font-semibold text-text">
+              지표 카드 · 사용량 미터
+            </h3>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <StatCard label="활성 테넌트" value="1,284" hint="전월 대비 +8%" />
               <StatCard label="MRR" value="₩4.2M" hint="Pro 96 · Scale 21" tone="success" />
@@ -621,7 +639,11 @@ export default function DesignPage() {
                   <Field label="조직 이름" htmlFor="d-name" hint="콘솔·청구서에 노출됩니다.">
                     <Input id="d-name" placeholder="예: Acme Inc." />
                   </Field>
-                  <Field label="slug" htmlFor="d-error" error="slug 는 소문자·숫자·하이픈만 가능합니다.">
+                  <Field
+                    label="slug"
+                    htmlFor="d-error"
+                    error="slug 는 소문자·숫자·하이픈만 가능합니다."
+                  >
                     <Input id="d-error" defaultValue="Acme!" aria-invalid />
                   </Field>
                   <Field label="기본 플랜" htmlFor="d-type">
@@ -685,7 +707,9 @@ export default function DesignPage() {
             </Card>
 
             {/* Overlays */}
-            <h3 className="mt-12 mb-3 text-base font-semibold text-text">오버레이 — Dialog · Tooltip</h3>
+            <h3 className="mt-12 mb-3 text-base font-semibold text-text">
+              오버레이 — Dialog · Tooltip
+            </h3>
             <Demo caption="모두 포털로 렌더링되어 overflow 를 벗어납니다.">
               <Dialog>
                 <DialogTrigger asChild>
@@ -764,7 +788,9 @@ export default function DesignPage() {
             </Card>
 
             {/* Feedback */}
-            <h3 className="mt-12 mb-3 text-base font-semibold text-text">피드백 — 로딩 · 빈 상태</h3>
+            <h3 className="mt-12 mb-3 text-base font-semibold text-text">
+              피드백 — 로딩 · 빈 상태
+            </h3>
             <div className="grid gap-5 md:grid-cols-2">
               <div className="flex flex-col gap-2">
                 <Card>
@@ -792,16 +818,14 @@ export default function DesignPage() {
                     </Button>
                   }
                 />
-                <p className="px-0.5 text-xs text-text-subtle">
-                  빈 상태는 다음 행동을 안내합니다.
-                </p>
+                <p className="px-0.5 text-xs text-text-subtle">빈 상태는 다음 행동을 안내합니다.</p>
               </div>
             </div>
           </Section>
 
           <p className="border-t border-border pt-8 text-xs text-text-subtle">
-            이 페이지는 DeskCloud 의 실제 토큰과 컴포넌트만 사용합니다. 그라데이션 텍스트·글래스모피즘·
-            사이드 스트라이프 보더 같은 금지 패턴을 쓰지 않습니다.
+            이 페이지는 DeskCloud 의 실제 토큰과 컴포넌트만 사용합니다. 그라데이션
+            텍스트·글래스모피즘· 사이드 스트라이프 보더 같은 금지 패턴을 쓰지 않습니다.
           </p>
         </main>
       </div>

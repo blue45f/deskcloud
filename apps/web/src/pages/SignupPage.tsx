@@ -9,8 +9,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CopyButton, Banner } from '@/components/ui/feedback'
 import { Field, Input } from '@/components/ui/field'
-import { ApiError, signup } from '@/services/api'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { ApiError, signup } from '@/services/api'
 
 /** 발급된 키 한 줄 — 라벨 + 모노 값 + 복사 버튼. */
 function KeyRow({ label, value, hint }: { label: string; value: string; hint: string }) {
@@ -37,7 +37,8 @@ function Result({ result }: { result: TenantWithSecretDto }) {
       </div>
       <p className="mt-1 text-sm text-text-muted">
         <strong className="text-text">{result.name}</strong> ·{' '}
-        <code className="font-mono">{result.slug}</code> · <Badge tone="neutral" size="sm">
+        <code className="font-mono">{result.slug}</code> ·{' '}
+        <Badge tone="neutral" size="sm">
           {result.plan.toUpperCase()}
         </Badge>
       </p>
@@ -134,8 +135,8 @@ export default function SignupPage() {
         <h1 className="text-xl font-semibold tracking-tight text-text">DeskCloud 시작하기</h1>
       </div>
       <p className="mt-2 text-sm text-text-muted">
-        테넌트를 만들면 publishable/secret 키 한 쌍을 받습니다. 가입은 무료(Free 플랜)이며 신용카드가
-        필요 없습니다.
+        테넌트를 만들면 publishable/secret 키 한 쌍을 받습니다. 가입은 무료(Free 플랜)이며
+        신용카드가 필요 없습니다.
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4">

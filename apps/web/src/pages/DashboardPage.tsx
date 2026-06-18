@@ -1,17 +1,10 @@
+import { UNLIMITED } from '@desk/shared/browser'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import {
-  AlertTriangle,
-  Check,
-  KeyRound,
-  RotateCw,
-  Settings,
-  TriangleAlert,
-} from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { AlertTriangle, Check, KeyRound, RotateCw, Settings, TriangleAlert } from 'lucide-react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
-import type { TenantWithSecretDto, UsageMetric } from '@desk/shared/browser'
-import { UNLIMITED } from '@desk/shared/browser'
+import type { TenantDto, TenantWithSecretDto, UsageMetric } from '@desk/shared/browser'
 
 import { useTheme } from '@/app/ThemeContext'
 import { PlanBadge, StatusBadge } from '@/components/ui/badge'
@@ -29,6 +22,7 @@ import {
 import { Banner, CopyButton, Spinner } from '@/components/ui/feedback'
 import { Field, Input, Textarea } from '@/components/ui/field'
 import { Meter } from '@/components/ui/meter'
+import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { PoweredByDeskCloud } from '@/PoweredByDeskCloud'
 import {
   cancelSubscription,
@@ -40,9 +34,8 @@ import {
   startCheckout,
   updateTenant,
 } from '@/services/api'
-import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { fmtNum, fmtPriceKrw, fmtStorage } from '@/utils/format'
 import { cn } from '@/utils/cn'
+import { fmtNum, fmtPriceKrw, fmtStorage } from '@/utils/format'
 
 const METRIC_LABEL: Record<UsageMetric, string> = {
   api_calls: 'API 호출',
@@ -134,7 +127,9 @@ function KeysPanel() {
         <div>
           <div className="flex items-center justify-between gap-2">
             <span className="text-xs font-semibold text-text-subtle">Publishable 키</span>
-            {tenant ? <CopyButton value={tenant.publishableKey} label="publishable 키 복사" /> : null}
+            {tenant ? (
+              <CopyButton value={tenant.publishableKey} label="publishable 키 복사" />
+            ) : null}
           </div>
           <code className="mt-1 block overflow-x-auto rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] break-all text-text">
             {tenant?.publishableKey ?? '…'}
@@ -149,13 +144,9 @@ function KeysPanel() {
           </p>
         </div>
 
-        {rotate.isError ? (
-          <Banner tone="error">{(rotate.error as Error).message}</Banner>
-        ) : null}
+        {rotate.isError ? <Banner tone="error">{(rotate.error as Error).message}</Banner> : null}
 
-        {rotated ? (
-          <RotatedKeyDialog rotated={rotated} onClose={() => setRotated(null)} />
-        ) : null}
+        {rotated ? <RotatedKeyDialog rotated={rotated} onClose={() => setRotated(null)} /> : null}
 
         {/* 배지 미리보기 */}
         <div className="flex items-center justify-between gap-3 rounded-md bg-surface-2 px-3 py-2.5">
@@ -193,7 +184,8 @@ function RotatedKeyDialog({
         <DialogHeader>
           <DialogTitle>새 secret 키가 발급되었습니다</DialogTitle>
           <DialogDescription>
-            이 키는 지금 한 번만 표시됩니다. 즉시 안전한 곳에 저장하세요. 이전 키는 무효화되었습니다.
+            이 키는 지금 한 번만 표시됩니다. 즉시 안전한 곳에 저장하세요. 이전 키는
+            무효화되었습니다.
           </DialogDescription>
         </DialogHeader>
         <div className="rounded-lg border border-border bg-surface-2 p-3.5">
@@ -207,8 +199,8 @@ function RotatedKeyDialog({
         </div>
         <Banner tone="warning" className="mt-3">
           <span className="inline-flex items-center gap-1.5">
-            <TriangleAlert className="size-4 shrink-0" aria-hidden /> 저장하지 않고 닫으면 다시 볼 수
-            없습니다.
+            <TriangleAlert className="size-4 shrink-0" aria-hidden /> 저장하지 않고 닫으면 다시 볼
+            수 없습니다.
           </span>
         </Banner>
         <DialogFooter>
@@ -222,19 +214,19 @@ function RotatedKeyDialog({
 }
 
 // ── 설정(name·CORS) ──────────────────────────────────────────────────────────
+// 로더는 tenant 가 준비되면 SettingsForm 을 tenant.id 키로 마운트한다. key 가 바뀌면
+// 폼 상태가 자동으로 초기화되므로 fetch→state 동기화 이펙트가 필요 없다.
 function SettingsPanel() {
-  const qc = useQueryClient()
   const { data: tenant } = useQuery({ queryKey: ['tenant'], queryFn: fetchTenant })
-  const [name, setName] = useState('')
-  const [cors, setCors] = useState('')
-  const [ok, setOk] = useState(false)
+  if (!tenant) return null
+  return <SettingsForm key={tenant.id} tenant={tenant} />
+}
 
-  useEffect(() => {
-    if (tenant) {
-      setName(tenant.name)
-      setCors(tenant.corsOrigins.join('\n'))
-    }
-  }, [tenant])
+function SettingsForm({ tenant }: { tenant: TenantDto }) {
+  const qc = useQueryClient()
+  const [name, setName] = useState(tenant.name)
+  const [cors, setCors] = useState(() => tenant.corsOrigins.join('\n'))
+  const [ok, setOk] = useState(false)
 
   const save = useMutation({
     mutationFn: () =>
@@ -338,9 +330,7 @@ function BillingPanel() {
 
   return (
     <Card>
-      <CardHeader
-        action={sub ? <StatusBadge status={sub.status} /> : null}
-      >
+      <CardHeader action={sub ? <StatusBadge status={sub.status} /> : null}>
         <CardTitle>빌링</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -366,7 +356,9 @@ function BillingPanel() {
         ) : null}
 
         {notice ? <Banner tone="info">{notice}</Banner> : null}
-        {checkout.isError ? <Banner tone="error">{(checkout.error as Error).message}</Banner> : null}
+        {checkout.isError ? (
+          <Banner tone="error">{(checkout.error as Error).message}</Banner>
+        ) : null}
         {cancel.isError ? <Banner tone="error">{(cancel.error as Error).message}</Banner> : null}
 
         {/* 플랜 비교 + 업그레이드 */}

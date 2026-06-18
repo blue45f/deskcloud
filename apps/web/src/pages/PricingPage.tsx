@@ -1,16 +1,15 @@
+import { PLAN_LIMITS, PLANS, UNLIMITED, type PlanSummaryDto } from '@desk/shared/browser'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, Check, Minus, Package } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-import { PLAN_LIMITS, PLANS, UNLIMITED, type PlanSummaryDto } from '@desk/shared/browser'
-
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Banner } from '@/components/ui/feedback'
-import { fetchPlans } from '@/services/api'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { fmtNum, fmtPriceKrw, fmtStorage } from '@/utils/format'
+import { fetchPlans } from '@/services/api'
 import { cn } from '@/utils/cn'
+import { fmtNum, fmtPriceKrw, fmtStorage } from '@/utils/format'
 
 /** API 미응답 시 표시할 정적 폴백(PLAN_LIMITS 단일 소스에서 파생). */
 function staticPlans(): PlanSummaryDto[] {
@@ -106,9 +105,7 @@ function PlanCard({ p }: { p: PlanSummaryDto }) {
       <ul className="mt-5 space-y-2 border-t border-border pt-5">
         <li className="text-[0.8125rem] text-text-muted">
           API 호출{' '}
-          <strong className="font-mono text-text">
-            {fmtNum(p.limits.api_calls ?? UNLIMITED)}
-          </strong>
+          <strong className="font-mono text-text">{fmtNum(p.limits.api_calls ?? UNLIMITED)}</strong>
           /월
         </li>
         <li className="text-[0.8125rem] text-text-muted">
@@ -123,7 +120,8 @@ function PlanCard({ p }: { p: PlanSummaryDto }) {
           </strong>
         </li>
         <li className="text-[0.8125rem] text-text-muted">
-          좌석 <strong className="font-mono text-text">{fmtNum(p.limits.seats ?? UNLIMITED)}</strong>
+          좌석{' '}
+          <strong className="font-mono text-text">{fmtNum(p.limits.seats ?? UNLIMITED)}</strong>
         </li>
       </ul>
 
@@ -154,15 +152,15 @@ export default function PricingPage() {
           한 번 가입, 전체 패밀리에 적용되는 요금
         </h1>
         <p className="mt-4 text-pretty text-text-muted">
-          플랜·한도는 모든 Desk 에 공통으로 적용됩니다. 한 콘솔에서 사용량을 보고 언제든 업/다운그레이드
-          하세요. 결제는 TEST/STUB — 실제 청구는 없습니다.
+          플랜·한도는 모든 Desk 에 공통으로 적용됩니다. 한 콘솔에서 사용량을 보고 언제든
+          업/다운그레이드 하세요. 결제는 TEST/STUB — 실제 청구는 없습니다.
         </p>
       </header>
 
       {isError ? (
         <Banner tone="info" className="mx-auto mt-6 max-w-2xl text-center">
-          API(:6090)에 연결하지 못해 정적 가격표를 표시합니다. <code>pnpm dev</code> 로 API 를 띄우면
-          단일 소스(@desk/billing)로 동기화됩니다.
+          API(:6090)에 연결하지 못해 정적 가격표를 표시합니다. <code>pnpm dev</code> 로 API 를
+          띄우면 단일 소스(@desk/billing)로 동기화됩니다.
         </Banner>
       ) : null}
 
@@ -182,7 +180,8 @@ export default function PricingPage() {
             <h2 className="text-base font-semibold text-text">패밀리 번들</h2>
             <p className="mt-1 text-[0.8125rem] text-pretty text-text-muted">
               하나의 구독으로 모든 Desk(약관·설문·리뷰·알림·검색·실시간·커뮤니티·채팅 등)를
-              사용합니다. 한도는 테넌트 단위로 합산 적용되므로 서비스별로 따로 결제할 필요가 없습니다.
+              사용합니다. 한도는 테넌트 단위로 합산 적용되므로 서비스별로 따로 결제할 필요가
+              없습니다.
             </p>
           </div>
           <Button asChild variant="secondary" className="shrink-0">

@@ -2,16 +2,11 @@ import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
-import { DeskGlyph } from '@/components/feature/DeskGlyph'
-import {
-  DESK_CATALOG,
-  PRODUCT_DESKS,
-  embedSnippet,
-  type DeskEntry,
-} from '@/data/deskCatalog'
+import { DESK_CATALOG, PRODUCT_DESKS, embedSnippet, type DeskEntry } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 function DeskCard({ desk }: { desk: DeskEntry }) {
@@ -83,8 +78,8 @@ export default function CatalogPage() {
           DeskCloud 서비스 카탈로그
         </h1>
         <p className="mt-4 text-pretty text-text-muted">
-          {PRODUCT_DESKS.length}개 제품 Desk + 플랫폼 코어. 모두 같은 계정·빌링을 공유하며, 각 카드의
-          스니펫을 그대로 복사해 한 줄로 임베드할 수 있습니다.
+          {PRODUCT_DESKS.length}개 제품 Desk + 플랫폼 코어. 모두 같은 계정·빌링을 공유하며, 각
+          카드의 스니펫을 그대로 복사해 한 줄로 임베드할 수 있습니다.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Button asChild>
@@ -110,7 +105,9 @@ export default function CatalogPage() {
       ) : null}
 
       <section className="mt-12" aria-label="제품 Desk">
-        <h2 className="text-xs font-semibold tracking-wide text-text-subtle uppercase">제품 Desk</h2>
+        <h2 className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+          제품 Desk
+        </h2>
         <div className="mt-3 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {PRODUCT_DESKS.map((d) => (
             <DeskCard key={d.id} desk={d} />

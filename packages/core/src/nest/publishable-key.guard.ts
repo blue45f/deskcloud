@@ -8,9 +8,10 @@ import {
 } from '@nestjs/common'
 
 import { isOriginAllowed } from '../cors'
-import type { TenantService } from '../tenant-service'
 
 import { TENANT_CONTEXT_KEY, TENANT_SERVICE } from './tokens'
+
+import type { TenantService } from '../tenant-service'
 
 /**
  * publishable 키 게이트 — 공개(프론트 임베드) 경로용. `X-Desk-Key: pk_…` 헤더로 테넌트를

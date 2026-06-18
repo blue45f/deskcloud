@@ -1,7 +1,6 @@
-import { Global, Module } from '@nestjs/common'
-
 import { TenantService, UsageMeter } from '@desk/core'
 import { CORE_OPTIONS, TENANT_SERVICE, USAGE_METER, type CoreOptions } from '@desk/core/nest'
+import { Global, Module } from '@nestjs/common'
 
 import { APP_CONFIG, loadConfig, type AppConfig } from '../config'
 import { DatabaseService } from '../db/database.service'

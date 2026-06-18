@@ -1,8 +1,8 @@
 import { createParamDecorator, type ExecutionContext } from '@nestjs/common'
 
-import type { TenantRecord } from '../ports'
-
 import { TENANT_CONTEXT_KEY } from './tokens'
+
+import type { TenantRecord } from '../ports'
 
 /**
  * `@CurrentTenant()` — SecretKeyGuard/PublishableKeyGuard 가 부착한 인증 테넌트를 꺼낸다.

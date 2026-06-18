@@ -1,13 +1,4 @@
-import { Body, Controller, Get, HttpCode, Inject, Post, Put, Query, Req } from '@nestjs/common'
-import { UseGuards } from '@nestjs/common'
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { Throttle } from '@nestjs/throttler'
-import {
-  TenantService,
-  UsageMeter,
-  toTenantDto,
-  type TenantRecord,
-} from '@desk/core'
+import { TenantService, UsageMeter, toTenantDto, type TenantRecord } from '@desk/core'
 import { SecretKeyGuard, TENANT_SERVICE, USAGE_METER } from '@desk/core/nest'
 import {
   createTenantSchema,
@@ -21,6 +12,20 @@ import {
   type UpdateTenantInput,
   type UsageSummaryDto,
 } from '@desk/shared'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Inject,
+  Post,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common'
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
+import { Throttle } from '@nestjs/throttler'
 
 import { ZodValidationPipe } from '../common/zod.pipe'
 

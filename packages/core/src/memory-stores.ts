@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto'
 
-import type { UsageMetric } from '@desk/shared'
-
 import type {
   CreateTenantRecord,
   MemberRecord,
@@ -10,6 +8,7 @@ import type {
   TenantStore,
   UsageStore,
 } from './ports'
+import type { UsageMetric } from '@desk/shared'
 
 /**
  * 인메모리 포트 구현 — 테스트·로컬 데모·Desk 통합 레퍼런스용. 프로세스 메모리에만 산다.
@@ -113,10 +112,7 @@ export class InMemoryUsageStore implements UsageStore {
     return this.counters.get(this.key(tenantId, period, metric)) ?? 0
   }
 
-  async getAll(
-    tenantId: string,
-    period: string
-  ): Promise<Partial<Record<UsageMetric, number>>> {
+  async getAll(tenantId: string, period: string): Promise<Partial<Record<UsageMetric, number>>> {
     const prefix = `${tenantId}:${period}:`
     const out: Partial<Record<UsageMetric, number>> = {}
     for (const [k, v] of this.counters) {

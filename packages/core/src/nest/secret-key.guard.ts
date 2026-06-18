@@ -1,3 +1,4 @@
+import { extractBearerKey } from '@desk/shared'
 import {
   type CanActivate,
   type ExecutionContext,
@@ -6,11 +7,9 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 
-import { extractBearerKey } from '@desk/shared'
+import { TENANT_CONTEXT_KEY, TENANT_SERVICE } from './tokens'
 
 import type { TenantService } from '../tenant-service'
-
-import { TENANT_CONTEXT_KEY, TENANT_SERVICE } from './tokens'
 
 /**
  * secret 키 게이트 — `Authorization: Bearer sk_…` 를 해시 매칭으로 인증한다.
@@ -27,7 +26,9 @@ export class SecretKeyGuard implements CanActivate {
       [TENANT_CONTEXT_KEY]?: unknown
     }>()
     const auth = req.headers['authorization']
-    const key = extractBearerKey(Array.isArray(auth) ? String(auth[0]) : (auth as string | undefined))
+    const key = extractBearerKey(
+      Array.isArray(auth) ? String(auth[0]) : (auth as string | undefined)
+    )
     if (!key) throw new UnauthorizedException('Authorization: Bearer sk_… 헤더가 필요합니다')
 
     const tenant = await this.tenants.authenticateBySecretKey(key)

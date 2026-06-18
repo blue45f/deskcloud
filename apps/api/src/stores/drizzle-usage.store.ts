@@ -1,9 +1,10 @@
-import type { UsageMetric } from '@desk/shared'
-import type { UsageStore } from '@desk/core'
 import { and, eq, sql } from 'drizzle-orm'
 
 import { DatabaseService } from '../db/database.service'
 import { usageCounters } from '../db/schema'
+
+import type { UsageStore } from '@desk/core'
+import type { UsageMetric } from '@desk/shared'
 
 /** core 의 UsageStore 포트를 Drizzle 로 구현 — upsert 로 원자적 증가. */
 export class DrizzleUsageStore implements UsageStore {
@@ -42,10 +43,7 @@ export class DrizzleUsageStore implements UsageStore {
     return Number(rows[0]?.count ?? 0)
   }
 
-  async getAll(
-    tenantId: string,
-    period: string
-  ): Promise<Partial<Record<UsageMetric, number>>> {
+  async getAll(tenantId: string, period: string): Promise<Partial<Record<UsageMetric, number>>> {
     const rows = await this.dbs.db
       .select({ metric: usageCounters.metric, count: usageCounters.count })
       .from(usageCounters)

@@ -1,10 +1,10 @@
 import { ArrowRight, CreditCard, Boxes, KeyRound, Layers, Plug, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
-import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { DESK_CATALOG, PRODUCT_DESKS, embedSnippet } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
@@ -33,7 +33,12 @@ const VALUE = [
 
 const STEPS = [
   { n: '01', title: '가입', body: '테넌트를 만들고 키 한 쌍을 받습니다.', to: '/signup' },
-  { n: '02', title: 'Desk 고르기', body: '카탈로그에서 필요한 서비스를 선택합니다.', to: '/catalog' },
+  {
+    n: '02',
+    title: 'Desk 고르기',
+    body: '카탈로그에서 필요한 서비스를 선택합니다.',
+    to: '/catalog',
+  },
   { n: '03', title: '한 줄 임베드', body: '스니펫을 붙이면 바로 라이브.', to: '/docs' },
 ] as const
 
@@ -171,7 +176,8 @@ export default function LandingPage() {
               <h3 className="mt-3 text-base font-semibold text-text">{s.title}</h3>
               <p className="mt-1 text-[0.8125rem] text-text-muted">{s.body}</p>
               <span className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-accent-strong">
-                바로가기 <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                바로가기{' '}
+                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
               </span>
             </Link>
           ))}

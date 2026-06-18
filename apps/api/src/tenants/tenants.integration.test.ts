@@ -1,6 +1,6 @@
+import { TenantService, UsageMeter } from '@desk/core'
 import { PGlite } from '@electric-sql/pglite'
 import { drizzle } from 'drizzle-orm/pglite'
-import { TenantService, UsageMeter } from '@desk/core'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { MIGRATIONS } from '../db/migrations'

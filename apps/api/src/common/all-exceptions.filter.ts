@@ -1,3 +1,4 @@
+import { TenantError } from '@desk/core'
 import {
   type ArgumentsHost,
   Catch,
@@ -6,8 +7,6 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common'
-
-import { TenantError } from '@desk/core'
 
 import type { Response } from 'express'
 

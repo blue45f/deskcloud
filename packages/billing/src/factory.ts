@@ -1,10 +1,11 @@
 import { type Plan } from '@desk/shared'
 
-import type { BillingAdapter, BillingProvider } from './adapter'
 import { planFeatures } from './limits'
 import { StripeBillingAdapter } from './stripe-adapter'
 import { StubBillingAdapter } from './stub-adapter'
 import { TossBillingAdapter } from './toss-adapter'
+
+import type { BillingAdapter, BillingProvider } from './adapter'
 
 /**
  * 환경 설정으로 결제 어댑터를 고른다 — 모두 **TEST/STUB 전용**.

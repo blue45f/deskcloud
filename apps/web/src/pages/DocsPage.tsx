@@ -1,16 +1,11 @@
 import { ArrowRight, BookOpen, KeyRound, Plug, Webhook } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
-import { DeskGlyph } from '@/components/feature/DeskGlyph'
-import {
-  PRODUCT_DESKS,
-  embedEndpoint,
-  embedSnippet,
-  restSnippet,
-} from '@/data/deskCatalog'
+import { PRODUCT_DESKS, embedEndpoint, embedSnippet, restSnippet } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 const NAV = [
@@ -32,7 +27,10 @@ function Section({
   children: React.ReactNode
 }) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-border py-10 first:border-t-0 first:pt-0">
+    <section
+      id={id}
+      className="scroll-mt-24 border-t border-border py-10 first:border-t-0 first:pt-0"
+    >
       <h2 className="text-xl font-semibold tracking-tight text-text">{title}</h2>
       <div className="mt-4 space-y-4">{children}</div>
     </section>

@@ -1,12 +1,9 @@
-import type {
-  CreateTenantRecord,
-  TenantRecord,
-  TenantStore,
-} from '@desk/core'
 import { eq } from 'drizzle-orm'
 
 import { DatabaseService } from '../db/database.service'
 import { tenants } from '../db/schema'
+
+import type { CreateTenantRecord, TenantRecord, TenantStore } from '@desk/core'
 
 type Row = typeof tenants.$inferSelect
 

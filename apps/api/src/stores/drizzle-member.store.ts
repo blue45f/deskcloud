@@ -1,8 +1,9 @@
-import type { MemberRecord, MemberStore } from '@desk/core'
 import { and, eq, sql } from 'drizzle-orm'
 
 import { DatabaseService } from '../db/database.service'
 import { members } from '../db/schema'
+
+import type { MemberRecord, MemberStore } from '@desk/core'
 
 type Row = typeof members.$inferSelect
 

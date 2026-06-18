@@ -1,6 +1,5 @@
-import type { Plan } from '@desk/shared'
-
 import type { SubscriptionEvent } from './subscription'
+import type { Plan } from '@desk/shared'
 
 /**
  * 결제 어댑터 포트 — 빌링 제공자(Toss/Stripe) 추상화. **TEST/STUB 전용**.

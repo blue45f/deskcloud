@@ -2,8 +2,8 @@ import { Menu, Moon, Sun, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 
-import { useTheme } from '@/app/ThemeContext'
 import { useSessionStore } from '@/app/sessionStore'
+import { useTheme } from '@/app/ThemeContext'
 import { Brand } from '@/components/layout/Brand'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
@@ -24,7 +24,11 @@ function ThemeToggle() {
       onClick={toggle}
       aria-label={resolved === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
     >
-      {resolved === 'dark' ? <Sun className="size-[1.05rem]" /> : <Moon className="size-[1.05rem]" />}
+      {resolved === 'dark' ? (
+        <Sun className="size-[1.05rem]" />
+      ) : (
+        <Moon className="size-[1.05rem]" />
+      )}
     </Button>
   )
 }

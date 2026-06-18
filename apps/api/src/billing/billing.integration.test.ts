@@ -1,6 +1,6 @@
+import { TenantService } from '@desk/core'
 import { PGlite } from '@electric-sql/pglite'
 import { drizzle } from 'drizzle-orm/pglite'
-import { TenantService } from '@desk/core'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { type AppConfig } from '../config'
@@ -98,7 +98,11 @@ describe('BillingService (PGlite, 풀 플로우)', () => {
 
   it('웹훅 서명 틀리면 null(검증 실패)', async () => {
     const t = await tenants.signup({ name: 'Acme' })
-    const r = await billing.handleWebhook('stub', JSON.stringify({ type: 'subscription.activated', tenantId: t.id, plan: 'pro' }), { 'x-stub-signature': 'WRONG' })
+    const r = await billing.handleWebhook(
+      'stub',
+      JSON.stringify({ type: 'subscription.activated', tenantId: t.id, plan: 'pro' }),
+      { 'x-stub-signature': 'WRONG' }
+    )
     expect(r).toBeNull()
   })
 
@@ -120,8 +124,12 @@ describe('BillingService (PGlite, 풀 플로우)', () => {
 
   it('웹훅 업그레이드(pro→scale) 반영', async () => {
     const t = await tenants.signup({ name: 'Acme', plan: 'free' })
-    await billing.handleWebhook('stub', activateWebhook(t.id, 'pro').body, { 'x-stub-signature': 'stub-ok' })
-    await billing.handleWebhook('stub', activateWebhook(t.id, 'scale').body, { 'x-stub-signature': 'stub-ok' })
+    await billing.handleWebhook('stub', activateWebhook(t.id, 'pro').body, {
+      'x-stub-signature': 'stub-ok',
+    })
+    await billing.handleWebhook('stub', activateWebhook(t.id, 'scale').body, {
+      'x-stub-signature': 'stub-ok',
+    })
     const sub = await billing.getSubscription(t.id)
     expect(sub.plan).toBe('scale')
     expect((await tenants.getById(t.id)).plan).toBe('scale')

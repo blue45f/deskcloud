@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto'
 
 import { type Plan } from '@desk/shared'
 
+import { verifyStubSignature } from './stub-adapter'
+
 import type {
   BillingAdapter,
   CheckoutRequest,
@@ -10,7 +12,6 @@ import type {
   SubscriptionStatus,
   WebhookVerifyInput,
 } from './adapter'
-import { verifyStubSignature } from './stub-adapter'
 
 /**
  * Stripe 어댑터 — **TEST/STUB 전용**. 실제 Stripe API·시크릿 키 절대 호출 안 함.
