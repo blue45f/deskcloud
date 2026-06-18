@@ -28,6 +28,7 @@
     "@nestjs/throttler": "^6.5.0",
     "compression": "^1.8.1",
     "drizzle-orm": "^0.45.2",
+    "express": "^5.2.1",
     "helmet": "^8.2.0",
     "pg": "^8.21.0",
     "reflect-metadata": "^0.2.2",
