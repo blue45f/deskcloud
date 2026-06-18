@@ -15,6 +15,9 @@ import { getSessionToken, useSessionStore } from '@/app/sessionStore'
 /** API 베이스 — Vite 빌드 타임 주입(VITE_API_BASE_URL). 비면 동일 출처(/api 프록시). */
 const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? ''
 
+/** 콘솔 API 연결 여부 — VITE_API_BASE_URL 가 설정된 빌드에서만 콘솔(가입·로그인·대시보드)이 활성화. */
+export const CONSOLE_API_READY = BASE.length > 0
+
 /** 구조화된 API 에러 — status + 서버 메시지. */
 export class ApiError extends Error {
   readonly status: number

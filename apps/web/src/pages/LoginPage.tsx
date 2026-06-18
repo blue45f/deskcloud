@@ -3,11 +3,12 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 import { useSessionStore } from '@/app/sessionStore'
+import { ConsolePreviewNotice } from '@/components/ConsolePreviewNotice'
 import { Button } from '@/components/ui/button'
 import { Banner } from '@/components/ui/feedback'
 import { Field, Input } from '@/components/ui/field'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { ApiError, fetchTenant } from '@/services/api'
+import { ApiError, CONSOLE_API_READY, fetchTenant } from '@/services/api'
 
 interface LocationState {
   from?: string
@@ -23,6 +24,14 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
 
   const from = (location.state as LocationState | null)?.from ?? '/dashboard'
+
+  if (!CONSOLE_API_READY) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-12 sm:px-6 sm:py-20">
+        <ConsolePreviewNotice title="콘솔 로그인" />
+      </div>
+    )
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()

@@ -5,12 +5,13 @@ import { Link } from 'react-router-dom'
 import type { TenantWithSecretDto } from '@desk/shared/browser'
 
 import { useSessionStore } from '@/app/sessionStore'
+import { ConsolePreviewNotice } from '@/components/ConsolePreviewNotice'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CopyButton, Banner } from '@/components/ui/feedback'
 import { Field, Input } from '@/components/ui/field'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { ApiError, signup } from '@/services/api'
+import { ApiError, CONSOLE_API_READY, signup } from '@/services/api'
 
 /** 발급된 키 한 줄 — 라벨 + 모노 값 + 복사 버튼. */
 function KeyRow({ label, value, hint }: { label: string; value: string; hint: string }) {
@@ -95,6 +96,14 @@ export default function SignupPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<TenantWithSecretDto | null>(null)
+
+  if (!CONSOLE_API_READY) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-12 sm:px-6 sm:py-20">
+        <ConsolePreviewNotice title="DeskCloud 시작하기" />
+      </div>
+    )
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
