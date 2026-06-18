@@ -23,7 +23,7 @@ const COLUMNS = [
     title: '리소스',
     links: [
       { to: '/design', label: '디자인 시스템' },
-      { to: '/docs', label: '임베드 가이드' },
+      { to: '/docs', label: '통합 가이드' },
     ],
   },
 ] as const
@@ -37,8 +37,8 @@ export function SiteFooter() {
           <div className="max-w-xs">
             <Brand />
             <p className="mt-3 text-[0.8125rem] text-pretty text-text-muted">
-              여러 SaaS 를 하나의 계정·빌링으로 묶는 DeskCloud 패밀리. 가입 한 번, 한 줄 임베드로
-              어떤 Desk든 바로 붙입니다.
+              여러 SaaS 를 하나의 계정·빌링으로 묶는 DeskCloud 패밀리. 가입 한 번, 단일 SDK 설치로
+              어떤 Desk든 앱 안에서 네이티브로 렌더합니다.
             </p>
           </div>
           {COLUMNS.map((col) => (
@@ -49,7 +49,10 @@ export function SiteFooter() {
               <ul className="mt-3 space-y-2">
                 {col.links.map((l) => (
                   <li key={l.to}>
-                    <Link to={l.to} className="text-sm text-text-muted transition-colors hover:text-text">
+                    <Link
+                      to={l.to}
+                      className="text-sm text-text-muted transition-colors hover:text-text"
+                    >
                       {l.label}
                     </Link>
                   </li>

@@ -154,7 +154,7 @@ function KeysPanel() {
             <p className="text-xs font-semibold text-text">Powered by DeskCloud 배지</p>
             <p className="text-[0.6875rem] text-text-muted">
               {sub?.showBadge
-                ? 'Free 플랜 — 공개 위젯에 배지가 노출됩니다.'
+                ? 'Free 플랜 — 공개 화면에 배지가 노출됩니다.'
                 : '유료 플랜 — 배지가 제거됩니다.'}
             </p>
           </div>

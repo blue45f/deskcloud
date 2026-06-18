@@ -1,18 +1,19 @@
-import { ArrowRight, CreditCard, Boxes, KeyRound, Layers, Plug, Zap } from 'lucide-react'
+import { ArrowRight, CreditCard, Boxes, KeyRound, Layers, Package, Zap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
-import { DESK_CATALOG, PRODUCT_DESKS, embedSnippet } from '@/data/deskCatalog'
+import { InstallTabs } from '@/components/ui/install-tabs'
+import { DESK_CATALOG, PRODUCT_DESKS, sdkSnippet } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 const VALUE = [
   {
-    icon: Plug,
-    title: '한 줄 임베드',
-    body: '스크립트 태그 하나, init() 한 번. 어떤 Desk든 같은 패턴으로 사이트에 붙습니다.',
+    icon: Package,
+    title: 'npm 한 번 설치',
+    body: 'npm·pnpm·yarn·bun 중 무엇이든. 단일 SDK 하나로 어떤 Desk든 같은 패턴으로 씁니다.',
   },
   {
     icon: KeyRound,
@@ -35,17 +36,22 @@ const STEPS = [
   { n: '01', title: '가입', body: '테넌트를 만들고 키 한 쌍을 받습니다.', to: '/signup' },
   {
     n: '02',
-    title: 'Desk 고르기',
-    body: '카탈로그에서 필요한 서비스를 선택합니다.',
+    title: 'SDK 설치',
+    body: 'npm i @heejun/deskcloud — 패키지 매니저 무관.',
+    to: '/docs',
+  },
+  {
+    n: '03',
+    title: '네이티브 렌더',
+    body: 'createXClient 로 앱 컴포넌트에 바로 붙입니다.',
     to: '/catalog',
   },
-  { n: '03', title: '한 줄 임베드', body: '스니펫을 붙이면 바로 라이브.', to: '/docs' },
 ] as const
 
 export default function LandingPage() {
   useDocumentTitle()
   const survey = DESK_CATALOG.find((d) => d.id === 'surveydesk') ?? DESK_CATALOG[1]
-  const snippet = survey ? embedSnippet(survey, 'my-app') : ''
+  const snippet = survey ? sdkSnippet(survey) : ''
 
   return (
     <>
@@ -56,12 +62,15 @@ export default function LandingPage() {
             SaaS 패밀리 · 멀티테넌트 + 빌링 코어
           </Badge>
           <h1 className="mt-4 text-[clamp(2.2rem,6vw,3.6rem)] leading-[1.05] font-semibold tracking-tight text-balance text-text">
-            여러 SaaS를, 하나의 계정과 한 줄 임베드로
+            여러 SaaS를, 하나의 계정과 한 번의 설치로
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-pretty text-text-muted">
-            DeskCloud 는 약관·설문·리뷰·알림·검색·실시간·커뮤니티 같은 제품 기능을 독립 Desk 로
-            제공하는 패밀리입니다. 모두 같은 멀티테넌트 + 빌링 코어 위에 있어, 가입 한 번이면 어떤
-            Desk든 한 줄로 붙입니다.
+            DeskCloud 는 약관·설문·리뷰·알림·검색·실시간·커뮤니티·광고 같은 제품 기능을 독립 Desk 로
+            제공하는 패밀리입니다. 모두 같은 멀티테넌트 + 빌링 코어 위에 있어, 단일 SDK{' '}
+            <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-base text-text">
+              @heejun/deskcloud
+            </code>{' '}
+            한 번 설치로 어떤 Desk든 앱 안에서 네이티브로 렌더합니다.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button asChild size="lg">
@@ -92,30 +101,33 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* 한 줄 임베드 */}
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-label="한 줄 임베드">
+      {/* SDK 설치 */}
+      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6" aria-label="SDK 설치">
         <div className="grid items-center gap-10 lg:grid-cols-2">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight text-balance text-text">
-              어떤 Desk든, 똑같은 한 줄
+              어떤 Desk든, 똑같은 SDK
             </h2>
             <p className="mt-3 max-w-prose text-pretty text-text-muted">
-              비-React 사이트는 스크립트 태그 하나로 끝. 모든 Desk 가 동일한{' '}
+              설치 한 번이면 끝. 모든 Desk 가 동일한{' '}
               <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-[0.8125rem] text-text">
-                init({'{ appId, endpoint }'})
+                createXClient({'{ endpoint, publishableKey }'})
               </code>{' '}
               패턴을 따르므로, 한 번 익히면 전체 패밀리에 그대로 적용됩니다.
             </p>
             <ul className="mt-5 space-y-2 text-sm text-text-muted">
               <li className="flex items-center gap-2">
                 <Zap className="size-4 text-accent-strong" aria-hidden />
-                외부 CSS 프레임워크 0 · 의존성 최소
+                의존성 0(zero-dep) · 트리셰이커블 · 자체 타입 동봉
               </li>
               <li className="flex items-center gap-2">
                 <KeyRound className="size-4 text-accent-strong" aria-hidden />
                 publishable 키 + CORS allowlist 로 안전하게 공개
               </li>
             </ul>
+            <div className="mt-6 max-w-sm">
+              <InstallTabs />
+            </div>
             <div className="mt-6">
               <Button asChild variant="secondary">
                 <Link to="/docs">
@@ -124,7 +136,7 @@ export default function LandingPage() {
               </Button>
             </div>
           </div>
-          <CodeBlock code={snippet} language="html" />
+          <CodeBlock code={snippet} language="ts" />
         </div>
       </section>
 

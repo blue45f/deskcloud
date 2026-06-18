@@ -56,7 +56,7 @@ function Result({ result }: { result: TenantWithSecretDto }) {
         <KeyRow
           label="Publishable 키 (pk_…)"
           value={result.publishableKey}
-          hint="공개 안전 — 프론트엔드 임베드/위젯에 사용. CORS allowlist 와 함께 검증됩니다."
+          hint="공개 안전 — 브라우저 SDK(createXClient)에 사용. CORS allowlist 와 함께 검증됩니다."
         />
         <KeyRow
           label="Secret 키 (sk_…)"
@@ -69,7 +69,10 @@ function Result({ result }: { result: TenantWithSecretDto }) {
         <h3 className="text-sm font-semibold text-text">다음 단계</h3>
         <ol className="mt-2 space-y-1.5 text-[0.8125rem] text-text-muted">
           <li>1. secret 키로 콘솔에 로그인해 사용량·구독·키를 관리하세요.</li>
-          <li>2. 카탈로그에서 Desk 를 골라 publishable 키로 한 줄 임베드하세요.</li>
+          <li>
+            2. <code className="font-mono">npm i @heejun/deskcloud</code> 후 publishable 키로 Desk
+            를 네이티브로 렌더하세요.
+          </li>
           <li>3. 트래픽이 늘면 콘솔에서 Pro·Scale 로 업그레이드하세요.</li>
         </ol>
       </div>

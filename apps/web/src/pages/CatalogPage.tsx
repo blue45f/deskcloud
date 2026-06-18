@@ -1,17 +1,15 @@
 import { ArrowRight } from 'lucide-react'
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
-import { DESK_CATALOG, PRODUCT_DESKS, embedSnippet, type DeskEntry } from '@/data/deskCatalog'
+import { InstallTabs } from '@/components/ui/install-tabs'
+import { DESK_CATALOG, PRODUCT_DESKS, sdkSnippet, type DeskEntry } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 function DeskCard({ desk }: { desk: DeskEntry }) {
-  const [appId, setAppId] = useState('my-app')
-  const inputId = `appid-${desk.id}`
   return (
     <article className="flex flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex items-start gap-3">
@@ -44,21 +42,8 @@ function DeskCard({ desk }: { desk: DeskEntry }) {
         ))}
       </ul>
 
-      <div className="mt-4 flex items-center gap-2">
-        <label htmlFor={inputId} className="text-xs font-medium text-text-subtle">
-          appId
-        </label>
-        <input
-          id={inputId}
-          value={appId}
-          onChange={(e) => setAppId(e.target.value.trim() || 'my-app')}
-          className="h-7 w-40 rounded-md border border-border bg-bg px-2 font-mono text-xs text-text outline-none focus-visible:border-accent-strong focus-visible:ring-2 focus-visible:ring-accent-strong/30"
-          aria-label={`${desk.name} appId`}
-        />
-      </div>
-
-      <div className="mt-2">
-        <CodeBlock code={embedSnippet(desk, appId)} language="html" />
+      <div className="mt-4">
+        <CodeBlock code={sdkSnippet(desk)} language={desk.isCore ? 'bash' : 'ts'} />
       </div>
     </article>
   )
@@ -78,9 +63,15 @@ export default function CatalogPage() {
           DeskCloud 서비스 카탈로그
         </h1>
         <p className="mt-4 text-pretty text-text-muted">
-          {PRODUCT_DESKS.length}개 제품 Desk + 플랫폼 코어. 모두 같은 계정·빌링을 공유하며, 각
-          카드의 스니펫을 그대로 복사해 한 줄로 임베드할 수 있습니다.
+          {PRODUCT_DESKS.length}개 제품 Desk + 플랫폼 코어. 모두 같은 계정·빌링을 공유하며, 단일 SDK{' '}
+          <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-[0.8125rem] text-text">
+            @heejun/deskcloud
+          </code>{' '}
+          로 통합합니다. 각 카드의 스니펫을 그대로 복사해 앱 안에서 네이티브로 렌더하세요.
         </p>
+        <div className="mt-5 max-w-md">
+          <InstallTabs />
+        </div>
         <div className="mt-5 flex flex-wrap gap-3">
           <Button asChild>
             <Link to="/signup">

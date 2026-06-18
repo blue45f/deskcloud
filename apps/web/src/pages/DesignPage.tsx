@@ -760,11 +760,15 @@ export default function DesignPage() {
             {/* CodeBlock */}
             <h3 className="mt-12 mb-3 text-base font-semibold text-text">코드 블록 (복사)</h3>
             <CodeBlock
-              code={`<script src="https://api.deskcloud.dev/feedback-widget.js" defer></script>
-<script>
-  SurveyDesk.init({ appId: 'my-app', endpoint: 'https://api.deskcloud.dev' })
-</script>`}
-              language="html"
+              code={`import { createSurveyClient } from '@heejun/deskcloud'
+
+const survey = createSurveyClient({
+  endpoint: 'https://api.deskcloud.dev',
+  publishableKey: 'pk_…',
+})
+
+const active = await survey.getActive('my-app')`}
+              language="ts"
               className="max-w-2xl"
             />
 
