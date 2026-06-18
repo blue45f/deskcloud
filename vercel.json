@@ -3,5 +3,5 @@
   "framework": "vite",
   "buildCommand": "pnpm --filter @desk/web... build",
   "outputDirectory": "apps/web/dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }]
 }

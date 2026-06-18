@@ -140,7 +140,8 @@ export default function PricingPage() {
     queryKey: ['plans'],
     queryFn: fetchPlans,
   })
-  const plans = data ?? staticPlans()
+  // data 가 배열이 아니면(예: 정적 호스팅에서 /api 가 SPA HTML 로 폴백될 때) 정적 요금표로 안전 폴백.
+  const plans = Array.isArray(data) ? data : staticPlans()
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
