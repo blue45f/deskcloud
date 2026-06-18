@@ -13,8 +13,9 @@ export const TabsList = forwardRef<
     <TabsPrimitive.List
       ref={ref}
       className={cn(
-        // Radix가 tablist에 tabindex=0 + inline outline:none을 주므로, 포커스 가시성을 ring으로 보장.
-        'flex gap-1 overflow-x-auto border-b border-border focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong',
+        // Radix가 tablist에 tabindex=0 + inline outline:none 을 주므로, ! 로 inline 을 이기는 실제 outline 을
+        // focus-visible 에 부여(box-shadow ring 은 정적 a11y 체크가 포커스 대안으로 인정 안 함).
+        'flex gap-1 overflow-x-auto border-b border-border focus-visible:rounded-sm focus-visible:outline-2! focus-visible:-outline-offset-2! focus-visible:outline-accent-strong!',
         className
       )}
       {...props}
