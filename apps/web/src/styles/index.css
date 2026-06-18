@@ -1,0 +1,244 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── 디자인 토큰. @theme = 라이트 기본값(유틸 생성), .dark = 런타임 오버라이드.
+   SurveyDesk 토큰 구조를 미러링하되 DeskCloud 브랜드(인디고·시안 강조)로 차별화. ── */
+@theme {
+  --color-bg: oklch(0.994 0.003 260);
+  --color-surface: oklch(0.985 0.004 260);
+  --color-surface-2: oklch(0.965 0.006 260);
+  --color-border: oklch(0.915 0.007 260);
+  --color-border-strong: oklch(0.86 0.009 260);
+
+  --color-text: oklch(0.26 0.02 270);
+  --color-text-muted: oklch(0.52 0.018 270);
+  --color-text-subtle: oklch(0.63 0.014 270);
+
+  --color-ink: oklch(0.24 0.018 270);
+  --color-ink-hover: oklch(0.31 0.02 270);
+  --color-ink-fg: oklch(0.99 0.003 260);
+
+  --color-accent: oklch(0.62 0.18 277);
+  --color-accent-strong: oklch(0.55 0.2 277);
+  --color-accent-soft: oklch(0.95 0.035 277);
+  --color-accent-fg: oklch(0.32 0.12 277);
+
+  --color-success: oklch(0.6 0.13 150);
+  --color-success-soft: oklch(0.95 0.04 150);
+  --color-info: oklch(0.62 0.14 230);
+  --color-info-soft: oklch(0.95 0.04 230);
+  --color-warning: oklch(0.68 0.15 60);
+  --color-warning-soft: oklch(0.95 0.05 70);
+  --color-danger: oklch(0.57 0.18 25);
+  --color-danger-soft: oklch(0.95 0.04 25);
+
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI',
+    'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.06);
+  --shadow-sm:
+    0 1px 3px 0 hsl(var(--shadow-color) / 0.1), 0 1px 2px -1px hsl(var(--shadow-color) / 0.08);
+  --shadow-md:
+    0 4px 12px -2px hsl(var(--shadow-color) / 0.12), 0 2px 6px -2px hsl(var(--shadow-color) / 0.08);
+  --shadow-lg:
+    0 16px 40px -8px hsl(var(--shadow-color) / 0.22),
+    0 6px 14px -6px hsl(var(--shadow-color) / 0.12);
+}
+
+:root {
+  --shadow-color: 270 25% 12%;
+  color-scheme: light;
+}
+
+.dark {
+  --color-bg: oklch(0.19 0.012 270);
+  --color-surface: oklch(0.227 0.013 270);
+  --color-surface-2: oklch(0.27 0.015 270);
+  --color-border: oklch(0.32 0.016 270);
+  --color-border-strong: oklch(0.4 0.018 270);
+
+  --color-text: oklch(0.93 0.008 270);
+  --color-text-muted: oklch(0.72 0.012 270);
+  --color-text-subtle: oklch(0.6 0.012 270);
+
+  --color-ink: oklch(0.93 0.01 270);
+  --color-ink-hover: oklch(0.85 0.01 270);
+  --color-ink-fg: oklch(0.19 0.012 270);
+
+  --color-accent: oklch(0.72 0.17 277);
+  --color-accent-strong: oklch(0.8 0.16 277);
+  --color-accent-soft: oklch(0.32 0.08 277);
+  --color-accent-fg: oklch(0.95 0.04 277);
+
+  --color-success: oklch(0.7 0.13 150);
+  --color-success-soft: oklch(0.3 0.05 150);
+  --color-info: oklch(0.72 0.12 230);
+  --color-info-soft: oklch(0.32 0.05 230);
+  --color-warning: oklch(0.76 0.14 65);
+  --color-warning-soft: oklch(0.33 0.06 65);
+  --color-danger: oklch(0.68 0.17 25);
+  --color-danger-soft: oklch(0.32 0.07 25);
+
+  --shadow-color: 270 35% 2%;
+  color-scheme: dark;
+}
+
+/* ── 베이스 (반드시 @layer base: 언레이어드면 유틸리티를 덮어써 버림) ── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.014em;
+    color: var(--color-text);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-fg);
+  }
+}
+
+/* ── 스크롤바 ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 9999px;
+  border: 3px solid var(--color-bg);
+}
+
+/* ── a11y: 스킵링크 · 포커스 · 모션 · sr-only ── */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-ink);
+  color: var(--color-ink-fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-180%);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 본문 prose 줄길이 제한 */
+.prose-measure {
+  max-width: 72ch;
+}
+
+/* ── 모션 keyframes (Dialog/토스트/미터 등) ── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes meter-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}

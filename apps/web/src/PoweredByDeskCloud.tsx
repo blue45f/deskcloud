@@ -2,7 +2,7 @@
  * 'Powered by DeskCloud' 배지 — vendor/PoweredByDeskCloud.tsx 의 동기화 복사본(zero-dep).
  * Free 플랜 Desk 의 공개 위젯/페이지 하단에 노출. 유료(removeBranding)는 hidden 으로 숨김.
  */
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactElement } from 'react'
 
 export interface PoweredByDeskCloudProps {
   hidden?: boolean
@@ -12,8 +12,12 @@ export interface PoweredByDeskCloudProps {
 }
 
 const PALETTE = {
-  light: { fg: '#475569', bg: 'rgba(255,255,255,0.9)', border: '#e2e8f0' },
-  dark: { fg: '#cbd5e1', bg: 'rgba(15,23,42,0.85)', border: '#334155' },
+  light: { fg: 'var(--color-text)', bg: 'color-mix(in srgb, var(--color-surface) 85%, transparent)', border: 'var(--color-border)' },
+  dark: {
+    fg: 'var(--color-text)',
+    bg: 'color-mix(in srgb, var(--color-surface-2) 88%, transparent)',
+    border: 'var(--color-border-strong)',
+  },
 } as const
 
 export function PoweredByDeskCloud({
@@ -21,7 +25,7 @@ export function PoweredByDeskCloud({
   href = 'https://deskcloud.dev',
   theme = 'light',
   style,
-}: PoweredByDeskCloudProps): React.JSX.Element | null {
+}: PoweredByDeskCloudProps): ReactElement | null {
   if (hidden) return null
   const c = PALETTE[theme]
   return (
@@ -53,7 +57,7 @@ export function PoweredByDeskCloud({
           width: 8,
           height: 8,
           borderRadius: 2,
-          background: 'linear-gradient(135deg,#6366f1,#06b6d4)',
+          background: 'linear-gradient(135deg, var(--color-accent), var(--color-info))',
         }}
       />
       Powered by <strong style={{ fontWeight: 700 }}>DeskCloud</strong>
