@@ -2,6 +2,9 @@ import { type ComponentType, lazy, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import { CommandPalette } from './components/CommandPalette'
+import { ChangelogWidget } from './components/deskcloud/changelog/ChangelogWidget'
+import { NotificationBell } from './components/deskcloud/notify/NotificationBell'
+import { SearchPalette } from './components/deskcloud/search/SearchPalette'
 import { DialogHost } from './components/DialogHost'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { FeedbackWidget } from './components/feedback/FeedbackWidget'
@@ -212,6 +215,35 @@ export function App() {
             렌더한다(SurveyDesk 미배포 기본값에서는 앱에 아무 영향 없음). */}
         {import.meta.env.VITE_SURVEYDESK_URL && (
           <FeedbackWidget appId="spaseo" endpoint={import.meta.env.VITE_SURVEYDESK_URL} />
+        )}
+        {/* DeskCloud — 각 위젯은 해당 VITE_*_URL 이 설정된 경우에만 렌더(미배포 기본값=비활성).
+            모두 react-only · self-contained · 스코프 CSS(cd-/nd-/sk- 프리픽스)라 앱 스타일과 충돌 없음. */}
+        {/* ChangelogDesk 변경 이력 — fixed 플로팅 벨. SurveyDesk 가 우하단을 쓰므로 좌하단에 배치. */}
+        {import.meta.env.VITE_CHANGELOGDESK_URL && (
+          <ChangelogWidget
+            publishableKey={import.meta.env.VITE_CHANGELOGDESK_PK ?? 'pk_demo'}
+            endpoint={import.meta.env.VITE_CHANGELOGDESK_URL}
+            position="bottom-left"
+          />
+        )}
+        {/* NotifyDesk 알림 벨 — inline 컴포넌트라 fixed 컨테이너로 감싸 우상단에 띄운다. */}
+        {import.meta.env.VITE_NOTIFYDESK_URL && (
+          <div style={{ position: 'fixed', top: 12, right: 12, zIndex: 2147483000 }}>
+            <NotificationBell
+              recipientId="admin"
+              publishableKey={import.meta.env.VITE_NOTIFYDESK_PK ?? 'pk_demo'}
+              endpoint={import.meta.env.VITE_NOTIFYDESK_URL}
+            />
+          </div>
+        )}
+        {/* SearchDesk ⌘K 팔레트 — 앱 자체 CommandPalette 가 ⌘K 를 이미 쓰므로, 충돌 방지를 위해
+            ⌘⇧K(mod+shift+k) 핫키로 마운트한다(기존 기능을 덮어쓰지 않음). */}
+        {import.meta.env.VITE_SEARCHDESK_URL && (
+          <SearchPalette
+            publishableKey={import.meta.env.VITE_SEARCHDESK_PK ?? 'pk_demo'}
+            endpoint={import.meta.env.VITE_SEARCHDESK_URL}
+            hotkey="mod+shift+k"
+          />
         )}
       </ErrorBoundary>
     </>

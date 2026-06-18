@@ -13,6 +13,11 @@ export default defineConfig(
     '**/.venv/**',
     '**/*.d.ts',
     '**/*.config.*',
+    // 벤더링된 단일 파일 위젯(DeskCloud/SurveyDesk) — npm publish 막힌 동안 형제 앱에
+    // 그대로 복붙해 쓰는 사본이라 react-compiler/react-hooks/jsx-a11y strict 규칙을
+    // 설계상 통과 못 한다. 소스는 외부 패키지가 원본이므로 여기서 린트 대상에서 제외한다.
+    '**/components/deskcloud/**',
+    '**/components/feedback/**',
   ]),
 
   // 공유 베이스(TS + import 위생 + prettier 충돌 비활성). 프레임워크 비의존이라

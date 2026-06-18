@@ -23,7 +23,8 @@ export function useReducedMotion(): boolean {
   })
 
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof globalThis.matchMedia !== 'function') return undefined
+    if (typeof window === 'undefined' || typeof globalThis.matchMedia !== 'function')
+      return undefined
     const mq = globalThis.matchMedia('(prefers-reduced-motion: reduce)')
     const onChange = () => setReduced(mq.matches)
     mq.addEventListener('change', onChange)

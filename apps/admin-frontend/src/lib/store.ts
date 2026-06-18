@@ -90,7 +90,8 @@ export const useStore = create<State & Actions>((set, get) => ({
   sidebarOpen: typeof window !== 'undefined' ? globalThis.innerWidth >= 1024 : true,
   cmdPaletteOpen: false,
   shortcutsOpen: false,
-  tourSeen: typeof window !== 'undefined' ? globalThis.localStorage?.getItem(TOUR_KEY) === '1' : true,
+  tourSeen:
+    typeof window !== 'undefined' ? globalThis.localStorage?.getItem(TOUR_KEY) === '1' : true,
   tourStep: 0,
   toasts: [],
   globalError: '',

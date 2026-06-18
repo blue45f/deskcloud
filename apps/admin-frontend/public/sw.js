@@ -23,7 +23,9 @@ globalThis.addEventListener('fetch', (event) => {
         })
         .catch(() =>
           // 오프라인 내비 폴백 — 등록 scope 루트(데모 '/', 임베드 '/admin/ui/')의 캐시된 셸.
-          caches.match(request).then((cached) => cached || caches.match(globalThis.registration.scope))
+          caches
+            .match(request)
+            .then((cached) => cached || caches.match(globalThis.registration.scope))
         )
     )
   }
