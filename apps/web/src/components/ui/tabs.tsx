@@ -12,7 +12,11 @@ export const TabsList = forwardRef<
   return (
     <TabsPrimitive.List
       ref={ref}
-      className={cn('flex gap-1 overflow-x-auto border-b border-border', className)}
+      className={cn(
+        // Radix가 tablist에 tabindex=0 + inline outline:none을 주므로, 포커스 가시성을 ring으로 보장.
+        'flex gap-1 overflow-x-auto border-b border-border focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-strong',
+        className
+      )}
       {...props}
     />
   )

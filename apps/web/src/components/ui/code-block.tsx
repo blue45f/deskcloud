@@ -41,7 +41,14 @@ export function CodeBlock({
           </>
         )}
       </button>
-      <pre className="overflow-x-auto p-4 pt-12 text-[0.8125rem] leading-relaxed">
+      <pre
+        // 가로 스크롤 영역 — 키보드 사용자가 포커스해 스크롤(WCAG 2.1.1)하도록 tabIndex 필요(axe 요구).
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- 스크롤 영역은 region role+tabIndex 정당
+        tabIndex={0}
+        role="region"
+        aria-label={`${language} 코드 스니펫`}
+        className="overflow-x-auto p-4 pt-12 text-[0.8125rem] leading-relaxed focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:outline-none"
+      >
         <code className={cn('font-mono text-text', `language-${language}`)}>{code}</code>
       </pre>
     </div>
