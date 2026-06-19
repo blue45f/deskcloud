@@ -16,7 +16,11 @@ function ThemeToggle() {
       onClick={toggle}
       aria-label={resolved === 'dark' ? '라이트 모드로 전환' : '다크 모드로 전환'}
     >
-      {resolved === 'dark' ? <Sun className="size-[1.05rem]" /> : <Moon className="size-[1.05rem]" />}
+      {resolved === 'dark' ? (
+        <Sun className="size-[1.05rem]" />
+      ) : (
+        <Moon className="size-[1.05rem]" />
+      )}
     </Button>
   )
 }
@@ -42,6 +46,9 @@ export default function AppLayout() {
 
           <div className="ml-auto flex items-center gap-2">
             <Button asChild variant="ghost" size="sm">
+              <Link to="/admin/inquiries">문의</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
               <Link to="/catalog">카탈로그</Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">

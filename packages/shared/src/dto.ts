@@ -1,4 +1,4 @@
-import type { MemberRole, Plan, UsageMetric } from './constants'
+import type { InquiryCategory, InquiryStatus, MemberRole, Plan, UsageMetric } from './constants'
 
 /** 테넌트 공개 표현(서버 직렬화). secretKey/secretKeyHash 는 절대 포함하지 않는다. */
 export interface TenantDto {
@@ -46,4 +46,41 @@ export interface UsageSummaryDto {
   /** 'current' 또는 'YYYY-MM'. */
   period: string
   metrics: UsageMetricDto[]
+}
+
+/**
+ * 문의 공개 표현 — 공개 게시판이 읽는 안전 필드만.
+ * **contactEmail 은 포함하지 않는다**(공개 목록에서 redact). 어드민 표현은 {@link InquiryAdminDto}.
+ */
+export interface InquiryDto {
+  id: string
+  /** 문의를 보낸 형제 앱 식별자(예: 'rotifolk', 'offhours'). */
+  appId: string
+  category: InquiryCategory
+  status: InquiryStatus
+  title: string
+  body: string
+  /** 작성자 표시명(선택). */
+  authorName: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+/**
+ * 문의 어드민 표현 — 공개 필드 + contactEmail·originUrl(트리아지용).
+ * AdminTokenGuard 로 보호되는 경로에서만 직렬화한다.
+ */
+export interface InquiryAdminDto extends InquiryDto {
+  /** 회신용 이메일(선택). 공개 목록에서는 노출하지 않는다. */
+  contactEmail: string | null
+  /** 문의가 제출된 출처 URL(선택). */
+  originUrl: string | null
+}
+
+/** 문의 목록 응답(페이지네이션) — 공개 게시판/어드민 공용 봉투. */
+export interface InquiryListDto<T extends InquiryDto = InquiryDto> {
+  appId: string
+  items: T[]
+  limit: number
+  offset: number
 }

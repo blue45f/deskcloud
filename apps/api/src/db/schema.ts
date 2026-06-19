@@ -10,7 +10,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-import type { MemberRole, Plan, UsageMetric } from '@desk/shared'
+import type { InquiryCategory, InquiryStatus, MemberRole, Plan, UsageMetric } from '@desk/shared'
 
 /**
  * 테넌트(조직) — 멀티테넌트 루트. publishable 키는 평문(공개 안전), secret 은 해시만 저장.
@@ -95,4 +95,30 @@ export const subscriptions = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [unique('subscriptions_tenant_uq').on(t.tenantId)]
+)
+
+/**
+ * 문의(Inquiry) — 형제 앱이 공개 API 로 제출하는 게시판 항목. 테넌트가 아니라
+ * `appId`(형제 앱 식별자)로 묶인다(공개 위젯이라 키 인증 없이 들어온다).
+ * (appId)·(appId, createdAt) 인덱스로 앱별 최신순 조회를 가속한다.
+ */
+export const inquiries = pgTable(
+  'inquiries',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    appId: text('app_id').notNull(),
+    category: text('category').$type<InquiryCategory>().notNull(),
+    status: text('status').$type<InquiryStatus>().notNull().default('new'),
+    title: text('title').notNull(),
+    body: text('body').notNull(),
+    contactEmail: text('contact_email'),
+    originUrl: text('origin_url'),
+    authorName: text('author_name'),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('idx_inquiries_app').on(t.appId),
+    index('idx_inquiries_app_created').on(t.appId, t.createdAt),
+  ]
 )

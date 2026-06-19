@@ -53,6 +53,8 @@ export const router = createBrowserRouter([
       },
       // 라이브 스타일 가이드 — 자체 헤더를 가짐(공개).
       { path: 'design', lazy: lazyRetry(() => import('@/pages/DesignPage')) },
+      // 어드민 문의 보드 — 자체 헤더(공개 라우트, 데이터는 X-Admin-Token 으로 보호).
+      { path: 'admin/inquiries', lazy: lazyRetry(() => import('@/pages/AdminInquiriesPage')) },
       // 콘솔 — secret 키 필요.
       {
         path: 'dashboard',

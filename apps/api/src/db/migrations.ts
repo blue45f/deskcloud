@@ -68,4 +68,24 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 CREATE INDEX IF NOT EXISTS idx_subscriptions_tenant ON subscriptions (tenant_id);
 `,
   },
+  {
+    name: '0002_inquiries',
+    sql: /* sql */ `
+CREATE TABLE IF NOT EXISTS inquiries (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  app_id text NOT NULL,
+  category text NOT NULL,
+  status text NOT NULL DEFAULT 'new',
+  title text NOT NULL,
+  body text NOT NULL,
+  contact_email text,
+  origin_url text,
+  author_name text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_inquiries_app ON inquiries (app_id);
+CREATE INDEX IF NOT EXISTS idx_inquiries_app_created ON inquiries (app_id, created_at);
+`,
+  },
 ]

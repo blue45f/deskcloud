@@ -8,6 +8,7 @@ import { BootstrapService } from './bootstrap.service'
 import { AllExceptionsFilter } from './common/all-exceptions.filter'
 import { CoreModule } from './core/core.module'
 import { HealthModule } from './health/health.module'
+import { InquiriesModule } from './inquiries/inquiries.module'
 import { TenantsModule } from './tenants/tenants.module'
 
 @Module({
@@ -17,6 +18,7 @@ import { TenantsModule } from './tenants/tenants.module'
     CoreModule,
     TenantsModule,
     BillingModule,
+    InquiriesModule,
     HealthModule,
   ],
   providers: [

@@ -2,6 +2,9 @@ import type {
   CheckoutInput,
   CheckoutResponseDto,
   CreateTenantInput,
+  InquiryAdminDto,
+  InquiryListDto,
+  InquiryStatus,
   PlanSummaryDto,
   SubscriptionDto,
   TenantDto,
@@ -36,10 +39,12 @@ interface RequestOptions {
   query?: Record<string, string | undefined>
   /** secret 키(Bearer) 필요 여부. 기본 false(공개 경로). */
   auth?: boolean
+  /** 어드민 토큰 — 지정 시 X-Admin-Token 헤더로 싣는다(어드민 경로). */
+  adminToken?: string
 }
 
 async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', body, query, auth = false } = opts
+  const { method = 'GET', body, query, auth = false, adminToken } = opts
   const qs = query
     ? new URLSearchParams(
         Object.entries(query).filter((e): e is [string, string] => e[1] !== undefined)
@@ -53,6 +58,7 @@ async function request<T>(path: string, opts: RequestOptions = {}): Promise<T> {
     const token = getSessionToken()
     if (token) headers.authorization = `Bearer ${token}`
   }
+  if (adminToken) headers['x-admin-token'] = adminToken
 
   let res: Response
   try {
@@ -150,4 +156,38 @@ export function startCheckout(input: CheckoutInput): Promise<CheckoutResponseDto
 /** 구독 취소 → Free 복귀. */
 export function cancelSubscription(): Promise<SubscriptionDto> {
   return request<SubscriptionDto>('billing/cancel', { method: 'POST', auth: true })
+}
+
+// ── 문의(어드민, X-Admin-Token) ────────────────────────────────────────────
+
+/** 앱별 문의 목록(어드민) — 회신 이메일·출처 URL 포함. status 로 필터 가능. */
+export function fetchInquiriesAdmin(
+  appId: string,
+  adminToken: string,
+  params?: { status?: InquiryStatus; limit?: number; offset?: number }
+): Promise<InquiryListDto<InquiryAdminDto>> {
+  return request<InquiryListDto<InquiryAdminDto>>(
+    `v1/apps/${encodeURIComponent(appId)}/inquiries/admin`,
+    {
+      adminToken,
+      query: {
+        status: params?.status,
+        limit: params?.limit != null ? String(params.limit) : undefined,
+        offset: params?.offset != null ? String(params.offset) : undefined,
+      },
+    }
+  )
+}
+
+/** 문의 상태 변경(어드민) — new/in_progress/resolved/closed. */
+export function updateInquiryStatus(
+  appId: string,
+  id: string,
+  status: InquiryStatus,
+  adminToken: string
+): Promise<InquiryAdminDto> {
+  return request<InquiryAdminDto>(
+    `v1/apps/${encodeURIComponent(appId)}/inquiries/${encodeURIComponent(id)}/status`,
+    { method: 'PATCH', body: { status }, adminToken }
+  )
 }

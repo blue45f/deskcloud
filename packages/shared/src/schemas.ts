@@ -1,6 +1,9 @@
 import { z } from 'zod'
 
 import {
+  INQUIRY_CATEGORIES,
+  INQUIRY_LIST_MAX_LIMIT,
+  INQUIRY_STATUSES,
   MEMBER_ROLES,
   PLANS,
   SLUG_RE,
@@ -65,5 +68,39 @@ export type RecordUsageInput = z.infer<typeof recordUsageSchema>
 export const usagePeriodSchema = z
   .string()
   .trim()
-  .refine((v) => v === 'current' || USAGE_PERIOD_RE.test(v), "기간은 'current' 또는 'YYYY-MM' 형식이어야 합니다")
+  .refine(
+    (v) => v === 'current' || USAGE_PERIOD_RE.test(v),
+    "기간은 'current' 또는 'YYYY-MM' 형식이어야 합니다"
+  )
 export type UsagePeriod = z.infer<typeof usagePeriodSchema>
+
+/**
+ * 문의 제출 입력 — 형제 앱이 공개 API 로 그대로 POST 한다(SDK 불필요).
+ * `website` 는 허니팟: 봇이 채우는 미끼 필드로, 비어 있어야 통과한다(사람은 보이지 않음).
+ */
+export const submitInquirySchema = z.object({
+  category: z.enum(INQUIRY_CATEGORIES),
+  title: z.string().trim().min(1).max(120),
+  body: z.string().trim().min(1).max(4000),
+  contactEmail: z.string().trim().toLowerCase().email().max(255).optional(),
+  authorName: z.string().trim().min(1).max(80).optional(),
+  originUrl: z.string().trim().url().max(2048).optional(),
+  /** 허니팟 — 반드시 비어 있어야 한다(채워져 오면 봇으로 간주). */
+  website: z.string().max(0, '허니팟 필드는 비어 있어야 합니다').optional().or(z.literal('')),
+})
+export type SubmitInquiryInput = z.infer<typeof submitInquirySchema>
+
+/** 문의 목록 페이지네이션 쿼리 — limit(1..50, 기본 20) · offset(≥0, 기본 0). */
+export const inquiryListQuerySchema = z.object({
+  limit: z.coerce.number().int().min(1).max(INQUIRY_LIST_MAX_LIMIT).optional(),
+  offset: z.coerce.number().int().min(0).optional(),
+  /** 어드민 목록 한정 — 상태로 필터(미지정 시 전체). */
+  status: z.enum(INQUIRY_STATUSES).optional(),
+})
+export type InquiryListQuery = z.infer<typeof inquiryListQuerySchema>
+
+/** 문의 상태 변경 입력(어드민 트리아지). */
+export const updateInquiryStatusSchema = z.object({
+  status: z.enum(INQUIRY_STATUSES),
+})
+export type UpdateInquiryStatusInput = z.infer<typeof updateInquiryStatusSchema>
