@@ -6,18 +6,21 @@ import { ThemeProvider } from './ThemeProvider'
 
 import ErrorBoundary from '@/components/common/ErrorBoundary'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { AuthProvider } from '@/lib/firebaseAuth'
 import { router } from '@/router'
 
-/** 앱 루트 — Query · Theme · Tooltip · 에러바운더리 · 라우터를 배선한다. */
+/** 앱 루트 — Query · Theme · Auth · Tooltip · 에러바운더리 · 라우터를 배선한다. */
 export default function AppProviders() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <TooltipProvider delayDuration={200} skipDelayDuration={300}>
-          <ErrorBoundary>
-            <RouterProvider router={router} />
-          </ErrorBoundary>
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+            <ErrorBoundary>
+              <RouterProvider router={router} />
+            </ErrorBoundary>
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
   )

@@ -5,6 +5,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { useSessionStore } from '@/app/sessionStore'
 import { useTheme } from '@/app/ThemeContext'
 import { Brand } from '@/components/layout/Brand'
+import { MemberAuthControl } from '@/components/layout/MemberAuthControl'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils/cn'
 
@@ -65,6 +66,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <MemberAuthControl />
           <ThemeToggle />
           {isAuthed ? (
             <Button asChild size="sm" className="hidden sm:inline-flex">

@@ -11,3 +11,8 @@ allowBuilds:
   '@swc/core': true
   unrs-resolver: true
   '@scarf/scarf': false
+  # firebase 웹 SDK(Auth)는 번들에서 이 빌드 스크립트가 필요 없다.
+  # @firebase/util 의 postinstall 은 Scarf 분석 no-op, protobufjs 는 우리가 쓰지 않는
+  # 모듈(Firestore 등)용 코드 생성이라 명시적으로 거절한다.
+  '@firebase/util': false
+  protobufjs: false
