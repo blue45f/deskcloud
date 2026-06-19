@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { App } from '../App'
+import { AuthProvider } from '../lib/firebaseAuth'
 import { useStore } from '../lib/store'
 
 import { resetStore } from './test-utils'
@@ -40,7 +41,9 @@ describe('App global shortcuts', () => {
     globalThis.fetch = mockFetch()
     render(
       <MemoryRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MemoryRouter>
     )
     await waitFor(() => expect(useStore.getState().authed).toBe(true)) // settle whoami
@@ -58,7 +61,9 @@ describe('App global shortcuts', () => {
     globalThis.fetch = mockFetch()
     render(
       <MemoryRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MemoryRouter>
     )
     await waitFor(() => expect(useStore.getState().authed).toBe(true))
@@ -73,7 +78,9 @@ describe('App global shortcuts', () => {
     globalThis.fetch = mockFetch()
     render(
       <MemoryRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MemoryRouter>
     )
     await waitFor(() => expect(useStore.getState().authed).toBe(true))
@@ -96,7 +103,9 @@ describe('App whoami bootstrap', () => {
     globalThis.fetch = mockFetch({ authenticated: true, adminEnabled: true })
     render(
       <MemoryRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MemoryRouter>
     )
     await waitFor(() => expect(useStore.getState().authed).toBe(true))
@@ -108,7 +117,9 @@ describe('App whoami bootstrap', () => {
     globalThis.fetch = vi.fn(() => Promise.reject(new Error('network'))) as unknown as typeof fetch
     render(
       <MemoryRouter>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </MemoryRouter>
     )
     await waitFor(() => expect(useStore.getState().authed).toBe(false))

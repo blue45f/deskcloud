@@ -3,6 +3,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Layout } from '../../components/Layout'
+import { AuthProvider } from '../../lib/firebaseAuth'
 import { mockJsonFetch, resetStore } from '../test-utils'
 
 const originalFetch = globalThis.fetch
@@ -19,13 +20,15 @@ afterEach(() => {
 
 function renderLayout() {
   return render(
-    <MemoryRouter initialEntries={['/']}>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route index element={<div data-testid="child" />} />
-        </Route>
-      </Routes>
-    </MemoryRouter>
+    <AuthProvider>
+      <MemoryRouter initialEntries={['/']}>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route index element={<div data-testid="child" />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    </AuthProvider>
   )
 }
 

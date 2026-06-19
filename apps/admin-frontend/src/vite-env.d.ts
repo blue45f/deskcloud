@@ -18,6 +18,21 @@ interface ImportMetaEnv {
   readonly VITE_SEARCHDESK_PK?: string
   /** desk-platform 문의(Inquiry) 백엔드 URL. 미설정 시 prod 기본값(desk-platform.vercel.app). */
   readonly VITE_DESK_PLATFORM_URL?: string
+
+  /* 통합 로그인(Firebase Auth, deskcloud-fleet-auth) — 리터럴 금지, env 로만 주입.
+     apiKey/appId 가 없으면 인증은 런타임에서 비활성(isFirebaseAuthConfigured=false)된다. */
+  /** Firebase 웹 apiKey(`AIza…`). 로컬 `.env.local` + Vercel env 로만 공급(커밋 금지). */
+  readonly VITE_FIREBASE_API_KEY?: string
+  /** Firebase authDomain. 미설정 시 `deskcloud-fleet-auth.firebaseapp.com`. */
+  readonly VITE_FIREBASE_AUTH_DOMAIN?: string
+  /** Firebase projectId. 미설정 시 `deskcloud-fleet-auth`. */
+  readonly VITE_FIREBASE_PROJECT_ID?: string
+  /** Firebase storageBucket. */
+  readonly VITE_FIREBASE_STORAGE_BUCKET?: string
+  /** Firebase messagingSenderId. */
+  readonly VITE_FIREBASE_SENDER_ID?: string
+  /** Firebase appId. 로컬 `.env.local` + Vercel env 로만 공급(커밋 금지). */
+  readonly VITE_FIREBASE_APP_ID?: string
 }
 
 interface ImportMeta {

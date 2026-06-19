@@ -5,6 +5,7 @@ import { findNavItemByPath, requiresAuth } from '../lib/nav'
 import { useStore } from '../lib/store'
 
 import { LoginForm } from './LoginForm'
+import { MemberAuthControl } from './MemberAuthControl'
 
 export function Header() {
   const location = useLocation()
@@ -36,16 +37,21 @@ export function Header() {
         </h1>
         <p className="text-xs text-ink-subtle truncate">{item ? t(item.subtitleKey) : ''}</p>
       </div>
-      {showLogin ? <LoginForm /> : null}
-      {authed ? (
-        <button
-          type="button"
-          className="btn-ghost shrink-0 min-h-[44px] md:min-h-0 px-3 py-1.5 text-sm"
-          onClick={logout}
-        >
-          {t('auth.logout')}
-        </button>
-      ) : null}
+      <div className="flex shrink-0 items-center gap-2">
+        {showLogin ? <LoginForm /> : null}
+        {authed ? (
+          <button
+            type="button"
+            className="btn-ghost shrink-0 min-h-[44px] md:min-h-0 px-3 py-1.5 text-sm"
+            onClick={logout}
+          >
+            {t('auth.logout')}
+          </button>
+        ) : null}
+        {/* 통합 회원 로그인(Firebase) — 위의 관리자 토큰 로그인과 별개로 항상 노출되는
+            추가 진입점(이메일/게스트). env 미설정이면 다이얼로그가 친절히 안내한다. */}
+        <MemberAuthControl />
+      </div>
     </header>
   )
 }

@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { type RenderOptions, type RenderResult, render } from '@testing-library/react'
 import { MemoryRouter, type MemoryRouterProps, Outlet, Route, Routes } from 'react-router-dom'
 
+import { AuthProvider } from '../lib/firebaseAuth'
 import { useStore } from '../lib/store'
 
 import type { PublicInfo } from '../lib/types'
@@ -31,7 +32,11 @@ function makeTestQueryClient(): QueryClient {
  * 있게 하는 래퍼. 매 호출마다 새 QueryClient 라 테스트 간 캐시 누수가 없다.
  */
 export function withQueryClient(ui: ReactElement): ReactElement {
-  return <QueryClientProvider client={makeTestQueryClient()}>{ui}</QueryClientProvider>
+  return (
+    <QueryClientProvider client={makeTestQueryClient()}>
+      <AuthProvider>{ui}</AuthProvider>
+    </QueryClientProvider>
+  )
 }
 
 /**
@@ -50,13 +55,18 @@ export function renderWithRouter(
   const queryClient = makeTestQueryClient()
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={initialEntries}>
-        <Routes>
-          <Route element={<OutletShim publicInfo={publicInfo} />}>
-            <Route path="*" element={ui} />
-          </Route>
-        </Routes>
-      </MemoryRouter>
+      {/* 통합 회원 로그인(Firebase) 컨텍스트 — Header 등 useAuth() 소비 컴포넌트용.
+          테스트 env 엔 VITE_FIREBASE_* 가 없어 인증 비활성(loading=false, user=null)이라
+          네트워크/구독 없이 즉시 안정 상태로 마운트된다. */}
+      <AuthProvider>
+        <MemoryRouter initialEntries={initialEntries}>
+          <Routes>
+            <Route element={<OutletShim publicInfo={publicInfo} />}>
+              <Route path="*" element={ui} />
+            </Route>
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
     </QueryClientProvider>,
     options
   )

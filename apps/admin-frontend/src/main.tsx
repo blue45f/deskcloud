@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 
 import { App } from './App'
+import { AuthProvider } from './lib/firebaseAuth'
 import { queryClient } from './lib/queryClient'
 import './styles.css'
 
@@ -31,9 +32,13 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
 createRoot(root).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter basename={basename}>
-        <App />
-      </BrowserRouter>
+      {/* 통합 회원 로그인(Firebase Auth) — 앱 전반에서 useAuth() 로 소비. env 미설정이면
+          런타임에서 친절히 degrade 한다(빌드/마운트는 무해). */}
+      <AuthProvider>
+        <BrowserRouter basename={basename}>
+          <App />
+        </BrowserRouter>
+      </AuthProvider>
     </QueryClientProvider>
   </StrictMode>
 )

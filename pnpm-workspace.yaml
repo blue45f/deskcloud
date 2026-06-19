@@ -3,7 +3,11 @@ packages:
   - 'apps/*'
 
 allowBuilds:
+  # firebase 웹 SDK 의 전이 의존성 — 빌드 스크립트 불필요(순수 번들). false 로 명시해
+  # ERR_PNPM_IGNORED_BUILDS 프롬프트를 끈다(fleet 컨벤션).
+  '@firebase/util': false
   esbuild: true
+  protobufjs: false
   puppeteer: true
   unrs-resolver: true
 
