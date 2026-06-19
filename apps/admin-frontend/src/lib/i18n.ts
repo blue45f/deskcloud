@@ -88,6 +88,7 @@ const ko: Strings = {
   'btn.measure': 'Lighthouse 측정',
   'btn.cancel': '취소',
   'btn.close': '닫기',
+  'btn.copy': '복사',
 
   // In-app dialog (confirm/prompt)
   'dialog.ok': '확인',
@@ -186,6 +187,9 @@ const ko: Strings = {
   'lighthouse.scores.accessibility': 'Accessibility',
   'lighthouse.scores.seo': 'SEO',
   'lighthouse.scores.bestPractices': 'Best Practices',
+  'lighthouse.share': '점수 공유',
+  'lighthouse.share.title': 'Lighthouse 점수',
+  'lighthouse.share.copied': '점수표가 클립보드에 복사됨',
 
   // Visual
   'visual.title': '시각 회귀 (Visual Regression)',
@@ -226,6 +230,20 @@ const ko: Strings = {
   'audit.ok': '무결성 OK',
   'audit.broken': '변조 감지',
   'audit.empty': '기록된 감사 이벤트가 없습니다.',
+  'audit.filter.placeholder': 'actor · action · target 검색',
+  'audit.filter.none': '필터에 맞는 이벤트가 없습니다.',
+  'audit.outcome.all': '전체',
+  'audit.outcome.ok': '성공',
+  'audit.outcome.error': '실패',
+  'audit.summary.total': '이벤트',
+  'audit.summary.ok': '성공',
+  'audit.summary.error': '실패',
+  'audit.export': 'JSON 내보내기',
+  'audit.export.empty': '내보낼 이벤트가 없습니다.',
+  'audit.export.done': '감사 로그 내보냄',
+  'audit.copyHash': '해시 복사',
+  'audit.copyHash.done': '해시 복사됨',
+  'audit.count': '{shown} / {total}건',
 
   // API
   'api.title': 'API 엔드포인트 레퍼런스',
@@ -556,6 +574,7 @@ const en: Strings = {
   'btn.measure': 'Measure',
   'btn.cancel': 'Cancel',
   'btn.close': 'Close',
+  'btn.copy': 'Copy',
 
   // In-app dialog (confirm/prompt)
   'dialog.ok': 'OK',
@@ -653,6 +672,9 @@ const en: Strings = {
   'lighthouse.scores.accessibility': 'Accessibility',
   'lighthouse.scores.seo': 'SEO',
   'lighthouse.scores.bestPractices': 'Best Practices',
+  'lighthouse.share': 'Share scores',
+  'lighthouse.share.title': 'Lighthouse scores',
+  'lighthouse.share.copied': 'Scorecard copied to clipboard',
 
   // Visual
   'visual.title': 'Visual Regression',
@@ -693,6 +715,20 @@ const en: Strings = {
   'audit.ok': 'integrity OK',
   'audit.broken': 'tampering detected',
   'audit.empty': 'No audit events recorded yet.',
+  'audit.filter.placeholder': 'Search actor · action · target',
+  'audit.filter.none': 'No events match the filter.',
+  'audit.outcome.all': 'All',
+  'audit.outcome.ok': 'OK',
+  'audit.outcome.error': 'Error',
+  'audit.summary.total': 'events',
+  'audit.summary.ok': 'ok',
+  'audit.summary.error': 'error',
+  'audit.export': 'Export JSON',
+  'audit.export.empty': 'No events to export.',
+  'audit.export.done': 'Audit log exported',
+  'audit.copyHash': 'Copy hash',
+  'audit.copyHash.done': 'Hash copied',
+  'audit.count': '{shown} / {total}',
 
   // API
   'api.title': 'API endpoint reference',

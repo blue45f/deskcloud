@@ -64,6 +64,106 @@ describe('AuditLog page', () => {
     expect(screen.getByText('10:30:45')).toBeInTheDocument()
   })
 
+  it('filters rows by text and by outcome', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          events: [
+            {
+              ts: '2026-04-27T10:30:45.123Z',
+              actor: 'admin',
+              action: 'cache.clear',
+              outcome: 'ok',
+              hash: 'abcd1234ef5678abcdef',
+            },
+            {
+              ts: '2026-04-27T10:31:00.000Z',
+              actor: 'system',
+              action: 'visual.diff',
+              target: 'https://x/y',
+              outcome: 'error',
+              hash: '99887766554433221100',
+            },
+          ],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } }
+      )
+    )
+    renderWithRouter(<AuditLog />)
+    await waitFor(() => expect(screen.getByText('cache.clear')).toBeInTheDocument())
+
+    // text filter narrows to the matching actor
+    fireEvent.change(screen.getByPlaceholderText('actor · action · target 검색'), {
+      target: { value: 'system' },
+    })
+    expect(screen.queryByText('cache.clear')).not.toBeInTheDocument()
+    expect(screen.getByText('visual.diff')).toBeInTheDocument()
+
+    // clearing the filter and switching outcome to 성공 hides the error row
+    fireEvent.change(screen.getByPlaceholderText('actor · action · target 검색'), {
+      target: { value: '' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: '성공' }))
+    expect(screen.getByText('cache.clear')).toBeInTheDocument()
+    expect(screen.queryByText('visual.diff')).not.toBeInTheDocument()
+  })
+
+  it('shows a filtered empty state when nothing matches', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          events: [
+            {
+              ts: '2026-04-27T10:30:45.123Z',
+              actor: 'admin',
+              action: 'cache.clear',
+              outcome: 'ok',
+              hash: 'abcd1234ef5678abcdef',
+            },
+          ],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } }
+      )
+    )
+    renderWithRouter(<AuditLog />)
+    await waitFor(() => expect(screen.getByText('cache.clear')).toBeInTheDocument())
+    fireEvent.change(screen.getByPlaceholderText('actor · action · target 검색'), {
+      target: { value: 'zzz-no-match' },
+    })
+    expect(screen.getByText('필터에 맞는 이벤트가 없습니다.')).toBeInTheDocument()
+  })
+
+  it('copies an event hash to the clipboard', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText },
+    })
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          events: [
+            {
+              ts: '2026-04-27T10:30:45.123Z',
+              actor: 'admin',
+              action: 'cache.clear',
+              outcome: 'ok',
+              hash: 'abcd1234ef5678abcdef',
+            },
+          ],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } }
+      )
+    )
+    renderWithRouter(<AuditLog />)
+    await waitFor(() => expect(screen.getByText('cache.clear')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /해시 복사: abcd1234ef5678abcdef/ }))
+    await waitFor(() => expect(writeText).toHaveBeenCalledWith('abcd1234ef5678abcdef'))
+  })
+
   it('verify button calls /audit/verify', async () => {
     const fetchMock = vi.fn()
     fetchMock.mockResolvedValueOnce(

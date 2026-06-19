@@ -1,8 +1,10 @@
+import { Share2 } from 'lucide-react'
 import { type FormEvent, useState } from 'react'
 
 import { AuthGate } from '../components/AuthGate'
 import { api, errorMessage } from '../lib/api'
 import { lighthouseScoreBand, lighthouseScoreColor } from '../lib/format'
+import { shareOrCopy } from '../lib/share'
 import { useStore } from '../lib/store'
 
 import type { LighthouseResult, LighthouseScores } from '../lib/types'
@@ -18,6 +20,7 @@ export function Lighthouse() {
 function LighthouseBody() {
   const t = useStore((s) => s.t)
   const setError = useStore((s) => s.setGlobalError)
+  const pushToast = useStore((s) => s.pushToast)
   const [url, setUrl] = useState('')
   const [running, setRunning] = useState(false)
   const [result, setResult] = useState<LighthouseResult | null>(null)
@@ -44,6 +47,18 @@ function LighthouseBody() {
     { key: 'seo', label: t('lighthouse.scores.seo') },
     { key: 'bestPractices', label: t('lighthouse.scores.bestPractices') },
   ]
+
+  // 측정 결과를 사람이 읽을 한 줄 점수표로 공유/복사한다. 네이티브 공유 시트 우선, 미지원 시 클립보드.
+  async function shareScores(r: LighthouseResult) {
+    const scoreLine = labels.map((l) => `${l.label} ${Math.round(r.scores[l.key])}`).join(' · ')
+    const res = await shareOrCopy({
+      title: t('lighthouse.share.title'),
+      text: `${r.url} — ${scoreLine}`,
+      url: r.url,
+    })
+    if (res === 'copied') pushToast(t('lighthouse.share.copied'), 'success')
+    else if (res === 'unsupported') pushToast(t('toast.clipboard.denied'), 'warn')
+  }
 
   return (
     <section className="space-y-4" data-testid="page-lighthouse">
@@ -85,7 +100,17 @@ function LighthouseBody() {
                 <span className="ml-2 badge badge--neutral">{t('lighthouse.cached')}</span>
               ) : null}
             </div>
-            <span className="text-xs text-ink-subtle">{result.durationMs}ms</span>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                className="btn-ghost inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium"
+                onClick={() => shareScores(result)}
+              >
+                <Share2 className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                {t('lighthouse.share')}
+              </button>
+              <span className="text-xs text-ink-subtle">{result.durationMs}ms</span>
+            </div>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {labels.map((l) => {
