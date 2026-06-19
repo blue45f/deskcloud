@@ -3,8 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
+    <!-- PWA: theme-color = 잉크(#1c1f28, styles/index.css --color-ink). 매니페스트 링크와 SW
+         등록은 vite-plugin-pwa 가 빌드 시 자동 주입하므로 중복 선언하지 않는다. -->
+    <meta name="theme-color" content="#1c1f28" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DeskCloud" />
     <meta
       name="description"
       content="DeskCloud — 여러 SaaS를 하나의 계정과 한 줄 임베드로. 약관·설문·리뷰·알림·검색·실시간·커뮤니티 Desk 패밀리의 통합 멀티테넌트 + 빌링 플랫폼."
