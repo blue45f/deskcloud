@@ -50,8 +50,7 @@ dev   http://localhost:6090        # 로컬 desk-platform api
 ```
 
 - `201` → 생성된 `InquiryDto`(공개 필드만; `contactEmail`/`originUrl` 미포함)
-- 허니팟(`website` 채워짐) → `202 { accepted: true }` 후 저장 안 함(봇 무음 처리)
-- 검증 실패 → `400 { message: string[] }`
+- 허니팟(`website` 채워짐) 또는 검증 실패 → `400 { message: string[] }` (봇/잘못된 입력 차단·저장 안 함)
 
 ### 공개 게시판 목록 — `GET /api/v1/apps/:appId/inquiries?limit=20&offset=0` (60/min/IP)
 
@@ -129,4 +128,7 @@ export async function listInquiries(limit = 20, offset = 0) {
 }
 ```
 
-라이브 동작은 desk-platform 배포 후 가능. 로컬에서는 desk-platform api(:6090)를 띄워 검증.
+**라이브 상태(2026-06-19~)**: `desk-platform.vercel.app/api/*`가 AWS EC2 DeskCloud 게이트웨이
+(`16.176.210.195.nip.io/platform/api/*`, NestJS 컨테이너 + PGlite)로 프록시되어 동작 중.
+앱은 추가 설정 없이 기본 베이스 URL(`desk-platform.vercel.app`)로 호출하면 된다.
+로컬 개발 시에만 desk-platform api(:6090) 또는 `VITE_DESK_PLATFORM_URL`로 오버라이드.
