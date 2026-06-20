@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#101826" />
+    <meta
+      name="description"
+      content="MediaDesk — 멀티테넌트 미디어 업로드·변환·CDN SaaS. 테넌트가 직접 가입해 publishable/secret 키를 발급받고, 브라우저에서 업로드·공개 자산 조회, 서버에서 자산 관리를 한다."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MediaDesk" />
+    <meta property="og:title" content="MediaDesk — 업로드·변환·CDN as a Service" />
+    <meta
+      property="og:description"
+      content="한 줄 임베드 업로더·갤러리, 온더플라이 이미지 변환(리사이즈·포맷·품질), 테넌트별 키·CORS·사용량. SaaS·셀프호스팅."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MediaDesk — 업로드·변환·CDN as a Service" />
+    <meta
+      name="twitter:description"
+      content="한 줄 임베드 업로더·갤러리, 온더플라이 이미지 변환, 테넌트별 키·CORS·사용량."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PWA: apple-touch-icon + iOS standalone 메타. manifest 링크와 SW 등록은
+         vite-plugin-pwa(injectRegister:'auto')가 자동 주입하므로 여기서 중복 선언하지 않는다. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MediaDesk" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>MediaDesk — 업로드·변환·CDN as a Service</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
