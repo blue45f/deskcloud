@@ -1,0 +1,30 @@
+{
+  "$comment": "DeskCloud 모노레포 흡수 provenance. 각 Desk의 origin 레포는 sibling으로 LIVE 유지(mirror-first); 이 모노레포는 cutover까지 미러. origin 레포에 'pre-monorepo' 태그(=importedSha)가 드리프트 비교 기준. docs/MONOREPO-CONSOLIDATION-PLAN.md §4.2/§4.4 참조.",
+  "importDate": "2026-06-20",
+  "boundary": "partial-but-wide",
+  "excluded": {
+    "remote-devtools": "299MB 벤더 Chromium 포크 — 격리(filter-repo invert-paths). sibling 유지.",
+    "deskcloud-sdk": "발행 @heejun/deskcloud — published artifact, sibling 유지.",
+    "deskcloud-deploy": "배포 하네스(compose+Caddy+secrets) — sibling 유지.",
+    "@heejun/web-config-preset": "DeskCloud 외 더 넓은 소비자 — external 유지."
+  },
+  "imported": [
+    { "name": "desk-platform",  "prefix": "platform",              "originSha": "9d7b565ddc00", "origin": "https://github.com/blue45f/desk-platform.git",  "method": "subtree-full-history" },
+    { "name": "spa-seo-gateway","prefix": "desks/seo-gateway",     "originSha": "3c28a2e0a4b9", "origin": "https://github.com/blue45f/spa-seo-gateway.git","method": "subtree-full-history" },
+    { "name": "addesk",         "prefix": "desks/addesk",          "originSha": "8d3c33f69101", "origin": "https://github.com/blue45f/addesk.git",         "method": "subtree-squash" },
+    { "name": "authdesk",       "prefix": "desks/authdesk",        "originSha": "74a1906951d6", "origin": "https://github.com/blue45f/authdesk.git",       "method": "subtree-squash" },
+    { "name": "filedesk",       "prefix": "desks/filedesk",        "originSha": "6b65df3eaa7d", "origin": "https://github.com/blue45f/filedesk.git",       "method": "subtree-squash" },
+    { "name": "reviewdesk",     "prefix": "desks/reviewdesk",      "originSha": "0ccb87a98f93", "origin": "https://github.com/blue45f/reviewdesk.git",     "method": "subtree-squash" },
+    { "name": "surveydesk",     "prefix": "desks/surveydesk",      "originSha": "7e3d1c360053", "origin": "https://github.com/blue45f/surveydesk.git",     "method": "subtree-squash" },
+    { "name": "chatdesk",       "prefix": "desks/chatdesk",        "originSha": "8bf0088fdeb5", "origin": "https://github.com/blue45f/chatdesk.git",       "method": "subtree-squash" },
+    { "name": "communitydesk",  "prefix": "desks/communitydesk",   "originSha": "c2c3eb7da377", "origin": "https://github.com/blue45f/communitydesk.git",  "method": "subtree-squash" },
+    { "name": "mediadesk",      "prefix": "desks/mediadesk",       "originSha": "40cdf7444909", "origin": "https://github.com/blue45f/mediadesk.git",      "method": "subtree-squash" },
+    { "name": "moderationdesk", "prefix": "desks/moderationdesk",  "originSha": "cc321eba3a7c", "origin": "https://github.com/blue45f/moderationdesk.git", "method": "subtree-squash" },
+    { "name": "notifydesk",     "prefix": "desks/notifydesk",      "originSha": "e52aea7eb5a7", "origin": "https://github.com/blue45f/notifydesk.git",     "method": "subtree-squash" },
+    { "name": "searchdesk",     "prefix": "desks/searchdesk",      "originSha": "6be5e4aa640e", "origin": "https://github.com/blue45f/searchdesk.git",     "method": "subtree-squash" },
+    { "name": "changelogdesk",  "prefix": "desks/changelogdesk",   "originSha": "787bec376a73", "origin": "https://github.com/blue45f/changelogdesk.git",  "method": "subtree-squash" },
+    { "name": "realtimedesk",   "prefix": "desks/realtimedesk",    "originSha": "67e3146658db", "origin": "https://github.com/blue45f/realtimedesk.git",   "method": "subtree-squash" },
+    { "name": "aidigestdesk",   "prefix": "desks/aidigestdesk",    "originSha": "20097f5df10e", "origin": "https://github.com/blue45f/aidigestdesk.git",   "method": "subtree-squash" },
+    { "name": "termsdesk",      "prefix": "desks/termsdesk",       "originSha": "3143796d41c7", "origin": "https://github.com/blue45f/termsdesk.git",      "method": "subtree-squash" }
+  ]
+}

@@ -1,0 +1,3 @@
+# 스코프드 pre-push(플랜 §6.3): 전체 그래프 대신 typecheck만 — 무거운 build/test는 CI/수동.
+# (turbo affected는 @desk/* workspace 라우팅 후 도입)
+pnpm run typecheck

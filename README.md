@@ -5,11 +5,15 @@ DeskCloud SaaS 패밀리를 하나의 pnpm 모노레포로 통합한 저장소. 
 
 ## 구조
 
-| 경로 | 출처 (origin) | 역할 |
-| --- | --- | --- |
-| `platform/` | [desk-platform](https://github.com/blue45f/desk-platform) | `@desk/platform` 멀티테넌트 + 빌링 코어 (`packages/{shared,core,billing}` · `apps/{api,web}` · `vendor/`) |
-| `desks/seo-gateway/` | [spa-seo-gateway](https://github.com/blue45f/spa-seo-gateway) | 다이내믹 렌더링 SEO 게이트웨이 (이미 saas 멀티테넌트 모드) |
-| `desks/<name>/` *(예정)* | 동질 백엔드 14 Desk + aidigestdesk | 흡수 배치 — `docs/MONOREPO-CONSOLIDATION-PLAN.md` §5 |
+| 경로            | 출처 (origin)                                             | 역할                                                                                                      |
+| --------------- | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `platform/`     | [desk-platform](https://github.com/blue45f/desk-platform) | `@desk/platform` 멀티테넌트 + 빌링 코어 (`packages/{shared,core,billing}` · `apps/{api,web}` · `vendor/`) |
+| `desks/<name>/` | 각 Desk origin 레포                                       | **흡수된 16 Desk** (아래)                                                                                 |
+
+흡수된 Desk(16): `seo-gateway`(Fastify 렌더) · `addesk` · `authdesk` · `changelogdesk` · `chatdesk` · `communitydesk` ·
+`filedesk` · `mediadesk` · `moderationdesk` · `notifydesk` · `realtimedesk` · `reviewdesk` · `searchdesk` · `surveydesk` ·
+`aidigestdesk`(api 없음·GH Pages) · `termsdesk`(가장 성숙·Vercel+EC2). 대부분 NestJS+Drizzle+PGlite / Vite+React 동질 스택.
+provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 
 ### 통합 경계 — "부분-but-와이드"
 
@@ -33,7 +37,9 @@ DeskCloud SaaS 패밀리를 하나의 pnpm 모노레포로 통합한 저장소. 
 
 ```bash
 pnpm install
-pnpm -r build && pnpm -r typecheck && pnpm -r test
+pnpm build && pnpm typecheck && pnpm lint && pnpm test   # Turborepo (test는 직렬)
 ```
 
-원본 레포는 그대로 유지되며, 이 모노레포는 추가본입니다(되돌리기 안전). push/원격 생성은 명시 요청 시에만.
+**상태**: 물리 통합(16 Desk) + Stage 0 게이트(install/build/typecheck/lint/test) GREEN. 다음은 deploy cutover(라이브·게이트됨)와 아키텍처 와이어링(`docs/INTEGRATION-PLAN.md` P0~P5).
+
+원본 레포는 그대로 유지·LIVE(미러-퍼스트, cutover까지 canonical). 이 모노레포는 추가본입니다(되돌리기 안전). push/원격 생성은 명시 요청 시에만.

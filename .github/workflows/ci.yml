@@ -1,0 +1,37 @@
+# DeskCloud 모노레포 루트 CI (스캐폴드).
+#
+# ⚠️ 게이트: private 레포 Actions 결제 활성화는 오너 결정(docs/MONOREPO-CONSOLIDATION-PLAN.md §6.1).
+#   결제 미해결 시 이 워크플로는 startup 실패 → 그동안 각 origin Desk 레포의 CI가 권위 있는
+#   게이트(cutover 전까지). 로컬 verify(`pnpm run lint/typecheck/build/test`)가 폴백.
+#
+# 현 단계는 full `pnpm -r`(turbo) — affected 필터(`--filter='...[origin/main]'`)는
+#   @desk/* workspace:* 라우팅(Batch 4) 이후에만 정확(§6.2). 그 전엔 full run.
+name: CI
+on:
+  push:
+    paths-ignore: ["**/*.md", "docs/**"]
+  pull_request:
+    paths-ignore: ["**/*.md", "docs/**"]
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: "1" # seo-gateway 렌더 테스트는 별도 잡/실기기서 — CI는 단위/빌드 위주
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # turbo affected diffing
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run build
+      - run: pnpm run test
