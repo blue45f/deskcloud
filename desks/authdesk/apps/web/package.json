@@ -1,0 +1,34 @@
+{
+  "name": "@authdesk/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AuthDesk 대시보드 — 셀프 가입(pk_/sk_)·어드민 로그인(sk_)·사용자 목록/통계·인증 위젯 데모·임베드 가이드·디자인 시스템(/design).",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --port 5310",
+    "typecheck": "tsc -b",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@authdesk/shared": "workspace:*",
+    "@authdesk/widget": "workspace:*",
+    "firebase": "^12.15.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.16.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.16",
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vite-plugin-pwa": "^1.3.0",
+    "vitest": "^4.1.8"
+  }
+}

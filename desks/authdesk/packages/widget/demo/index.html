@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AuthDesk Widget — Demo</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #1a1d23;
+        background: #f4f5f7;
+        line-height: 1.6;
+      }
+      .wrap { max-width: 720px; margin: 0 auto; padding: 56px 24px 160px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+      p.lead { color: #4a4f57; margin: 0 0 28px; max-width: 60ch; }
+      .panel {
+        background: #fff;
+        border: 1px solid #d7dae0;
+        border-radius: 14px;
+        padding: 20px 22px;
+        margin: 16px 0;
+      }
+      label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+      input, select {
+        width: 100%; padding: 9px 11px; font: inherit; font-size: 14px;
+        border: 1px solid #d7dae0; border-radius: 9px;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      code { background: #eef0f3; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+      .hint { font-size: 12px; color: #6b7280; margin-top: 8px; }
+      pre { overflow: auto; background: #f4f5f7; padding: 12px; border-radius: 9px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>AuthDesk 인증 위젯</h1>
+      <p class="lead">
+        아래 폼으로 end-user 를 가입/로그인시키세요. 성공하면 사용자·토큰이 콘솔에 찍히고
+        폼이 로그인 상태 카드로 바뀝니다. 설정을 바꾸면 즉시 다시 마운트됩니다.
+      </p>
+
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="endpoint">endpoint</label>
+            <input id="endpoint" value="http://localhost:4110" />
+          </div>
+          <div>
+            <label for="publishableKey">publishableKey</label>
+            <input id="publishableKey" value="pk_demo" />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+          <div>
+            <label for="mode">initialMode</label>
+            <select id="mode">
+              <option value="login">login</option>
+              <option value="register">register</option>
+            </select>
+          </div>
+          <div>
+            <label for="accent">accent</label>
+            <input id="accent" type="color" value="#2f5fe0" style="height: 38px; padding: 4px" />
+          </div>
+        </div>
+        <p class="hint">
+          로컬 API 가 떠 있어야 합니다.
+          <code>AUTHDESK_MODE=self-hosted pnpm --filter @authdesk/api run dev</code>
+          (기본 포트 4110, PGlite 폴백). 시드된 <code>pk_demo</code> 테넌트 · 데모 사용자
+          <code>ada@demo.test</code> / <code>Password123!</code> 로 로그인됩니다.
+        </p>
+      </div>
+
+      <div class="panel">
+        <strong>인증 위젯</strong>
+        <div id="form-host" style="margin-top: 12px"></div>
+      </div>
+
+      <div class="panel">
+        <strong>바닐라(비-React) 임베드</strong>
+        <p class="hint" style="margin-top: 6px">빌드한 IIFE 를 비-React 페이지에 붙일 때:</p>
+        <pre><code>&lt;div id="authdesk-form"&gt;&lt;/div&gt;
+&lt;script src="https://auth.example.com/authdesk-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  AuthDesk.init({
+    target: '#authdesk-form',
+    publishableKey: 'pk_…',
+    endpoint: 'https://auth.example.com',
+  })
+&lt;/script&gt;</code></pre>
+      </div>
+    </div>
+
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
