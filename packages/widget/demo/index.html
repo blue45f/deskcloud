@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CommunityDesk Widget — Demo</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #1a1d23;
+        background: #f4f5f7;
+        line-height: 1.6;
+      }
+      .wrap { max-width: 1000px; margin: 0 auto; padding: 56px 24px 120px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+      p.lead { color: #4a4f57; margin: 0 0 28px; max-width: 70ch; }
+      .panel { background: #fff; border: 1px solid #d7dae0; border-radius: 14px; padding: 20px 22px; margin: 16px 0 28px; }
+      label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+      input { width: 100%; padding: 9px 11px; font: inherit; font-size: 14px; border: 1px solid #d7dae0; border-radius: 9px; }
+      .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+      code { background: #eef0f3; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+      .hint { font-size: 12px; color: #6b7280; margin-top: 10px; }
+      pre { overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>CommunityDesk 위젯</h1>
+      <p class="lead">
+        호스트 앱에 게시판/카페를 임베드하는 <code>&lt;CommunityBoard&gt;</code>(좌측)와
+        최근 글 요약 <code>&lt;CommunityFeed&gt;</code>(우측)입니다. 글을 열면 중첩 댓글이
+        보이고, <code>memberId</code> 를 주면 글/댓글 작성·반응이 켜집니다.
+      </p>
+
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="boardSlug">boardSlug</label>
+            <input id="boardSlug" value="free" />
+          </div>
+          <div>
+            <label for="publishableKey">publishableKey</label>
+            <input id="publishableKey" value="pk_demo" />
+          </div>
+          <div>
+            <label for="endpoint">endpoint</label>
+            <input id="endpoint" value="http://localhost:4096" />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+          <div>
+            <label for="memberId">memberId (비우면 읽기전용)</label>
+            <input id="memberId" value="demo-user" />
+          </div>
+          <div>
+            <label for="memberName">memberName</label>
+            <input id="memberName" value="데모 사용자" />
+          </div>
+          <div>
+            <label for="accent">accent</label>
+            <input id="accent" type="color" value="#2f5fe0" style="height: 38px; padding: 4px" />
+          </div>
+        </div>
+        <p class="hint">
+          로컬 API 가 떠 있어야 합니다. <code>pnpm --filter @communitydesk/api run start:dev</code>
+          (기본 포트 4096, PGlite 폴백). 시드된 <code>pk_demo</code> 테넌트의
+          <code>free</code>/<code>notice</code> 게시판, <code>dev-cafe</code> 카페가 자동으로 보입니다.
+        </p>
+      </div>
+
+      <div class="panel">
+        <strong>바닐라(비-React) 임베드</strong>
+        <pre style="margin-top: 8px"><code>&lt;div id="community"&gt;&lt;/div&gt;
+&lt;script src="https://community.example.com/community-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  CommunityDesk.init({
+    target: '#community', boardSlug: 'free',
+    publishableKey: 'pk_...', endpoint: 'https://community.example.com',
+    memberId: 'u_42', memberName: '준호'
+  })
+&lt;/script&gt;</code></pre>
+      </div>
+
+      <div id="app"></div>
+    </div>
+
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

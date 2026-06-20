@@ -1,0 +1,395 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── 디자인 토큰. @theme = 라이트 기본값(유틸 생성), .dark = 런타임 오버라이드. ── */
+@theme {
+  --color-bg: oklch(0.994 0.003 90);
+  --color-surface: oklch(0.985 0.004 90);
+  --color-surface-2: oklch(0.965 0.005 85);
+  --color-border: oklch(0.915 0.005 85);
+  --color-border-strong: oklch(0.86 0.006 85);
+
+  --color-text: oklch(0.26 0.012 75);
+  --color-text-muted: oklch(0.52 0.012 80);
+  --color-text-subtle: oklch(0.63 0.01 80);
+
+  --color-ink: oklch(0.24 0.012 75);
+  --color-ink-hover: oklch(0.31 0.014 75);
+  --color-ink-fg: oklch(0.99 0.003 90);
+
+  --color-accent: oklch(0.7 0.13 70);
+  --color-accent-strong: oklch(0.62 0.14 65);
+  --color-accent-soft: oklch(0.95 0.04 80);
+  --color-accent-fg: oklch(0.26 0.04 65);
+
+  --color-success: oklch(0.6 0.13 150);
+  --color-success-soft: oklch(0.95 0.04 150);
+  --color-info: oklch(0.58 0.1 240);
+  --color-info-soft: oklch(0.95 0.035 240);
+  --color-warning: oklch(0.68 0.15 60);
+  --color-warning-soft: oklch(0.95 0.05 70);
+  --color-danger: oklch(0.57 0.18 25);
+  --color-danger-soft: oklch(0.95 0.04 25);
+
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI',
+    'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.06);
+  --shadow-sm:
+    0 1px 3px 0 hsl(var(--shadow-color) / 0.1), 0 1px 2px -1px hsl(var(--shadow-color) / 0.08);
+  --shadow-md:
+    0 4px 12px -2px hsl(var(--shadow-color) / 0.12), 0 2px 6px -2px hsl(var(--shadow-color) / 0.08);
+  --shadow-lg:
+    0 16px 40px -8px hsl(var(--shadow-color) / 0.22),
+    0 6px 14px -6px hsl(var(--shadow-color) / 0.12);
+}
+
+:root {
+  --shadow-color: 75 20% 12%;
+  color-scheme: light;
+}
+
+.dark {
+  --color-bg: oklch(0.2 0.008 80);
+  --color-surface: oklch(0.237 0.008 80);
+  --color-surface-2: oklch(0.275 0.009 80);
+  --color-border: oklch(0.32 0.009 80);
+  --color-border-strong: oklch(0.4 0.01 80);
+
+  --color-text: oklch(0.93 0.006 85);
+  --color-text-muted: oklch(0.72 0.01 82);
+  --color-text-subtle: oklch(0.6 0.01 82);
+
+  --color-ink: oklch(0.93 0.008 85);
+  --color-ink-hover: oklch(0.85 0.008 85);
+  --color-ink-fg: oklch(0.2 0.008 80);
+
+  --color-accent: oklch(0.76 0.13 72);
+  --color-accent-strong: oklch(0.82 0.13 75);
+  --color-accent-soft: oklch(0.32 0.05 70);
+  --color-accent-fg: oklch(0.18 0.02 70);
+
+  --color-success: oklch(0.7 0.13 150);
+  --color-success-soft: oklch(0.3 0.05 150);
+  --color-info: oklch(0.7 0.1 240);
+  --color-info-soft: oklch(0.32 0.05 240);
+  --color-warning: oklch(0.76 0.14 65);
+  --color-warning-soft: oklch(0.33 0.06 65);
+  --color-danger: oklch(0.68 0.17 25);
+  --color-danger-soft: oklch(0.32 0.07 25);
+
+  --shadow-color: 80 30% 2%;
+  color-scheme: dark;
+}
+
+/* ── 베이스 (반드시 @layer base: 언레이어드면 유틸리티를 덮어써 버림) ── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.014em;
+    color: var(--color-text);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-fg);
+  }
+}
+
+/* ── 스크롤바 ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 9999px;
+  border: 3px solid var(--color-bg);
+}
+
+/* ── a11y: 스킵링크 · 포커스 · 모션 · sr-only ── */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-ink);
+  color: var(--color-ink-fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-180%);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 본문 prose 줄길이 제한 */
+.prose-measure {
+  max-width: 72ch;
+}
+
+/* 서버 살균 HTML 본문(글/댓글 미리보기) 렌더 — 위젯과 동일한 화이트리스트 출력 */
+.cd-richtext {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--color-text);
+  word-break: break-word;
+}
+.cd-richtext p {
+  margin: 0 0 0.6em;
+}
+.cd-richtext p:last-child {
+  margin-bottom: 0;
+}
+.cd-richtext a {
+  color: var(--color-accent-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cd-richtext code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-sm);
+  padding: 0.1em 0.35em;
+}
+.cd-richtext pre {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+.cd-richtext pre code {
+  background: transparent;
+  padding: 0;
+}
+.cd-richtext blockquote {
+  margin: 0 0 0.6em;
+  padding-left: 0.75rem;
+  border-left: 3px solid var(--color-border-strong);
+  color: var(--color-text-muted);
+}
+.cd-richtext ul,
+.cd-richtext ol {
+  margin: 0 0 0.6em;
+  padding-left: 1.25rem;
+}
+
+/* ── 모션 keyframes (Dialog/Sheet/토스트 등) ── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ── 랜딩 모션: 진입 연출 · 스크롤 리빌 · 앰비언트 액센트 ──
+   모든 진입 모션은 "이미 보이는" 상태를 향상시킬 뿐, 가시성을 막지 않는다.
+   (헤드리스/JS 없음/감춰진 탭에서도 콘텐츠는 항상 렌더된다 — CLS·blank 방지.) */
+@keyframes cd-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes cd-rise-sm {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.6rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+/* 앰비언트 앰버 글로우 — 히어로 배경에서 느리게 호흡(드리프트). */
+@keyframes cd-aura {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.08);
+    opacity: 1;
+  }
+}
+/* 히어로 목업 카드 — 미세한 부유감. */
+@keyframes cd-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -0.5rem, 0);
+  }
+}
+/* 라이브 도트 — 신선함(활동성) 신호. */
+@keyframes cd-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  70%,
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+/* 누적 카운트 점 — 액센트 그라데이션 보더 스윕. */
+@keyframes cd-sheen {
+  to {
+    background-position: 200% center;
+  }
+}
+
+/* 히어로 진입 — 항상 보이는 기본값 위에 1회 연출(스태거는 [animation-delay] 유틸).
+   @layer components 로 두어, Tailwind 유틸리티 레이어의 [animation-delay:*] 가
+   shorthand 의 delay(0)를 덮어쓰게 한다(레이어 순서: components < utilities). */
+@layer components {
+  .cd-enter {
+    animation: cd-rise 700ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  .cd-enter-sm {
+    animation: cd-rise-sm 600ms cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+}
+
+/* 스크롤 리빌 — data-reveal 요소는 처음엔 살짝 내려가 흐릿, 보이면 제자리로.
+   .is-in 이 붙으면(IntersectionObserver) 트랜지션. JS 미작동 시 .no-js 가
+   html 에 남아 즉시 가시(아래 no-js 폴백). */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 1.5rem, 0);
+  transition:
+    opacity 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+[data-reveal].is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-enter,
+  .cd-enter-sm {
+    animation: none;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

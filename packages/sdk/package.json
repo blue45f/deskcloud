@@ -1,0 +1,43 @@
+{
+  "name": "@communitydesk/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CommunityDesk SDK — 의존성 0 클라이언트. 브라우저용 publishable(pk) 클라이언트(게시판/글/댓글 읽기 + 멤버 글·댓글·반응)와 서버용 secret(sk) 어드민 헬퍼(테넌트·게시판 CRUD·검수·운영)를 제공한다. 타입은 @communitydesk/shared 에서.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js",
+      "require": "./dist/browser.cjs"
+    },
+    "./admin": {
+      "types": "./dist/admin.d.ts",
+      "import": "./dist/admin.js",
+      "require": "./dist/admin.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@communitydesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
