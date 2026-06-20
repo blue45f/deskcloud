@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ReviewDesk — 바닐라 IIFE 임베드 예시</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; color: #1a1d23; background: #f7f8fa; }
+      .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+      h1 { display: flex; align-items: center; gap: 12px; font-size: 26px; }
+      h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .05em; color: #6b7280; margin: 40px 0 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- 1) 제품 제목 옆 배지 -->
+      <h1>
+        Pro 플랜
+        <span data-reviewdesk="stars" data-subject-id="pro-plan" data-href="#reviews"></span>
+      </h1>
+
+      <!-- 4) 후기 월 -->
+      <h2>고객 후기</h2>
+      <div data-reviewdesk="wall" data-limit="9"></div>
+
+      <!-- 2) 리뷰 목록 + 분포 + 집계 -->
+      <h2 id="reviews">리뷰</h2>
+      <div data-reviewdesk="list" data-subject-id="pro-plan"></div>
+
+      <!-- 3) 리뷰 작성 폼 -->
+      <h2>리뷰 작성</h2>
+      <div
+        data-reviewdesk="form"
+        data-subject-id="pro-plan"
+        data-subject-label="Pro 플랜"
+        data-collect-email
+      ></div>
+    </div>
+
+    <!--
+      빌드 산출물: packages/widget 에서 `pnpm run build` 후 dist/reviewdesk-widget.js 가 생깁니다.
+      운영에서는 이 파일을 endpoint(예: https://reviews.example.com/reviewdesk-widget.js)로 호스팅하세요.
+      아래 src 는 로컬 빌드 산출물을 가리키는 상대 경로 예시입니다.
+    -->
+    <script src="../packages/widget/dist/reviewdesk-widget.js"></script>
+    <script>
+      ReviewDesk.init({
+        publishableKey: 'pk_demo',
+        endpoint: 'http://localhost:4099',
+        accent: '#2f5fe0',
+      })
+    </script>
+  </body>
+</html>
