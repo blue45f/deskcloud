@@ -1,0 +1,78 @@
+I have what I need. The architecture is clearer and more nuanced than the plan portrays, and it has concrete economic gaps. Key confirmed facts:
+
+- `UsageStore` (core/ports.ts) is a **monotonic per-(tenant,period,metric) counter** with `increment`/`get`/`reset` — no decrement, no GB-month time-integration, no concurrency gauge.
+- The **NestJS `UsageLimitGuard` is the only wired enforcement path** and it uses the generic `checkLimit(PlanBearer, metric: string, current)` from `enforce-limit.ts` — good, string-keyed. BUT `UsageMeter.checkAllowed` and `enforce()` use the **closed-enum** `checkLimit` from `@desk/shared` (`api_calls|events|storage_mb|seats`). Two divergent limit engines coexist.
+- Overage exists and computes per-unit KRW, but `computeOverage` only runs over whatever `usage` map you pass; storage as `storage_mb` snapshot has no overage unit defined; everything is decision-only (no money movement) per the boundary.
+
+I don't need to read more. Here is the critique.
+
+---
+
+# Adversarial critique — Pricing & Unit-Economics lens
+
+Scope note: I accept the two fixed goals (one unified billing system; cheapest-sustainable tiers) and did not relitigate them or push base prices up. I read the actual code (`@desk/billing` `limits.ts`/`overage.ts`/`enforce-limit.ts`, `@desk/core` `usage-meter.ts`/`ports.ts`, `@desk/shared` `constants.ts`/`plans.ts`, and the wired `UsageLimitGuard`). The plan is directionally right that "bill the cost driver, not the request" — but it **overstates what today's metering can enforce** and **mis-bills the two most dangerous cost drivers (storage-time and concurrency)** in ways that let a cheap/free tenant run the platform into a loss. Five risks, each with a tighter metered fix.
+
+## Risk 1 — The two biggest cost drivers (replay storage-GB-**months** and concurrency) are physically unmeterable on today's `UsageStore`; the plan treats them as if they're just more `limits` keys
+
+This is the headline economic hole. `core/src/ports.ts` `UsageStore` is a **monotonic counter** keyed by `(tenantId, period, metric)` with only `increment` / `get` / `getAll` / `reset`. It has no decrement and no time-integration. That means:
+
+- **`replay_storage_gb_months` cannot be computed by this meter.** GB-months is ∫(bytes·dt), which requires either a periodic gauge snapshot rollup or a delta ledger (on delete you must subtract). An increment-only counter literally cannot represent "stored 5 GB for 10 days then deleted." The plan hand-waves this as "periodic replay-GB rollup → `@desk/core`," but `@desk/core`'s store has no surface to write a gauge to and no overage path keyed on a time-integrated unit. Storage is the plan's own "biggest cost" and it's the one dimension the substrate can't meter.
+- **`concurrent_sessions` / `render_concurrency` cannot be a `PlanLimit` map entry either.** Concurrency is an *instantaneous gauge* (peak in-flight), not a *monthly cumulative*. `UsageMeter`/`checkLimit` only compare cumulative-in-period vs. limit. Putting `concurrent_sessions: 3` into `limits` and running it through `checkAllowed` would compare *lifetime session count* against 3 and wrongly block the 4th session ever, not the 4th *simultaneous* one. Concurrency must be enforced at the live gateway (in-process gauge at connect/disconnect), which the plan *says* in prose but then contradicts by listing it as a `PlanLimit` dimension enforced "at gateway connect" — those are two different mechanisms and only one of them is the `PlanLimit` map.
+
+**Fix (metering, not price):**
+- Split the meter into **two kinds of dimension** explicitly: *cumulative* metrics (renders, events, warm jobs — fit the existing counter) vs. *gauge/time-integrated* metrics (storage-GB-month, peak concurrency). Add to `UsageStore` a second port: `setGauge(tenant, period, metric, value)` + a `gaugeRollup` that, on a timer, does `storage_gb_month += currentBytes/GiB × (Δhours/730)`. That single additive rollup makes storage-time expressible on the existing increment primitive (you increment GB-months, never decrement).
+- Enforce concurrency **only** at the gateway as a live counter with a plan-scoped ceiling; expose it to billing as *peak-concurrency-observed* (a gauge snapshot for the upgrade-nudge), never as a cumulative `checkAllowed` metric. Make the tier table label it "max concurrent" (a cap, hard 429 at connect) distinct from monthly meters.
+
+**Overage trigger:** retention is the real storage lever (plan got this right), but add a hard `replay_storage_gb` *ceiling* (not just retention days) on free — a tenant can blow past a 7-day-retention free tier in hours by uploading huge DOM snapshots/screenshots. Cap free at e.g. 500 MB *and* 7 days, whichever hits first; overage per GB-month on paid only.
+
+## Risk 2 — Two divergent limit engines are wired simultaneously; "one billing system" is not true in code today
+
+The plan asserts the generic `PlanDef.limits: Record<M,number>` map is the single mechanism each Desk extends. The repo actually has **two**:
+
+1. `@desk/shared`: closed enum `USAGE_METRICS = [api_calls, events, storage_mb, seats]` + `PLAN_LIMITS` struct + `checkLimit(plan, metric: UsageMetric, current)`. **`UsageMeter.checkAllowed()` and `enforce()` call this one** — so the *programmatic* enforcement path is hardwired to four fixed metrics and will not typecheck against `renders_per_month`, `events_ingested_per_month`, `replay_storage_gb_months`, or `concurrent_sessions`.
+2. `@desk/billing`: generic `PlanCatalog<M>` + `defineDeskPlans` + `checkLimit(tenant, metric: string, current)`. Only the **NestJS `UsageLimitGuard`** uses this (string-keyed, extensible).
+
+So the candidates' new dimensions only work through the HTTP guard, not through `UsageMeter.checkAllowed`/`enforce` — and remote-devtools' hot path is a **WebSocket gateway**, where the NestJS HTTP guard does not run. The plan's own "meter at the gateway, not HTTP middleware" instruction means the candidates land on the `UsageMeter`/`enforce` side — exactly the closed-enum side that can't represent their metrics. This is a real, code-level contradiction, not a style nit.
+
+**Fix:** Before either candidate, **collapse to one engine**: delete the closed `USAGE_METRICS`/shared `checkLimit`/`PLAN_LIMITS`, and make `UsageMeter.checkAllowed`/`enforce` delegate to `@desk/billing`'s generic `checkLimit<M>(PlanBearer, string, current)`. This is a prerequisite Phase-1 task the plan omits; "build `@desk/billing` into a real engine" understates it — the work is *deduplication*, and the shared enum is load-bearing for existing Desks (TermsDesk-style apiCalls/events), so it needs a migration shim, not a delete.
+
+## Risk 3 — Cache-miss renders are billed as a cumulative counter, but the actual cost spike is **concurrency × duration**, and the proposed free tier (5,000 renders, concurrency 2) is abusable into sustained loss
+
+A cache *miss* is the cost driver (correct), but "5,000 renders/mo, concurrency 2, hard-capped" does not cap cost, because:
+
+- A single tenant can point the warmer/sitemap at pages that are **heavy to render** (huge SPA, slow hydration, multi-second TTI). Render count is flat but CPU-seconds per render is unbounded — 5,000 × 8s renders at concurrency 2 is a different cost than 5,000 × 0.4s renders. The meter has no notion of render *duration*, so two tenants on identical "5,000 renders" cost 20× apart.
+- "Cache misses + warm jobs" also invites a **cache-busting abuse**: query-string fuzzing (`?_=random`) makes every bot hit a miss, converting a cheap cache-hit site into 100% Chromium launches while staying under any *request* limit. The plan explicitly says cache hits are "display-only / not metered" — so the abuser is invisible until the renders counter trips, by which point the pool is saturated and *other tenants'* renders queue (noisy-neighbor: one free tenant degrades paid tenants sharing the pool).
+
+**Fix (metering):**
+- Meter **`render_cpu_seconds`** (or `render_ms` bucketed) as the primary cost unit, with `renders_per_month` as a secondary guard. Overage and the free hard-cap key on CPU-seconds. This is the only unit that's tenant-fair and abuse-resistant; it's cheap to capture (you already time each render in the pool).
+- Add a **per-tenant cache-key cardinality cap** (distinct normalized URLs/mo) so query-string fuzzing trips a separate limit before it converts the whole pool to misses. Normalize/strip volatile query params at the cache layer by default.
+- Make `render_concurrency` a **per-tenant** ceiling enforced at the pool, not just a global pool max, so a free tenant cannot occupy both global slots and starve paid tenants. The plan's "plan-scoped pool max" reads as global; it must be per-tenant admission.
+
+## Risk 4 — "Never block ingestion on the meter" + monotonic counter + lossy gateway = **structurally unbounded free-tier ingest** (the meter can only ever under-bill, never stop the bleed)
+
+The plan's mitigation for the lossy gateway is "meter at connect/disconnect + sampled counter, reconcile drift, **never block ingestion**." Combined with the facts that (a) `concurrent_sessions` can't be a hard gate via the cumulative meter (Risk 1) and (b) free is "hard-capped" only on cumulative monthly events — a free SDK client can **open a long-lived socket and stream events for the whole month**; the only backstop is the monthly `events_ingested` cap, which is checked *after* ingest and explicitly *non-blocking*. So free-tier ingest cost (DB writes + buffer RAM + fan-out) is bounded only by goodwill until month-end reconciliation, after which you've already paid for the storage and CPU. "Never block ingest" is correct for *data integrity* but wrong as the *only* policy for *free* tenants — you've removed every backpressure lever on the one tier that doesn't pay.
+
+**Fix (metering / overage trigger, not base price):**
+- For **free tier only**, make the cap *connection-admission* enforced: at gateway `handleConnection`, read current-period `events_ingested` and `concurrent_sessions` gauge; if over, **refuse new sessions** (don't drop mid-session data — that preserves integrity) and return an upgrade signal. Paid tiers keep "never block, meter soft-overage." This splits the policy by tier: integrity-preserving hard *admission* gate on free, soft-overage on paid.
+- Add a **session-duration / event-rate ceiling** on free (e.g. max session minutes/day, max events/sec) so a single socket can't run unbounded — a per-second token bucket at the gateway, billed as `session_minutes`, which the plan lists but doesn't gate.
+
+## Risk 5 — "One invoice across all Desks" is a real proration/refund/tax hazard given the hybrid (shared-wallet subscription + per-Desk metered overage), and the subscription state machine isn't built for it
+
+The plan says one-invoice is "already enforced" by the account-level `unique(tenant_id)` subscription. But look at what's actually shipped (`subscription.ts`): a **single** `Subscription{ plan, status, periodEnd }` per tenant with one state machine, and on `canceled` it does `next.plan = 'free'` *immediately* ("스텁/단순화"). That's fine for one plan; it breaks the moment you have:
+
+- **Mixed metered overage across Desks on one invoice.** The base subscription is one plan, but render-overage (spa-seo) and replay-GB overage (devtools) accrue on *different* Desks with *different* metered units. `computeOverage` runs per-catalog, but there's no object that *sums* multiple Desks' overage into one invoice with correct per-Desk line items, currency, and tax category. KRW VAT vs. cross-border USD (`priceUsdCentsMonthly` exists) on the *same* invoice is a tax-treatment split the model doesn't represent.
+- **Mid-cycle plan change / cancel proration.** `applyEvent('canceled')` drops to free immediately and keeps `periodEnd` but the code comment admits it's simplified; there's no proration of *already-accrued metered overage* at cancel, and no credit/refund path. Refunding one Desk's charge while another Desk's metered usage stands, on a single invoice, is the classic unified-billing nightmare — and the money-movement boundary means today it's all decision-only, so the *complexity is latent and untested*.
+- **Downgrade with storage already consumed.** If a tenant downgrades and is now over the *lower* `replay_storage_gb` cap, what's billed? The monotonic GB-month meter keeps accruing at the old volume until they delete data. No grace/forced-retention-trim policy exists.
+
+**Fix (billing-system structure, not price):**
+- Introduce an explicit **`InvoiceDraft` aggregate** that is account-scoped and composes `{ base: oneSubscription } + lines: PerDeskOverage[]`, each line carrying `deskId`, `metric`, `currency`, `taxCategory`. Keep *one* subscription (shared wallet) but make overage a **first-class multi-Desk collection**, so "one invoice" is an *aggregation*, not a single plan row. This is the missing object the plan assumes exists.
+- Add **proration + credit primitives** to the subscription machine now (even decision-only): on plan change mid-cycle, compute prorated base + freeze accrued overage; on cancel, retain overage owed through `periodEnd` rather than zeroing to free instantly. Model refunds as negative invoice lines, not by mutating subscription plan.
+- Make **storage downgrade policy** explicit: on downgrade over cap, either auto-trim retention to fit (preferred — caps cost) or move to read-only + overage. Pick auto-trim so a downgrade can't strand the platform paying for old GB-months.
+
+---
+
+## Bottom line for the owner
+
+The cheap/free tiers are **not yet sustainable as specified**, for one root cause: the plan picks the right *cost drivers in prose* (CPU-seconds, GB-months, concurrency) but then maps them onto a metering substrate that can only count *monotonic monthly cumulatives* — so the three most expensive, most-abusable dimensions (render duration, replay storage-time, live concurrency) are either unmeterable or mis-enforced today, and "never block ingest" removes the last backstop on the free tier. None of the fixes raise base prices: meter **CPU-seconds not renders**, add a **gauge/GB-month rollup port** so storage-time is expressible, enforce **concurrency as a live per-tenant gateway cap** (not a `PlanLimit` cumulative), gate **free tier by connection-admission** while keeping paid soft-overage, and add a **per-tenant cache-cardinality cap** against miss-fuzzing. Two structural prerequisites the plan omits: **collapse the two coexisting limit engines** (`@desk/shared` closed-enum vs. `@desk/billing` generic) into one before either candidate lands, and build an **account-scoped `InvoiceDraft` + proration/credit model** so "one invoice" is a real multi-Desk aggregation rather than the single immediate-to-free subscription row that exists now.
+
+Files grounding this: `/Users/hjunkim/WebstormProjects/desk-platform/packages/core/src/ports.ts` (monotonic `UsageStore`), `/Users/hjunkim/WebstormProjects/desk-platform/packages/core/src/usage-meter.ts` (`checkAllowed` → shared closed-enum `checkLimit`), `/Users/hjunkim/WebstormProjects/desk-platform/packages/shared/src/constants.ts` + `plans.ts` (closed `USAGE_METRICS`/`PLAN_LIMITS`), `/Users/hjunkim/WebstormProjects/desk-platform/packages/billing/src/limits.ts` + `enforce-limit.ts` + `overage.ts` (generic engine, the other one), `/Users/hjunkim/WebstormProjects/desk-platform/packages/billing/src/nest/usage-limit.guard.ts` (only wired path, HTTP-only — doesn't cover the WS gateway), `/Users/hjunkim/WebstormProjects/desk-platform/packages/billing/src/subscription.ts` (single-plan machine, immediate-to-free cancel, no proration/credit).

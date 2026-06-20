@@ -1,0 +1,132 @@
+# DeskCloud 통합 모노레포 워크스페이스.
+# pnpm 은 루트 워크스페이스 설정만 읽으므로, 통합된 3개 하위 레포의
+# overrides/allowBuilds/auditConfig/minimumReleaseAgeExclude/packageExtensions 를
+# 여기로 병합했습니다. (하위 레포의 pnpm-workspace.yaml 은 install 시 무시됨 —
+# 정리는 아키텍처 플랜 기준 후속 단계에서.)
+packages:
+  # platform — @desk/* 코어
+  - 'platform/apps/*'
+  - 'platform/packages/*'
+  # desks/seo-gateway
+  - 'desks/seo-gateway/apps/*'
+  - 'desks/seo-gateway/packages/*'
+  # NOTE: remote-devtools 는 격리(OUT) — 299MB 벤더 Chromium 포크 때문에 sibling 레포로 분리.
+  # docs/MONOREPO-CONSOLIDATION-PLAN.md §4.3 참조. @desk/* 는 발행 caret 로 소비.
+
+# 빌드 스크립트 승인 (pnpm 11) — 3개 레포 union, 충돌은 안전값으로 수렴
+allowBuilds:
+  esbuild: true
+  '@electric-sql/pglite': true
+  '@nestjs/core': true
+  '@swc/core': true
+  unrs-resolver: true
+  puppeteer: true
+  sharp: true
+  '@embedded-postgres/darwin-arm64': true
+  '@embedded-postgres/darwin-x64': true
+  '@embedded-postgres/linux-arm': true
+  '@embedded-postgres/linux-arm64': true
+  '@embedded-postgres/linux-ia32': true
+  '@embedded-postgres/linux-ppc64': true
+  '@embedded-postgres/linux-x64': true
+  '@embedded-postgres/windows-x64': true
+  # 아래는 빌드 불필요(아날리틱스/미사용 코드젠) — 명시적으로 거절
+  '@scarf/scarf': false
+  '@firebase/util': false
+  protobufjs: false
+
+# 보안 핀 (3개 레포 union, 최고/안전값)
+overrides:
+  handlebars: '>=4.7.9'
+  multer: '>=2.2.0'
+  undici: '^7.28.0'
+  ws: '>=8.21.0'
+  form-data: '>=4.0.6'
+  hono: '>=4.12.25'
+  find-my-way: '>=8.2.2'
+  '@fastify/middie': '>=9.3.2'
+  fastify: '>=5.7.2'
+  fast-uri: '>=3.1.2'
+  path-to-regexp: '>=6.3.0'
+  serialize-javascript: '>=7.0.3'
+  piscina: '>=4.9.3'
+  drizzle-orm: '>=0.45.2'
+  vitest: '>=4.1.9'
+  '@vitest/coverage-v8': '>=4.1.9'
+  '@vitest/ui': '>=4.1.9'
+  vite: '>=8.0.16'
+  jspdf: '>=4.2.1'
+  minimatch: '>=10.2.3'
+  ajv: '>=8.18.0'
+  smol-toml: '>=1.6.1'
+  uuid: '>=11.1.1'
+  # ESLint 코어는 ajv@^6 draft-04 메타스키마에 의존 → eslint 하위에서만 6.x 로 복원
+  eslint>ajv: '^6.12.6'
+  # jsx-a11y 는 minimatch v3 default 시그니처 의존 → jsx-a11y 하위에서만 3.x 로 복원
+  eslint-plugin-jsx-a11y>minimatch: '^3.1.2'
+
+# @hookform/resolvers 5.x 가 zod peer 미선언이지만 dist 가 zod/v4/core 를 import → peer 링크
+packageExtensions:
+  '@hookform/resolvers':
+    peerDependencies:
+      zod: '*'
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
+auditConfig:
+  ignoreGhsas:
+    - GHSA-2p57-rm9w-gvfp
+
+# minimumReleaseAge 예외 (seo + rdt union)
+minimumReleaseAgeExclude:
+  - '@vercel/build-utils@13.26.3'
+  - '@vercel/node@5.8.6'
+  - '@vercel/static-config@3.4.0'
+  - '@heejun/eslint-config@5.0.0'
+  - '@heejun/eslint-config@4.0.0'
+  - '@heejun/prettier-config@3.0.0'
+  - '@heejun/deskcloud@0.1.0'
+  - '@ant-design/icons'
+  - '@aws-sdk/*'
+  - '@nodable/entities'
+  - '@pkgr/core'
+  - '@rc-component/menu'
+  - '@radix-ui/*'
+  - '@sentry-internal/*'
+  - '@sentry/*'
+  - '@smithy/*'
+  - '@storybook/*'
+  - '@tailwindcss/*'
+  - '@tanstack/*'
+  - '@testing-library/*'
+  - '@types/*'
+  - '@vitejs/*'
+  - '@vitest/*'
+  - axios
+  - babel-plugin-react-compiler
+  - devtools-protocol
+  - electron-to-chromium
+  - enhanced-resolve
+  - eslint
+  - eslint-module-utils
+  - eslint-plugin-prettier
+  - framer-motion
+  - googleapis
+  - hasown
+  - i18next
+  - lucide-react
+  - playwright
+  - react-hook-form
+  - react-router
+  - react-router-dom
+  - storybook
+  - synckit
+  - tailwindcss
+  - tldts-core
+  - typed-array-length
+  - typescript
+  - unplugin-swc
+  - vite
+  - vitest
+  - zustand

@@ -1,0 +1,15 @@
+# 루트 레벨 무시 (하위 레포는 각자 .gitignore 를 보존)
+node_modules/
+**/node_modules/
+dist/
+build/
+coverage/
+.turbo/
+*.log
+*.tsbuildinfo
+.DS_Store
+
+# 환경파일 (각 하위 레포의 .env.example 은 추적 유지)
+.env
+.env.local
+.env.*.local

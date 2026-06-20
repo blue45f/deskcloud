@@ -1,0 +1,19 @@
+{
+  "name": "deskcloud",
+  "private": true,
+  "version": "0.0.0",
+  "description": "DeskCloud SaaS 패밀리 통합 모노레포 (platform + desks)",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.16.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "build:platform": "pnpm --filter \"./platform/**\" -r build",
+    "build:desks": "pnpm --filter \"./desks/**\" -r build"
+  }
+}
