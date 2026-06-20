@@ -1,0 +1,17 @@
+# DeskCloud 배포용 — 빌드 컨텍스트에서 호스트 산출물·시크릿을 제외한다.
+# (SurveyDesk/TermsDesk .dockerignore 패턴 미러)
+**/node_modules
+**/dist
+**/.data
+**/coverage
+**/*.tsbuildinfo
+.git
+.github
+**/.env
+**/.env.*
+!**/.env.example
+.playwright-mcp
+*.png
+.idea
+.vscode
+.DS_Store
