@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // 선언 파일(.d.ts)을 함께 내보낸다 — Vercel 함수 엔트리(`api/index.ts`)가 import 하는
+    // 컴파일 산출물 `dist/serverless.js` 에 타입(`dist/serverless.d.ts`)을 부여하기 위함.
+    "declaration": true
+  },
+  "exclude": ["node_modules", "dist", "test", "**/*.spec.ts", "**/*.test.ts", "src/db/seed.ts"]
+}

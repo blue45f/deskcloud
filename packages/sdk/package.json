@@ -1,0 +1,33 @@
+{
+  "name": "@moderationdesk/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ModerationDesk 서버 SDK — secret 키(sk_)로 콘텐츠를 검사(moderate)·신고(report)하고 규칙/신고/로그를 관리한다. 의존성 0(런타임), 타입만 @moderationdesk/shared. 모더레이션을 호출하는 형제 백엔드/서버리스에서 import.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@moderationdesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
