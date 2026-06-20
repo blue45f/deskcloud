@@ -1,0 +1,63 @@
+{
+  "name": "@changelogdesk/widget",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ChangelogDesk 임베드 위젯 — 외부 사이트에 떠 있는 '벨' 버튼 + 미읽음 배지 → 접근성 패널에 최근 변경 이력(new/improved/fixed 태그, 날짜, 마크다운 본문)을 보여준다. 퍼블리시 키(pk_)로 인증, 열 때 seen 기록. React 컴포넌트 + 바닐라 IIFE 로더(window.ChangelogDesk). 의존성은 react(peer)뿐, 외부 CSS 프레임워크 0.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./vanilla": {
+      "types": "./dist/vanilla.d.ts",
+      "import": "./dist/vanilla.js",
+      "require": "./dist/vanilla.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup && vite build --config vite.iife.config.ts",
+    "build:demo": "vite build --config demo/vite.config.ts",
+    "dev": "tsup --watch",
+    "dev:demo": "vite --config demo/vite.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist demo/dist"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@changelogdesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  }
+}
