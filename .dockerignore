@@ -1,0 +1,16 @@
+**/node_modules
+**/dist
+**/.turbo
+**/.data
+**/coverage
+**/*.tsbuildinfo
+.git
+.github
+.idea
+.vscode
+.DS_Store
+**/.env
+**/.env.*
+!**/.env.example
+.playwright-mcp
+
