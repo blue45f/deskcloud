@@ -1,0 +1,9 @@
+# Lockfile + build artifacts — managed by pnpm/tooling, not Prettier
+pnpm-lock.yaml
+**/dist
+**/build
+**/coverage
+*.tsbuildinfo
+.data
+drizzle
+apps/api/src/db/migrations
