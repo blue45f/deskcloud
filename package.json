@@ -9,11 +9,15 @@
     "pnpm": ">=11"
   },
   "scripts": {
-    "build": "pnpm -r build",
-    "test": "pnpm -r test",
-    "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck",
-    "build:platform": "pnpm --filter \"./platform/**\" -r build",
-    "build:desks": "pnpm --filter \"./desks/**\" -r build"
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "build:platform": "turbo run build --filter=\"./platform/*\"",
+    "build:desks": "turbo run build --filter=\"./desks/**\""
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "turbo": "^2.5.5"
   }
 }
