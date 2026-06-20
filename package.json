@@ -1,0 +1,60 @@
+{
+  "name": "searchdesk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SearchDesk — 외부 온보딩형(멀티테넌트) Hosted Search-as-a-Service. 테넌트가 셀프 가입(pk_/sk_)해 문서를 색인하면, 브라우저에서 전문 검색(full-text)·패싯/필터·⌘K 커맨드 팔레트를 붙일 수 있다. SurveyDesk·NotifyDesk·TermsDesk 자매 프로젝트.",
+  "type": "module",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.16.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build:libs": "pnpm --filter @searchdesk/shared run build",
+    "dev": "pnpm run build:libs && pnpm -r --parallel --stream run dev",
+    "build": "pnpm -r run build",
+    "lint": "eslint .",
+    "lint:strict": "eslint . --max-warnings=0",
+    "lint:ci": "pnpm run lint:strict",
+    "audit:security": "pnpm audit --audit-level high --ignore GHSA-2p57-rm9w-gvfp",
+    "lint:security": "pnpm run lint:strict && pnpm run audit:security",
+    "typecheck": "pnpm run build:libs && pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build",
+    "verify:push": "pnpm run verify && pnpm run lint:security",
+    "ci": "pnpm run verify",
+    "db:seed": "pnpm --filter @searchdesk/api run db:seed",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@eslint/js": "^10.0.1",
+    "@heejun/eslint-config": "^5.0.0",
+    "@heejun/prettier-config": "^3.0.0",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-react-compiler": "19.1.0-rc.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --no-warn-ignored --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,html,css}": [
+      "prettier --write"
+    ]
+  },
+  "prettier": "@heejun/prettier-config"
+}

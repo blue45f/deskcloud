@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#16140f" />
+
+    <!-- PWA(iOS) — manifest link + SW 등록은 vite-plugin-pwa 가 자동 주입하므로 중복 금지. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SearchDesk" />
+    <meta
+      name="description"
+      content="SearchDesk — 외부 온보딩형(멀티테넌트) Hosted Search-as-a-Service. 셀프 가입(pk_/sk_)해 문서를 색인하면, 전문 검색·패싯/필터·⌘K 커맨드 팔레트를 한 줄로 붙입니다."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="SearchDesk" />
+    <meta property="og:title" content="SearchDesk — Hosted Search + ⌘K as a Service" />
+    <meta
+      property="og:description"
+      content="전문 검색(full-text)·패싯/필터·⌘K 커맨드 팔레트를 호스팅 서비스로. Elastic 없이 가볍게, 한 줄 임베드."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SearchDesk — Hosted Search + ⌘K as a Service" />
+    <meta
+      name="twitter:description"
+      content="전문 검색·패싯/필터·⌘K 커맨드 팔레트를 호스팅 서비스로. Elastic 없이 가볍게, 한 줄 임베드."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>SearchDesk — Hosted Search + ⌘K as a Service</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

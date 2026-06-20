@@ -1,0 +1,33 @@
+{
+  "name": "@searchdesk/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SearchDesk JS/TS SDK — 브라우저 검색 클라이언트(publishable pk_ 키) + 서버 색인기(secret sk_ 키). 의존성은 타입만(@searchdesk/shared), 런타임은 fetch 만 사용.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@searchdesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
