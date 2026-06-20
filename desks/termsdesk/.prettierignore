@@ -1,0 +1,12 @@
+node_modules
+dist
+build
+coverage
+.data
+pnpm-lock.yaml
+*.tsbuildinfo
+apps/web/dist
+apps/api/dist
+packages/*/dist
+drizzle
+apps/api/src/db/migrations

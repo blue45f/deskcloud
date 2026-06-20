@@ -1,0 +1,36 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# local data (PGlite embedded db, generated artifacts)
+.data/
+*.local
+
+# env
+.env
+.env.*
+!.env.example
+rootkey.csv
+*accessKeys*.csv
+
+# editor / os
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.log
+
+# vite / playwright
+.vite/
+playwright-report/
+test-results/
+.playwright-mcp/
+
+# Vercel
+.vercel

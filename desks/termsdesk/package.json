@@ -1,0 +1,56 @@
+{
+  "name": "termsdesk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "약관·정책 문서의 버전 관리와 변조 방지 게시 — SaaS 또는 셀프호스팅(self-hosted). 회사가 약관을 직접 작성하지 않습니다; 등록·버전 관리·변경이력 감사·게시만 담당합니다.",
+  "type": "module",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.16.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build:libs": "pnpm --filter @termsdesk/shared --filter @termsdesk/sdk run build",
+    "dev": "pnpm run build:libs && pnpm -r --parallel --stream run dev",
+    "build": "pnpm -r run build",
+    "lint": "eslint .",
+    "typecheck": "pnpm run build:libs && pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "pnpm run format:check && pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build",
+    "ci": "pnpm run verify",
+    "verify:push": "pnpm run verify && pnpm run lint:security",
+    "sonar": "sonar-scanner",
+    "lint:strict": "eslint . --max-warnings=0",
+    "lint:ci": "pnpm run lint:strict",
+    "audit:security": "pnpm audit --audit-level high --ignore GHSA-2p57-rm9w-gvfp",
+    "lint:security": "pnpm run lint:strict && pnpm run audit:security",
+    "sonar:ci": "sonar-scanner -Dsonar.qualitygate.wait=true",
+    "db:seed": "pnpm --filter @termsdesk/api run db:seed",
+    "prepare": "husky"
+  },
+  "prettier": "@heejun/prettier-config",
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.0",
+    "@heejun/eslint-config": "^5.0.0",
+    "@heejun/prettier-config": "^3.0.0",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.1",
+    "globals": "^16.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --no-warn-ignored --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,html,css}": [
+      "prettier --write"
+    ]
+  }
+}

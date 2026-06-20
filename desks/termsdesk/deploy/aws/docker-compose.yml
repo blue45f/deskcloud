@@ -1,0 +1,91 @@
+# TermsDesk 운영 스택 — AWS EC2(amd64) 등 단일 VM용. (OCI 구성과 동일)
+# Caddy 가 자동 HTTPS(Let's Encrypt) 종단 → web(nginx, SPA+/api 프록시) → api → postgres.
+#   cd deploy/aws && cp .env.example .env  (값 채우기) && docker compose up -d --build
+#   user-data.sh 로 부팅 시 자동 배포되도록 만들어져 있음(아래 README 참고).
+name: termsdesk
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    command:
+      - postgres
+      - -c
+      - shared_buffers=${PG_SHARED_BUFFERS:-512MB}
+      - -c
+      - effective_cache_size=${PG_EFFECTIVE_CACHE:-1536MB}
+      - -c
+      - work_mem=${PG_WORK_MEM:-8MB}
+      - -c
+      - max_connections=${PG_MAX_CONN:-50}
+      - -c
+      - wal_compression=on
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-termsdesk}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-termsdesk}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-termsdesk} -d ${POSTGRES_DB:-termsdesk}']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  api:
+    build:
+      context: ../..
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      TERMSDESK_MODE: self-hosted
+      TERMSDESK_SEED_DEMO: 'false' # 운영: 데모 정책 시드 끔(관리자만 보장)
+      PORT: '4070'
+      DATABASE_URL: postgres://${POSTGRES_USER:-termsdesk}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-termsdesk}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      WEB_ORIGIN: https://${DOMAIN}
+      COOKIE_SECURE: 'true' # Caddy 가 https 종단
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@termsdesk.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:?set SEED_ADMIN_PASSWORD in .env}
+      # 비우면 Google 로그인 버튼 숨김. 설정 시 GIS ID 토큰 검증 활성화.
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      TERMSDESK_ALLOW_SIGNUP: ${TERMSDESK_ALLOW_SIGNUP:-true}
+      TZ: Asia/Seoul
+    expose:
+      - '4070'
+
+  web:
+    build:
+      context: ../..
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_BASE_URL: '' # 동일 출처 /api (nginx 가 api 로 프록시)
+    restart: unless-stopped
+    depends_on:
+      - api
+    expose:
+      - '80'
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - web
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN (e.g. terms.acme.com) in .env}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  caddy_data:
+  caddy_config:
