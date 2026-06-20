@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "declaration": false,
+    "sourceMap": true,
+    // verbatimModuleSyntax 는 NestJS 에서 OFF 유지: 켜면 타입으로만 쓰이는 값 import
+    // (주입 토큰 등)가 제거되어 emitDecoratorMetadata 기반 DI 가 런타임에 깨진다.
+    // 나머지 strict 플래그(isolatedModules·noUnusedLocals·noUnusedParameters·
+    // noUncheckedIndexedAccess)는 base 의 true 를 그대로 상속한다.
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
+}

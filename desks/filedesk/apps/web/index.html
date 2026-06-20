@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#2f5fe0" />
+    <meta
+      name="description"
+      content="FileDesk — 외부 온보딩형(멀티테넌트) 파일 업로드/스토리지 모듈. publishable 키로 파일을 올리고, secret 키로 목록·통계·삭제를 관리합니다."
+    />
+
+    <!-- PWA: iOS 홈화면 설치(매니페스트 link + SW 등록은 vite-plugin-pwa 가 자동 주입). -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="FileDesk" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FileDesk" />
+    <meta property="og:title" content="FileDesk — 임베드 파일 업로드/스토리지" />
+    <meta
+      property="og:description"
+      content="드래그-드롭 업로드 위젯 + 멀티테넌트 레지스트리 + 접근 제어(public/private). Postgres-bytea 기본, S3/R2 스왑."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>FileDesk — 임베드 파일 업로드/스토리지</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
