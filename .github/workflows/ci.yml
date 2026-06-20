@@ -8,6 +8,7 @@
 #   @desk/* workspace:* 라우팅(Batch 4) 이후에만 정확(§6.2). 그 전엔 full run.
 name: CI
 on:
+  workflow_dispatch:
   push:
     paths-ignore: ["**/*.md", "docs/**"]
   pull_request:
