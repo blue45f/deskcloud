@@ -1,0 +1,39 @@
+{
+  "name": "@chatdesk/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ChatDesk SDK — 브라우저 ChatClient(pk + memberId: socket.io 실시간 + REST 히스토리)와 서버 ChatAdmin(sk: 대화 생성·시스템 발송·모더레이션). 의존성은 socket.io-client(브라우저)뿐, 타입은 @chatdesk/shared 공유.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./admin": {
+      "types": "./dist/admin.d.ts",
+      "import": "./dist/admin.js",
+      "require": "./dist/admin.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@chatdesk/shared": "workspace:*",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}

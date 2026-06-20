@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#16140f" />
+    <meta
+      name="description"
+      content="ChatDesk — 멀티테넌트 메시징(1:1 쪽지 DM + 그룹/룸 채팅) as a service. 외부 앱이 pk·sk 키로 임베드 위젯과 서버 SDK 를 통해 실시간 메시징을 붙이고, 운영자는 대화·사용량을 모니터한다."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ChatDesk" />
+    <meta property="og:title" content="ChatDesk — 임베드 메시징(쪽지·채팅) 인프라" />
+    <meta
+      property="og:description"
+      content="1:1 쪽지 DM 과 그룹 채팅을 한 줄 임베드로. 실시간(타이핑·읽음·presence·unread), 멀티테넌트(pk·sk), 시스템 발송·모더레이션."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ChatDesk — 임베드 메시징(쪽지·채팅) 인프라" />
+    <meta
+      name="twitter:description"
+      content="1:1 쪽지 DM 과 그룹 채팅을 한 줄 임베드로. 실시간·멀티테넌트·시스템 발송·모더레이션."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PWA: apple-touch-icon + 설치형 메타(매니페스트 link·SW 등록은 vite-plugin-pwa 가 자동 주입). -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ChatDesk" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>ChatDesk — 임베드 메시징(쪽지·채팅) 인프라</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
