@@ -1,0 +1,55 @@
+{
+  "name": "mediadesk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MediaDesk — 외부 온보딩형 미디어 업로드·변환·CDN SaaS(또는 셀프호스팅). 테넌트가 직접 가입해 publishable/secret 키를 발급받고, 브라우저에서 업로드·공개 자산 조회, 서버에서 자산 관리를 한다. 로컬은 파일시스템 저장, S3 어댑터는 스텁. sharp 가 있으면 온더플라이 이미지 변환(리사이즈·포맷·품질) + 파생 캐시.",
+  "type": "module",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.16.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build:libs": "pnpm --filter @mediadesk/shared run build",
+    "dev": "pnpm run build:libs && pnpm -r --parallel --stream run dev",
+    "build": "pnpm -r run build",
+    "lint": "eslint .",
+    "lint:strict": "eslint . --max-warnings=0",
+    "lint:ci": "pnpm run lint:strict",
+    "audit:security": "pnpm audit --audit-level high --ignore GHSA-2p57-rm9w-gvfp",
+    "lint:security": "pnpm run lint:strict && pnpm run audit:security",
+    "typecheck": "pnpm run build:libs && pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build",
+    "verify:push": "pnpm run verify && pnpm run lint:security",
+    "ci": "pnpm run verify",
+    "db:seed": "pnpm --filter @mediadesk/api run db:seed",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@heejun/eslint-config": "^5.0.0",
+    "@heejun/prettier-config": "^3.0.0",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --no-warn-ignored --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,html,css}": [
+      "prettier --write"
+    ]
+  },
+  "prettier": "@heejun/prettier-config"
+}

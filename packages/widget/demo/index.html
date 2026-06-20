@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MediaDesk Widget — Demo</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #1a1d23;
+        background: #f4f5f7;
+        line-height: 1.6;
+      }
+      .wrap { max-width: 820px; margin: 0 auto; padding: 64px 24px 120px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+      h2 { font-size: 16px; margin: 32px 0 12px; }
+      p.lead { color: #4a4f57; margin: 0 0 24px; max-width: 60ch; }
+      .panel {
+        background: #fff;
+        border: 1px solid #d7dae0;
+        border-radius: 14px;
+        padding: 20px 22px;
+        margin: 16px 0;
+      }
+      label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+      input {
+        width: 100%; padding: 9px 11px; font: inherit; font-size: 14px;
+        border: 1px solid #d7dae0; border-radius: 9px;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+      code { background: #eef0f3; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+      .hint { font-size: 12px; color: #6b7280; margin-top: 8px; }
+      pre { overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>MediaDesk 미디어 위젯</h1>
+      <p class="lead">
+        아래 <code>publishableKey</code>·<code>endpoint</code>·<code>folder</code> 를 바꾸면
+        업로더와 갤러리가 즉시 다시 마운트됩니다. 업로드가 성공하면 갤러리가 자동 새로고침됩니다.
+      </p>
+
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="pk">publishableKey</label>
+            <input id="pk" value="pk_demo" />
+          </div>
+          <div>
+            <label for="endpoint">endpoint</label>
+            <input id="endpoint" value="http://localhost:4191" />
+          </div>
+          <div>
+            <label for="folder">folder</label>
+            <input id="folder" value="demo" />
+          </div>
+        </div>
+        <p class="hint">
+          로컬 API 가 떠 있어야 합니다. <code>pnpm --filter @mediadesk/api run start:dev</code>
+          (기본 포트 4191, PGlite 폴백). 시드된 <code>pk_demo</code> 테넌트로 동작합니다.
+        </p>
+      </div>
+
+      <h2>업로더</h2>
+      <div class="panel"><div id="uploader"></div></div>
+
+      <h2>갤러리</h2>
+      <div class="panel"><div id="gallery"></div></div>
+
+      <div class="panel">
+        <strong>바닐라(비-React) 임베드</strong>
+        <pre><code>&lt;script src="https://media.example.com/media-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  MediaDesk.init({
+    uploader: { target: '#uploader', props: { publishableKey: 'pk_…', endpoint: 'https://media.example.com', folder: 'avatars' } },
+    gallery:  { target: '#gallery',  props: { publishableKey: 'pk_…', endpoint: 'https://media.example.com', folder: 'avatars' } },
+  })
+&lt;/script&gt;</code></pre>
+      </div>
+    </div>
+
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>
