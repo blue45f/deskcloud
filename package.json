@@ -13,6 +13,7 @@
     "test": "turbo run test --concurrency=1",
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
+    "verify": "pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run test",
     "build:platform": "turbo run build --filter=\"./platform/*\"",
     "build:desks": "turbo run build --filter=\"./desks/**\"",
     "prepare": "husky"
