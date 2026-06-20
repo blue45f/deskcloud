@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#cf4040" />
+
+    <!-- PWA(설치/오프라인): 매니페스트 link 와 SW 등록은 vite-plugin-pwa 가 자동 주입.
+         apple-touch-icon 과 iOS 홈화면 메타만 직접 선언. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="ModerationDesk" />
+    <meta
+      name="description"
+      content="ModerationDesk — 멀티테넌트 콘텐츠 모더레이션 SaaS. 외부 서비스가 publishable 키로 텍스트를 검사·신고하고, secret 키로 금칙 규칙·신고·로그를 관리합니다. 규칙 기반은 항상, Claude AI 보조는 선택."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ModerationDesk" />
+    <meta property="og:title" content="ModerationDesk — 콘텐츠 모더레이션 as a Service" />
+    <meta
+      property="og:description"
+      content="금칙어·정규식 규칙은 항상, Claude AI 독성 점수는 선택. publishable 키로 검사·신고, secret 키로 관리. SaaS·셀프호스팅."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="ModerationDesk — 콘텐츠 모더레이션 as a Service" />
+    <meta
+      name="twitter:description"
+      content="금칙어·정규식 규칙은 항상, Claude AI 독성 점수는 선택. publishable 키로 검사·신고, secret 키로 관리."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>ModerationDesk — 콘텐츠 모더레이션 as a Service</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
