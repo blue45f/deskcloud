@@ -1,0 +1,897 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* compact density — proportionally tightens rem-based spacing + type */
+:root[data-density='compact'] {
+  font-size: 90%;
+}
+
+/*
+ * ──────────────────────────────────────────────────────────────────────────
+ * Design tokens — "engineering paper" instrument console
+ *
+ * 전략: Restrained. 정체성은 hue 가 아니라 따뜻한 중립색 + 타이포 + 밀도가 짊어진다.
+ * 모든 색은 OKLCH. #000/#fff 금지 — 모든 중립색을 brand hue(~80, 따뜻함) 로 틴트.
+ * accent 는 violet-blue(~285) 단일색으로 primary action / 현재 선택 / focus 에만 (<10%).
+ * status 삼색(green ~150 / amber ~75 / red ~25) 은 accent 와 hue 가 겹치지 않는다.
+ * ──────────────────────────────────────────────────────────────────────────
+ */
+:root {
+  /* warm "paper" 중립 — 차가운 slate 가 아님 */
+  --app-bg: oklch(0.974 0.005 80);
+  --app-panel: oklch(0.995 0.0025 80);
+  --app-panel-2: oklch(0.955 0.006 80);
+  --app-line: oklch(0.905 0.006 80);
+  --app-line-strong: oklch(0.85 0.008 80);
+  /* overlay scrim — warm-charcoal (= dark --app-bg), never #000. Constant in both themes. */
+  --app-scrim: oklch(0.175 0.006 80 / 0.5);
+  --app-scrim-strong: oklch(0.175 0.006 80 / 0.6);
+
+  --app-ink: oklch(0.28 0.012 80);
+  --app-ink-muted: oklch(0.47 0.01 80);
+  --app-ink-subtle: oklch(0.54 0.01 80); /* WCAG AA: ≥4.5:1 on surface/panel */
+
+  /* accent — violet-blue, 작은 면적 전용 */
+  --app-accent: oklch(0.54 0.185 285);
+  --app-accent-hover: oklch(0.49 0.195 285);
+  --app-accent-fg: oklch(0.985 0.012 285);
+  --app-accent-soft: oklch(0.95 0.03 285);
+
+  /* status — accent / 서로와 hue 분리 */
+  --app-ok: oklch(0.58 0.13 150);
+  --app-ok-bg: oklch(0.95 0.04 150);
+  --app-ok-fg: oklch(0.4 0.1 150);
+  --app-warn: oklch(0.72 0.14 75);
+  --app-warn-bg: oklch(0.95 0.06 75);
+  --app-warn-fg: oklch(0.5 0.12 75);
+  --app-err: oklch(0.57 0.2 25);
+  --app-err-bg: oklch(0.95 0.05 25);
+  --app-err-fg: oklch(0.47 0.18 25);
+
+  /* 사이드바 레일 — 두 테마에서 동일한 따뜻한 차콜 (의도된 고정 레이어) */
+  --app-rail: oklch(0.205 0.008 80);
+  --app-rail-elev: oklch(0.255 0.01 80);
+  --app-rail-line: oklch(0.32 0.01 80);
+  --app-rail-ink: oklch(0.92 0.006 80);
+  --app-rail-ink-muted: oklch(0.66 0.01 80);
+  --app-ok-rail: oklch(0.8 0.13 150); /* light green — AA on the dark rail (public badge) */
+
+  --app-shadow: 0 1px 2px oklch(0.28 0.012 80 / 0.05), 0 1px 1px oklch(0.28 0.012 80 / 0.04);
+}
+
+.dark {
+  /* warm charcoal — slate-900 의 차가운 파랑이 아님 */
+  --app-bg: oklch(0.175 0.006 80);
+  --app-panel: oklch(0.215 0.007 80);
+  --app-panel-2: oklch(0.255 0.008 80);
+  --app-line: oklch(0.305 0.008 80);
+  --app-line-strong: oklch(0.4 0.01 80);
+
+  --app-ink: oklch(0.93 0.006 80);
+  --app-ink-muted: oklch(0.71 0.008 80);
+  --app-ink-subtle: oklch(0.64 0.008 80); /* WCAG AA: ≥4.5:1 on surface/panel */
+
+  --app-accent: oklch(0.7 0.16 285);
+  --app-accent-hover: oklch(0.76 0.15 285);
+  --app-accent-fg: oklch(0.16 0.02 285);
+  --app-accent-soft: oklch(0.3 0.06 285);
+
+  --app-ok: oklch(0.72 0.15 150);
+  --app-ok-bg: oklch(0.27 0.05 150);
+  --app-ok-fg: oklch(0.82 0.13 150);
+  --app-warn: oklch(0.8 0.14 75);
+  --app-warn-bg: oklch(0.3 0.05 75);
+  --app-warn-fg: oklch(0.85 0.12 75);
+  --app-err: oklch(0.7 0.18 25);
+  --app-err-bg: oklch(0.3 0.06 25);
+  --app-err-fg: oklch(0.84 0.14 25);
+
+  --app-shadow: 0 1px 2px oklch(0 0 0 / 0.3), 0 1px 2px oklch(0 0 0 / 0.2);
+}
+
+@theme inline {
+  --font-sans: ui-sans-serif, -apple-system, system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Code', 'Menlo', 'Consolas', monospace;
+
+  --color-surface: var(--app-bg);
+  --color-panel: var(--app-panel);
+  --color-panel-2: var(--app-panel-2);
+  --color-line: var(--app-line);
+  --color-line-strong: var(--app-line-strong);
+  --color-scrim: var(--app-scrim);
+  --color-scrim-strong: var(--app-scrim-strong);
+
+  --color-ink: var(--app-ink);
+  --color-ink-muted: var(--app-ink-muted);
+  --color-ink-subtle: var(--app-ink-subtle);
+
+  --color-accent: var(--app-accent);
+  --color-accent-hover: var(--app-accent-hover);
+  --color-accent-fg: var(--app-accent-fg);
+  --color-accent-soft: var(--app-accent-soft);
+
+  --color-ok: var(--app-ok);
+  --color-ok-bg: var(--app-ok-bg);
+  --color-ok-fg: var(--app-ok-fg);
+  --color-warn: var(--app-warn);
+  --color-warn-bg: var(--app-warn-bg);
+  --color-warn-fg: var(--app-warn-fg);
+  --color-err: var(--app-err);
+  --color-err-bg: var(--app-err-bg);
+  --color-err-fg: var(--app-err-fg);
+
+  --color-rail: var(--app-rail);
+  --color-rail-elev: var(--app-rail-elev);
+  --color-rail-line: var(--app-rail-line);
+  --color-rail-ink: var(--app-rail-ink);
+  --color-rail-ink-muted: var(--app-rail-ink-muted);
+  --color-ok-rail: var(--app-ok-rail);
+}
+
+@layer base {
+  body {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizelegibility;
+  }
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+  }
+  /* 기계 데이터는 tabular-nums 로 정렬 — instrument 시그니처.
+     bare <code>/<kbd>/<samp> 도 같은 시그니처를 받도록 포함. */
+  .font-mono,
+  code,
+  kbd,
+  samp {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'ss01', 'zero';
+  }
+}
+
+@layer components {
+  /* 재사용 표면 — 그림자 카드가 아닌 hairline elevation */
+  .panel {
+    background: var(--color-panel);
+    border: 1px solid var(--color-line);
+    border-radius: 0.625rem;
+    box-shadow: var(--app-shadow);
+  }
+  .panel-inset {
+    background: var(--color-panel-2);
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem;
+  }
+
+  /* status badge — bg-X-100/text-X-800 슬롭 대체 */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    padding: 0.0625rem 0.4375rem;
+    border-radius: 0.3125rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+  .badge::before {
+    content: '';
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 999px;
+    background: currentcolor;
+    flex: none;
+  }
+  .badge--ok {
+    background: var(--color-ok-bg);
+    color: var(--color-ok-fg);
+  }
+  .badge--warn {
+    background: var(--color-warn-bg);
+    color: var(--color-warn-fg);
+  }
+  .badge--err {
+    background: var(--color-err-bg);
+    color: var(--color-err-fg);
+  }
+  .badge--neutral {
+    background: var(--color-panel-2);
+    color: var(--color-ink-muted);
+  }
+
+  /* buttons — 색/상태만 정의. 크기(px/py/text-*)는 호출부 유틸리티 유지 */
+  .btn-primary,
+  .btn-ghost,
+  .btn-danger {
+    border-radius: 0.375rem;
+    font-weight: 500;
+    transition:
+      background-color 140ms cubic-bezier(0.25, 1, 0.5, 1),
+      border-color 140ms cubic-bezier(0.25, 1, 0.5, 1),
+      color 140ms cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 140ms cubic-bezier(0.25, 1, 0.5, 1),
+      transform 80ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .btn-primary:disabled,
+  .btn-ghost:disabled,
+  .btn-danger:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+  /* unified focus ring — covers buttons whose call site has no ring utility.
+     Tailwind's utilities layer wins where a focus-visible:ring-accent IS present,
+     so both paths land on the same accent ring. */
+  .btn-primary:focus-visible,
+  .btn-ghost:focus-visible,
+  .btn-danger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-accent);
+  }
+  /* tactile press — transform only (never layout); honored unless reduced-motion */
+  .btn-primary:active:not(:disabled),
+  .btn-ghost:active:not(:disabled),
+  .btn-danger:active:not(:disabled) {
+    transform: translateY(0.5px);
+  }
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-accent-fg);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-accent-hover);
+  }
+  .btn-ghost {
+    background: var(--color-panel-2);
+    color: var(--color-ink-muted);
+    border: 1px solid var(--color-line);
+  }
+  .btn-ghost:hover:not(:disabled) {
+    color: var(--color-ink);
+    border-color: var(--color-line-strong);
+  }
+  .btn-danger {
+    background: var(--color-err);
+    color: oklch(0.99 0.01 25);
+  }
+  .btn-danger:hover:not(:disabled) {
+    filter: brightness(0.94);
+  }
+
+  /* form controls */
+  .input {
+    background: var(--color-panel-2);
+    border: 1px solid var(--color-line);
+    border-radius: 0.375rem;
+    color: var(--color-ink);
+    transition:
+      border-color 140ms cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 140ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .input::placeholder {
+    color: var(--color-ink-subtle);
+  }
+  .input:focus-visible {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+  }
+  /* native checkbox — route the checked fill through the violet accent token */
+  .checkbox {
+    accent-color: var(--color-accent);
+  }
+
+  /* accent text link — underlined by default so inline links stay distinguishable
+     without relying on color (WCAG 1.4.1 / link-in-text-block). */
+  .link {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .link:hover {
+    text-decoration-thickness: 2px;
+  }
+  /* keyboard focus — outline handles inline/wrapped links better than a box ring */
+  .link:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+    text-decoration: underline;
+  }
+
+  /* Welcome landing — instrument-console glow-up without changing tokens. */
+  .welcome-page {
+    position: relative;
+  }
+  .welcome-page::before {
+    content: '';
+    position: absolute;
+    inset: -1.5rem -1.5rem auto;
+    height: 22rem;
+    pointer-events: none;
+    z-index: -1;
+    background:
+      radial-gradient(
+        circle at 18% 10%,
+        color-mix(in oklab, var(--color-accent) 18%, transparent),
+        transparent 34%
+      ),
+      radial-gradient(
+        circle at 82% 22%,
+        color-mix(in oklab, var(--color-ok) 14%, transparent),
+        transparent 32%
+      );
+    opacity: 0.72;
+  }
+  .welcome-hero {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: 0.875rem;
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-panel) 92%, var(--color-accent-soft)),
+        var(--color-panel)
+      ),
+      var(--color-panel);
+    box-shadow:
+      var(--app-shadow),
+      0 24px 70px color-mix(in oklab, var(--color-accent) 13%, transparent);
+  }
+  .welcome-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--color-accent) 16%, transparent),
+        transparent 36%
+      ),
+      radial-gradient(
+        circle at 90% 14%,
+        color-mix(in oklab, var(--color-accent) 18%, transparent),
+        transparent 26%
+      );
+    opacity: 0.9;
+  }
+  .welcome-hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(var(--color-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+    background-size: 42px 42px;
+    mask-image: linear-gradient(90deg, transparent, black 30%, black 76%, transparent);
+    opacity: 0.22;
+  }
+  .welcome-hero__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    grid-template-columns: minmax(0, 1fr);
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+  }
+  .welcome-hero__copy {
+    max-width: 46rem;
+  }
+  .welcome-live-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 1.875rem;
+    padding: 0.3125rem 0.625rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--color-panel) 84%, transparent);
+    color: var(--color-ink-muted);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .welcome-live-dot {
+    width: 0.4375rem;
+    height: 0.4375rem;
+    border-radius: 999px;
+    background: var(--color-ok);
+    box-shadow: 0 0 0 0.25rem color-mix(in oklab, var(--color-ok) 16%, transparent);
+  }
+  .welcome-title {
+    margin-top: 1rem;
+    max-width: 11ch;
+    color: var(--color-ink);
+    font-size: clamp(2.3rem, 8vw, 5.4rem);
+    font-weight: 760;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+  }
+  .welcome-lede {
+    margin-top: 1rem;
+    max-width: 54rem;
+    color: var(--color-ink-muted);
+    font-size: clamp(1rem, 1.2vw, 1.15rem);
+    line-height: 1.72;
+  }
+  .welcome-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .welcome-flow {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    align-content: center;
+    min-height: 17rem;
+    padding: 1rem;
+    border: 1px solid color-mix(in oklab, var(--color-line) 70%, transparent);
+    border-radius: 0.75rem;
+    background: color-mix(in oklab, var(--color-panel-2) 82%, transparent);
+  }
+  .welcome-flow__node {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 3.125rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.625rem;
+    background: var(--color-panel);
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: var(--app-shadow);
+  }
+  .welcome-flow__node--core {
+    border-color: color-mix(in oklab, var(--color-accent) 38%, var(--color-line));
+    background: color-mix(in oklab, var(--color-accent-soft) 50%, var(--color-panel));
+  }
+  .welcome-flow__node--result {
+    border-color: color-mix(in oklab, var(--color-ok) 35%, var(--color-line));
+  }
+  .welcome-flow__line {
+    width: 1px;
+    height: 1.25rem;
+    margin-left: 1.5rem;
+    background: var(--color-line-strong);
+  }
+  .welcome-flow__metrics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+  }
+  .welcome-flow__metrics span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    min-height: 1.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-panel);
+    color: var(--color-ink-muted);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+  .welcome-stat-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding: 0 clamp(1.5rem, 4vw, 2.75rem) clamp(1.5rem, 4vw, 2.75rem);
+  }
+  .welcome-stat {
+    min-height: 5rem;
+    border-color: color-mix(in oklab, var(--color-line) 82%, var(--color-accent));
+    background: color-mix(in oklab, var(--color-panel) 86%, transparent);
+    transition:
+      border-color 160ms cubic-bezier(0.25, 1, 0.5, 1),
+      transform 160ms cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 160ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .welcome-feature,
+  .welcome-section {
+    transition:
+      border-color 160ms cubic-bezier(0.25, 1, 0.5, 1),
+      transform 160ms cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 160ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .welcome-steps,
+  .welcome-resources {
+    display: grid;
+    gap: 0.625rem;
+  }
+  .welcome-step,
+  .welcome-resources li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-height: 2.5rem;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem;
+    background: var(--color-panel-2);
+  }
+  .welcome-step__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 999px;
+    background: var(--color-accent);
+    color: var(--color-accent-fg);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 800;
+  }
+  .welcome-demo {
+    background:
+      linear-gradient(
+        135deg,
+        color-mix(in oklab, var(--color-accent-soft) 32%, var(--color-panel)),
+        var(--color-panel)
+      ),
+      var(--color-panel);
+  }
+  .welcome-check {
+    transition:
+      border-color 160ms cubic-bezier(0.25, 1, 0.5, 1),
+      background-color 160ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+  .welcome-architecture {
+    min-height: 17rem;
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--color-panel-2) 90%, var(--color-accent-soft)),
+      var(--color-panel-2)
+    );
+    color: var(--color-ink-muted);
+  }
+
+  @media (min-width: 768px) {
+    .welcome-stat-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .welcome-hero__grid {
+      grid-template-columns: minmax(0, 1.45fr) minmax(19rem, 0.75fr);
+      align-items: center;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .welcome-stat:hover,
+    .welcome-feature:hover,
+    .welcome-section:hover {
+      transform: translateY(-2px);
+      border-color: color-mix(in oklab, var(--color-accent) 34%, var(--color-line));
+      box-shadow:
+        var(--app-shadow),
+        0 12px 30px color-mix(in oklab, var(--color-accent) 10%, transparent);
+    }
+    .welcome-check:hover {
+      border-color: color-mix(in oklab, var(--color-accent) 32%, var(--color-line));
+      background: color-mix(in oklab, var(--color-accent-soft) 24%, var(--color-panel-2));
+    }
+  }
+
+  /* inline notices — bg-X-50/text-X-800 슬롭 대체 */
+  .alert {
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  .alert--ok {
+    background: var(--color-ok-bg);
+    color: var(--color-ok-fg);
+    border-color: var(--color-ok);
+  }
+  .alert--warn {
+    background: var(--color-warn-bg);
+    color: var(--color-warn-fg);
+    border-color: var(--color-warn);
+  }
+  .alert--err {
+    background: var(--color-err-bg);
+    color: var(--color-err-fg);
+    border-color: var(--color-err);
+  }
+  .alert--info {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+    border-color: var(--color-accent);
+  }
+
+  /* native <details>/<summary> toggles — accent focus ring (A11y law) */
+  summary {
+    outline: none;
+  }
+  summary:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer utilities {
+  [x-cloak] {
+    display: none !important;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+/* Sidebar nav active state — accent 토큰 사용 (테마 무관 동일 accent) */
+.nav-item {
+  transition:
+    background-color 140ms cubic-bezier(0.25, 1, 0.5, 1),
+    color 140ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.nav-item.active {
+  background: var(--color-accent);
+  color: var(--color-accent-fg);
+}
+/* "public" badge is green (AA on the dark rail), but the active item paints an
+   accent background where green drops to ~3:1. In the active state, inherit the
+   accent foreground so the badge keeps WCAG AA contrast. */
+.nav-item.active .text-ok-rail {
+  color: var(--color-accent-fg);
+}
+
+/* Fade animations */
+.animate-fade-in {
+  animation: fade-in 220ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .welcome-enter {
+    opacity: 0;
+    transform: translateY(10px);
+    animation: welcome-rise 520ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  .welcome-enter--chip {
+    animation-delay: 40ms;
+  }
+  .welcome-enter--title {
+    animation-delay: 90ms;
+  }
+  .welcome-enter--lede {
+    animation-delay: 150ms;
+  }
+  .welcome-enter--actions {
+    animation-delay: 210ms;
+  }
+  .welcome-enter--flow {
+    animation-delay: 180ms;
+  }
+  .welcome-enter--stats {
+    animation-delay: 260ms;
+  }
+  .welcome-flow__line {
+    transform-origin: top;
+    animation: welcome-line 540ms cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
+  .welcome-flow__line:nth-of-type(2) {
+    animation-delay: 260ms;
+  }
+}
+
+@keyframes welcome-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes welcome-line {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* Toast animations */
+.toast-enter {
+  animation: slide-in 200ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.toast-exit {
+  animation: slide-out 180ms ease-in forwards;
+}
+@keyframes slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-out {
+  to {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+}
+
+/* Native <dialog> (confirm/prompt) — top-layer 진입 페이드/리프트. ::backdrop 은 scrim 토큰. */
+.app-dialog {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+  transition:
+    opacity 180ms cubic-bezier(0.25, 1, 0.5, 1),
+    transform 180ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+.app-dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+/* display:none → top-layer 전환 첫 프레임의 시작값 — 미지원 브라우저는 즉시 표시(우아한 강등) */
+@starting-style {
+  .app-dialog[open] {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+.app-dialog::backdrop {
+  background: var(--color-scrim);
+}
+
+/* Drag-reorder feedback */
+.drag-row.dragging {
+  opacity: 0.4;
+}
+.drag-row.drag-over {
+  border-top: 2px solid var(--color-accent);
+}
+
+/* Mobile/Tablet sidebar slide — strictly below Tailwind lg(width >= 1024px).
+   inclusive 한 ≤1024 쿼리는 lg 와 정확히 1024px 에서 겹쳐, static 사이드바가
+   translateX(-100%) 로 사라지고 햄버거(lg:hidden)도 없는 데드존을 만든다. */
+@media (width < 1024px) {
+  aside.collapsed {
+    transform: translateX(-100%);
+  }
+  aside {
+    transition: transform 220ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+}
+
+/* Sparkline — stroke-draw 리빌(레이아웃 아님, paint-only). 한 번만 그려진다. */
+.spark path {
+  animation: spark-draw 600ms cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes spark-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* count-up 직후 갱신을 알리는 아주 옅은 mono 수치 강조 — 색 변화만(transform 없음) */
+.figure-pulse {
+  animation: figure-pulse 540ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+@keyframes figure-pulse {
+  0% {
+    color: var(--color-accent);
+  }
+  100% {
+    color: inherit;
+  }
+}
+
+/* "지금 갱신됨" 표시 도트 — 갱신 시점에 한 번 옅게 맥동(opacity 만) */
+.live-dot {
+  animation: live-dot 1100ms cubic-bezier(0.25, 1, 0.5, 1);
+}
+@keyframes live-dot {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Skeleton loading pulse */
+.skeleton-pulse {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/*
+ * 접근성 — 사용자가 'reduce motion' 을 켰을 때는
+ * 토스트 슬라이드 / 사이드바 transition / 스켈레톤 펄스를 즉시 정지.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter,
+  .toast-exit,
+  .app-dialog,
+  .skeleton-pulse,
+  .spark path,
+  .figure-pulse,
+  .live-dot,
+  .nav-item,
+  .btn-primary,
+  .btn-ghost,
+  .btn-danger,
+  .input,
+  .welcome-enter,
+  .welcome-flow__line,
+  .welcome-stat,
+  .welcome-feature,
+  .welcome-section,
+  .welcome-check {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* sparkline 은 모션을 꺼도 선은 온전히 그려져 있어야 한다(데이터 보조선) */
+  .spark path {
+    stroke-dashoffset: 0 !important;
+  }
+  .welcome-enter,
+  .welcome-flow__line {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .welcome-stat:hover,
+  .welcome-feature:hover,
+  .welcome-section:hover {
+    transform: none !important;
+  }
+  /* no tactile press displacement for reduced-motion users */
+  .btn-primary:active,
+  .btn-ghost:active,
+  .btn-danger:active {
+    transform: none !important;
+  }
+  aside {
+    transition: none !important;
+  }
+}

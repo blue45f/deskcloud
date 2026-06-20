@@ -1,0 +1,35 @@
+node_modules/
+dist/
+.env
+.env.local
+*.log
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+coverage/
+.cache/
+# Python virtualenv (scratch tooling)
+.venv/
+puppeteer-cache/
+.vercel
+apps/demo/public/
+# admin-ui/public/ is a Vite build artifact of apps/admin-frontend (source of truth).
+# npm publish runs the build first via admin-ui's `build` script.
+packages/admin-ui/public/
+
+# tsc -b incremental build info
+*.tsbuildinfo
+
+# Storybook static build output
+storybook-static/
+
+# Playwright MCP scratch artifacts
+.playwright-mcp/
+
+# Playwright (a11y) run artifacts
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

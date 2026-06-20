@@ -1,0 +1,55 @@
+{
+  "name": "@heejun/spa-seo-gateway-anthropic",
+  "version": "1.0.1",
+  "description": "Anthropic Claude reference adapter for spa-seo-gateway — schema.org JSON-LD inference",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.104.1"
+  },
+  "peerDependencies": {
+    "@heejun/spa-seo-gateway-core": "^1.6.0"
+  },
+  "devDependencies": {
+    "@heejun/spa-seo-gateway-core": "^1.9.0",
+    "typescript": "^6.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blue45f/spa-seo-gateway.git",
+    "directory": "packages/anthropic"
+  },
+  "bugs": {
+    "url": "https://github.com/blue45f/spa-seo-gateway/issues"
+  },
+  "homepage": "https://github.com/blue45f/spa-seo-gateway/tree/main/packages/anthropic#readme",
+  "license": "MIT",
+  "author": "heejun",
+  "keywords": [
+    "seo",
+    "spa",
+    "anthropic",
+    "claude",
+    "schema.org",
+    "json-ld",
+    "ai"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

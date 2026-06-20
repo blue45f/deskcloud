@@ -1,0 +1,54 @@
+name: Deploy Gateway to Fly.io
+
+# Deploys the BACKEND render server (Fastify + Puppeteer container, see Dockerfile
+# + fly.toml) to Fly.io. This is the server-tier counterpart to deploy-netlify.yml
+# (which deploys the admin-frontend + demo static tiers).
+#
+# Like the Netlify workflow, every step is GATED on the FLY_API_TOKEN secret and
+# SKIPS cleanly when it is not configured — so forks / contributors without deploy
+# creds never see a red X. Configure the secret in repo Settings → Secrets to
+# enable production deploys.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/gateway/**'
+      - 'packages/core/**'
+      - 'packages/cms/**'
+      - 'packages/multi-tenant/**'
+      - 'packages/admin-ui/**'
+      - 'Dockerfile'
+      - 'fly.toml'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - '.github/workflows/deploy-fly.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Skip deployment when FLY_API_TOKEN is not configured
+        if: env.FLY_API_TOKEN == ''
+        run: echo "FLY_API_TOKEN is not configured; skipping Fly.io deployment."
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+        if: env.FLY_API_TOKEN != ''
+
+      - name: Deploy gateway (remote build from Dockerfile + fly.toml)
+        if: env.FLY_API_TOKEN != ''
+        run: flyctl deploy --remote-only --config fly.toml

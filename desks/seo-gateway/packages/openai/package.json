@@ -1,0 +1,54 @@
+{
+  "name": "@heejun/spa-seo-gateway-openai",
+  "version": "1.0.0",
+  "description": "OpenAI-compatible reference adapter for spa-seo-gateway — works with OpenAI, Ollama, Groq, OpenRouter, LM Studio",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "@heejun/spa-seo-gateway-core": "^1.6.0"
+  },
+  "devDependencies": {
+    "@heejun/spa-seo-gateway-core": "^1.9.0",
+    "typescript": "^6.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blue45f/spa-seo-gateway.git",
+    "directory": "packages/openai"
+  },
+  "bugs": {
+    "url": "https://github.com/blue45f/spa-seo-gateway/issues"
+  },
+  "homepage": "https://github.com/blue45f/spa-seo-gateway/tree/main/packages/openai#readme",
+  "license": "MIT",
+  "author": "heejun",
+  "keywords": [
+    "seo",
+    "spa",
+    "openai",
+    "ollama",
+    "groq",
+    "openrouter",
+    "schema.org",
+    "json-ld",
+    "ai"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

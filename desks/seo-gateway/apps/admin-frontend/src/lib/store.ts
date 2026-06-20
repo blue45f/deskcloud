@@ -1,0 +1,197 @@
+/**
+ * 전역 admin UI 상태 — Zustand. localStorage 동기화는 명시적으로 .persist() 미사용 (단순함 유지).
+ */
+import { create } from 'zustand'
+
+import { translate } from './i18n'
+
+import type { Density, Lang, PublicInfo, Theme, ThemeMode, ToastItem, ToastKind } from './types'
+
+const TOUR_KEY = 'seo-admin-tour-seen'
+const THEME_KEY = 'seo-admin-theme'
+const DENSITY_KEY = 'seo-admin-density'
+const LANG_KEY = 'seo-admin-lang'
+
+function systemPrefersDark(): boolean {
+  return typeof window !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches
+}
+
+function detectInitialThemeMode(): ThemeMode {
+  if (typeof window === 'undefined') return 'system'
+  const saved = globalThis.localStorage?.getItem(THEME_KEY)
+  return saved === 'dark' || saved === 'light' || saved === 'system' ? saved : 'system'
+}
+
+function resolveTheme(mode: ThemeMode): Theme {
+  if (mode === 'system') return systemPrefersDark() ? 'dark' : 'light'
+  return mode
+}
+
+function detectInitialDensity(): Density {
+  if (typeof window === 'undefined') return 'comfortable'
+  return globalThis.localStorage?.getItem(DENSITY_KEY) === 'compact' ? 'compact' : 'comfortable'
+}
+
+function detectInitialLang(): Lang {
+  if (typeof window === 'undefined') return 'ko'
+  const saved = globalThis.localStorage?.getItem(LANG_KEY) as Lang | null
+  if (saved === 'ko' || saved === 'en') return saved
+  return navigator.language?.startsWith('ko') ? 'ko' : 'en'
+}
+
+type State = {
+  authed: boolean
+  adminEnabled: boolean
+  theme: Theme
+  themeMode: ThemeMode
+  density: Density
+  lang: Lang
+  sidebarOpen: boolean
+  cmdPaletteOpen: boolean
+  shortcutsOpen: boolean
+  tourSeen: boolean
+  tourStep: number
+  toasts: ToastItem[]
+  globalError: string
+  publicInfo: PublicInfo | null
+}
+
+type Actions = {
+  setAuthed(v: boolean): void
+  setAdminEnabled(v: boolean): void
+  setPublicInfo(info: PublicInfo | null): void
+  toggleTheme(): void
+  setThemeMode(mode: ThemeMode): void
+  toggleDensity(): void
+  toggleLang(): void
+  toggleSidebar(): void
+  setSidebarOpen(open: boolean): void
+  openCmd(): void
+  closeCmd(): void
+  openShortcuts(): void
+  closeShortcuts(): void
+  startTour(): void
+  endTour(): void
+  tourNext(): void
+  pushToast(message: string, kind?: ToastKind): void
+  removeToast(id: number): void
+  setGlobalError(msg: string): void
+  /** 현재 언어로 i18n key 를 lookup */
+  t(key: string, fallback?: string): string
+}
+
+export const useStore = create<State & Actions>((set, get) => ({
+  authed: false,
+  adminEnabled: true,
+  theme: resolveTheme(detectInitialThemeMode()),
+  themeMode: detectInitialThemeMode(),
+  density: detectInitialDensity(),
+  lang: detectInitialLang(),
+  sidebarOpen: typeof window !== 'undefined' ? globalThis.innerWidth >= 1024 : true,
+  cmdPaletteOpen: false,
+  shortcutsOpen: false,
+  tourSeen:
+    typeof window !== 'undefined' ? globalThis.localStorage?.getItem(TOUR_KEY) === '1' : true,
+  tourStep: 0,
+  toasts: [],
+  globalError: '',
+  publicInfo: null,
+
+  setAuthed(v) {
+    set({ authed: v })
+  },
+  setAdminEnabled(v) {
+    set({ adminEnabled: v })
+  },
+  setPublicInfo(info) {
+    set({ publicInfo: info })
+  },
+
+  toggleTheme() {
+    // explicit flip (light <-> dark); "system" is only reachable via setThemeMode
+    get().setThemeMode(get().theme === 'dark' ? 'light' : 'dark')
+  },
+  setThemeMode(mode) {
+    const eff = resolveTheme(mode)
+    if (typeof document !== 'undefined') {
+      document.documentElement.classList.toggle('dark', eff === 'dark')
+      globalThis.localStorage?.setItem(THEME_KEY, mode)
+    }
+    set({ themeMode: mode, theme: eff })
+  },
+  toggleDensity() {
+    const next: Density = get().density === 'compact' ? 'comfortable' : 'compact'
+    if (typeof document !== 'undefined') {
+      document.documentElement.setAttribute('data-density', next)
+      globalThis.localStorage?.setItem(DENSITY_KEY, next)
+    }
+    set({ density: next })
+  },
+
+  toggleLang() {
+    const next: Lang = get().lang === 'ko' ? 'en' : 'ko'
+    if (typeof window !== 'undefined') globalThis.localStorage?.setItem(LANG_KEY, next)
+    set({ lang: next })
+  },
+
+  toggleSidebar() {
+    set((s) => ({ sidebarOpen: !s.sidebarOpen }))
+  },
+  setSidebarOpen(open) {
+    set({ sidebarOpen: open })
+  },
+
+  openCmd() {
+    set({ cmdPaletteOpen: true })
+  },
+  closeCmd() {
+    set({ cmdPaletteOpen: false })
+  },
+
+  openShortcuts() {
+    set({ shortcutsOpen: true })
+  },
+  closeShortcuts() {
+    set({ shortcutsOpen: false })
+  },
+
+  startTour() {
+    set({ tourStep: 0, tourSeen: false })
+  },
+  endTour() {
+    if (typeof window !== 'undefined') globalThis.localStorage?.setItem(TOUR_KEY, '1')
+    set({ tourSeen: true, tourStep: -1 })
+  },
+  tourNext() {
+    set((s) => ({ tourStep: s.tourStep + 1 }))
+  },
+
+  pushToast(message, kind = 'info') {
+    const id = Date.now() + Math.random()
+    set((s) => ({
+      toasts: [...s.toasts, { id, message, kind }],
+    }))
+    setTimeout(() => get().removeToast(id), 4000)
+  },
+  removeToast(id) {
+    set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) }))
+  },
+
+  setGlobalError(msg) {
+    set({ globalError: msg })
+  },
+
+  t(key, fallback) {
+    return translate(get().lang, key, fallback)
+  },
+}))
+
+// Live-follow the OS theme while the user's choice is "system".
+if (typeof window !== 'undefined') {
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    if (useStore.getState().themeMode !== 'system') return
+    const eff: Theme = e.matches ? 'dark' : 'light'
+    document.documentElement.classList.toggle('dark', eff === 'dark')
+    useStore.setState({ theme: eff })
+  })
+}

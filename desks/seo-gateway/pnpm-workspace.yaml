@@ -1,0 +1,56 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
+allowBuilds:
+  # firebase 웹 SDK 의 전이 의존성 — 빌드 스크립트 불필요(순수 번들). false 로 명시해
+  # ERR_PNPM_IGNORED_BUILDS 프롬프트를 끈다(fleet 컨벤션).
+  '@firebase/util': false
+  esbuild: true
+  protobufjs: false
+  puppeteer: true
+  unrs-resolver: true
+
+auditConfig:
+  ignoreGhsas:
+    - GHSA-2p57-rm9w-gvfp
+
+minimumReleaseAgeExclude:
+  - '@vercel/build-utils@13.26.3'
+  - '@vercel/node@5.8.6'
+  - '@vercel/static-config@3.4.0'
+  - '@heejun/eslint-config@5.0.0'
+  - '@heejun/prettier-config@3.0.0'
+  - '@heejun/deskcloud@0.1.0'
+
+overrides:
+  minimatch: '>=10.2.3'
+  undici: '^7.28.0'
+  ajv: '>=8.18.0'
+  # ESLint 코어는 ajv@^6 의 draft-04 메타스키마(ajv 7+ 에서 제거됨)에 의존하므로
+  # 보안용 전역 ajv>=8 오버라이드를 eslint 하위에서만 6.x 로 되돌린다.
+  eslint>ajv: '^6.12.6'
+  # eslint-plugin-jsx-a11y(react() 가 끌어옴)는 minimatch v3 의 default 호출 시그니처에
+  # 의존하는데, 전역 minimatch>=10 핀에서는 `_minimatch.default is not a function` 로
+  # 깨진다. 보안용 전역 핀은 유지하면서 jsx-a11y 하위에서만 3.x 로 되돌린다.
+  eslint-plugin-jsx-a11y>minimatch: '^3.1.2'
+  smol-toml: '>=1.6.1'
+  path-to-regexp: '>=6.3.0'
+  uuid: '>=11.1.1'
+  handlebars: '>=4.7.9'
+  multer: '>=2.2.0'
+  ws: '>=8.21.0'
+  form-data: '>=4.0.6'
+  hono: '>=4.12.25'
+  find-my-way: '>=8.2.2'
+  '@fastify/middie': '>=9.3.2'
+  fastify: '>=5.7.2'
+  fast-uri: '>=3.1.2'
+  serialize-javascript: '>=7.0.3'
+  piscina: '>=4.9.3'
+  drizzle-orm: '>=0.45.2'
+  vitest: '>=4.1.9'
+  '@vitest/coverage-v8': '>=4.1.9'
+  '@vitest/ui': '>=4.1.9'
+  vite: '>=8.0.16'
+  jspdf: '>=4.2.1'

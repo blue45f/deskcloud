@@ -1,0 +1,135 @@
+import { type FormEvent, useState } from 'react'
+
+import { AuthGate } from '../components/AuthGate'
+import { api, errorMessage } from '../lib/api'
+import { useStore } from '../lib/store'
+
+import type { WarmReport } from '../lib/types'
+
+export function Warm() {
+  return (
+    <AuthGate>
+      <WarmBody />
+    </AuthGate>
+  )
+}
+
+function WarmBody() {
+  const t = useStore((s) => s.t)
+  const pushToast = useStore((s) => s.pushToast)
+  const setError = useStore((s) => s.setGlobalError)
+  const [sitemap, setSitemap] = useState('')
+  const [max, setMax] = useState(1000)
+  const [concurrency, setConcurrency] = useState(4)
+  const [running, setRunning] = useState(false)
+  const [report, setReport] = useState<WarmReport | null>(null)
+
+  async function run(e: FormEvent) {
+    e.preventDefault()
+    if (!sitemap.trim() || running) return
+    setRunning(true)
+    setReport(null)
+    try {
+      const r = await api<{ ok: true; report: WarmReport }>('POST', '/admin/api/warm', {
+        sitemap: sitemap.trim(),
+        max,
+        concurrency,
+      })
+      setReport(r.report)
+      pushToast(
+        `${t('toast.warm.done')}: ${r.report.warmed} OK / ${r.report.errors} fail`,
+        'success'
+      )
+    } catch (e) {
+      const msg = errorMessage(e)
+      setError(msg)
+      pushToast(msg, 'error')
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  return (
+    <section className="space-y-4" data-testid="page-warm">
+      <h2 className="text-lg font-semibold tracking-tight text-ink">{t('warm.title')}</h2>
+      <p className="text-sm text-ink-muted">{t('warm.intro')}</p>
+
+      <form onSubmit={run} className="panel p-5 space-y-3">
+        <label className="block">
+          <span className="text-sm font-medium">{t('warm.sitemap.label')}</span>
+          <input
+            type="url"
+            className="input mt-1 w-full px-3 py-2 text-sm"
+            placeholder="https://www.example.com/sitemap.xml"
+            value={sitemap}
+            onChange={(e) => setSitemap(e.target.value)}
+          />
+        </label>
+        <div className="grid grid-cols-2 gap-3">
+          <label className="block">
+            <span className="text-sm font-medium">{t('warm.max.label')}</span>
+            <input
+              type="number"
+              min={1}
+              className="input mt-1 w-full px-3 py-2 text-sm"
+              value={max}
+              onChange={(e) => setMax(Number(e.target.value))}
+            />
+          </label>
+          <label className="block">
+            <span className="text-sm font-medium">{t('warm.concurrency.label')}</span>
+            <input
+              type="number"
+              min={1}
+              max={32}
+              className="input mt-1 w-full px-3 py-2 text-sm"
+              value={concurrency}
+              onChange={(e) => setConcurrency(Number(e.target.value))}
+            />
+          </label>
+        </div>
+        <button
+          type="submit"
+          disabled={running || !sitemap.trim()}
+          className="btn-primary px-4 py-2 text-sm font-medium"
+        >
+          {running ? t('btn.running') : t('warm.run')}
+        </button>
+      </form>
+
+      {report ? (
+        <div className="panel p-5 text-sm">
+          <h3 className="font-semibold mb-3 text-ink">{t('warm.result')}</h3>
+          <dl className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <Stat k="found" v={String(report.found)} />
+            <Stat
+              k="warmed"
+              v={String(report.warmed)}
+              tone={report.warmed > 0 ? 'ok' : undefined}
+            />
+            <Stat k="skipped" v={String(report.skipped)} />
+            <Stat
+              k="errors"
+              v={String(report.errors)}
+              tone={report.errors > 0 ? 'err' : undefined}
+            />
+            <Stat k="durationMs" v={String(report.durationMs)} />
+          </dl>
+          <div className="text-xs text-ink-subtle mt-3 truncate" title={report.sitemap}>
+            sitemap: <code>{report.sitemap}</code>
+          </div>
+        </div>
+      ) : null}
+    </section>
+  )
+}
+
+function Stat({ k, v, tone }: { k: string; v: string; tone?: 'ok' | 'err' }) {
+  const toneClass = tone === 'err' ? 'text-err-fg' : tone === 'ok' ? 'text-ok-fg' : 'text-ink'
+  return (
+    <div className="panel-inset p-3">
+      <div className="text-xs text-ink-subtle">{k}</div>
+      <div className={`font-mono text-lg ${toneClass}`}>{v}</div>
+    </div>
+  )
+}

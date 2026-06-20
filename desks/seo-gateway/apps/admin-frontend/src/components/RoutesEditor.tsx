@@ -1,0 +1,377 @@
+import { useEffect, useMemo, useRef, useState } from 'react'
+
+import { useStore } from '../lib/store'
+
+import type { ScopedRoute } from '../lib/types'
+
+/**
+ * Routes 편집 테이블 (controlled component).
+ *
+ * - 글로벌 routes (Routes 페이지) / 사이트별 routes (SiteDetail) / 테넌트별 routes (TenantDetail) 가 공유.
+ * - 본 컴포넌트는 저장 버튼을 갖지 않고 onChange 로 부모에게 변경을 위임.
+ * - 드래그 리오더, 패턴 필터, 추가/삭제, 셀 단위 인라인 편집 지원.
+ */
+export type RoutesEditorProps = {
+  routes: ScopedRoute[]
+  onChange(next: ScopedRoute[]): void
+  /** 컬럼 헤더에서 사용할 라벨. i18n key 가 아닌 화면 문자열 그대로. */
+  labels?: {
+    pattern?: string
+    ttl?: string
+    waitUntil?: string
+    waitSelector?: string
+    waitMs?: string
+    ignore?: string
+    actions?: string
+  }
+  /** 드래그 리오더 활성화 여부 (기본 true) */
+  reorderable?: boolean
+}
+
+export function RoutesEditor({ routes, onChange, labels, reorderable = true }: RoutesEditorProps) {
+  const t = useStore((s) => s.t)
+  const pushToast = useStore((s) => s.pushToast)
+  const [filter, setFilter] = useState('')
+  const [dragSrc, setDragSrc] = useState<number | null>(null)
+  // 행 추가 시 새 행의 pattern 입력으로 포커스 이동 — 키보드 사용자가 테이블 전체를 Tab 하지 않게.
+  const lastPatternRef = useRef<HTMLInputElement>(null)
+  const prevLen = useRef(routes.length)
+
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const check = () => setIsMobile(globalThis.innerWidth < 768)
+    check()
+    globalThis.addEventListener('resize', check)
+    return () => globalThis.removeEventListener('resize', check)
+  }, [])
+
+  useEffect(() => {
+    // 길이가 늘었고(=추가) 필터가 비어 새 빈 행이 실제로 렌더될 때만 포커스.
+    if (routes.length > prevLen.current && filter.trim() === '') {
+      lastPatternRef.current?.focus()
+    }
+    prevLen.current = routes.length
+  }, [routes.length, filter])
+
+  const L = {
+    pattern: labels?.pattern ?? t('routes.col.pattern'),
+    ttl: labels?.ttl ?? t('routes.col.ttl'),
+    waitUntil: labels?.waitUntil ?? t('routes.col.waitUntil'),
+    waitSelector: labels?.waitSelector ?? t('routes.col.waitSelector'),
+    waitMs: labels?.waitMs ?? t('routes.col.waitMs'),
+    ignore: labels?.ignore ?? t('routes.col.ignore'),
+    actions: labels?.actions ?? '',
+  }
+
+  function update(i: number, patch: Partial<ScopedRoute>) {
+    onChange(routes.map((r, idx) => (idx === i ? { ...r, ...patch } : r)))
+  }
+
+  function add() {
+    onChange([
+      ...routes,
+      {
+        pattern: '',
+        ttlMs: undefined,
+        waitUntil: undefined,
+        waitSelector: undefined,
+        waitMs: undefined,
+        ignore: false,
+      },
+    ])
+  }
+
+  function remove(i: number) {
+    onChange(routes.filter((_, idx) => idx !== i))
+  }
+
+  function onDrop(dst: number) {
+    if (!reorderable) return
+    if (dragSrc === null || dragSrc === dst) return
+    const arr = routes.slice()
+    const [moved] = arr.splice(dragSrc, 1)
+    arr.splice(dst, 0, moved)
+    onChange(arr)
+    pushToast(`${t('toast.routes.reordered')} (${dragSrc + 1} → ${dst + 1})`, 'info')
+    setDragSrc(null)
+  }
+
+  const filtered = useMemo(() => {
+    const q = filter.toLowerCase().trim()
+    if (!q) return routes.map((r, i) => ({ row: r, idx: i }))
+    return routes
+      .map((r, i) => ({ row: r, idx: i }))
+      .filter(
+        ({ row }) =>
+          (row.pattern || '').toLowerCase().includes(q) ||
+          (row.waitSelector || '').toLowerCase().includes(q)
+      )
+  }, [routes, filter])
+
+  return (
+    <div className="space-y-3" data-testid="routes-editor">
+      <div className="flex flex-wrap gap-2 items-center">
+        <input
+          type="text"
+          className="input flex-1 min-w-48 px-3 py-2 text-sm"
+          placeholder={t('routes.filter.placeholder')}
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+        <button type="button" className="btn-primary px-3 py-2 text-sm" onClick={add}>
+          {t('btn.add')}
+        </button>
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-sm text-ink-subtle py-8 text-center">{t('routes.empty')}</p>
+      ) : isMobile ? (
+        /* Mobile Card List View */
+        <div className="space-y-4">
+          {filtered.map(({ row: r, idx: i }) => (
+            <div key={`${i}-${r.pattern}`} className="panel p-4 space-y-3 relative bg-panel">
+              <div className="flex items-center justify-between border-b border-line pb-2">
+                <span className="font-semibold text-xs text-ink-muted select-none">#{i + 1}</span>
+                <button
+                  type="button"
+                  className="text-err hover:text-err-fg text-xs rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                  aria-label={`${t('btn.delete')} ${L.pattern} ${i + 1}`}
+                  onClick={() => remove(i)}
+                >
+                  {t('btn.delete')}
+                </button>
+              </div>
+
+              <div className="space-y-2.5">
+                <label className="block space-y-1">
+                  <span className="text-xs font-medium text-ink-subtle">{L.pattern}</span>
+                  <input
+                    ref={i === routes.length - 1 ? lastPatternRef : undefined}
+                    type="text"
+                    className="input w-full px-3 py-1.5 font-mono text-xs"
+                    aria-label={`${L.pattern} ${i + 1}`}
+                    value={r.pattern}
+                    onChange={(e) => update(i, { pattern: e.target.value })}
+                    placeholder="^/products/[0-9]+"
+                  />
+                </label>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block space-y-1">
+                    <span className="text-xs font-medium text-ink-subtle">{L.ttl}</span>
+                    <input
+                      type="number"
+                      className="input w-full px-3 py-1.5 text-xs"
+                      aria-label={`${L.ttl} ${i + 1}`}
+                      value={r.ttlMs ?? ''}
+                      onChange={(e) =>
+                        update(i, {
+                          ttlMs: e.target.value ? Number(e.target.value) : undefined,
+                        })
+                      }
+                    />
+                  </label>
+
+                  <label className="block space-y-1">
+                    <span className="text-xs font-medium text-ink-subtle">{L.waitUntil}</span>
+                    <select
+                      className="input w-full px-3 py-1.5 text-xs"
+                      aria-label={`${L.waitUntil} ${i + 1}`}
+                      value={r.waitUntil ?? ''}
+                      onChange={(e) =>
+                        update(i, {
+                          waitUntil: (e.target.value as ScopedRoute['waitUntil']) || undefined,
+                        })
+                      }
+                    >
+                      <option value="">(default)</option>
+                      <option value="load">load</option>
+                      <option value="domcontentloaded">domcontentloaded</option>
+                      <option value="networkidle0">networkidle0</option>
+                      <option value="networkidle2">networkidle2</option>
+                    </select>
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="block space-y-1">
+                    <span className="text-xs font-medium text-ink-subtle">{L.waitSelector}</span>
+                    <input
+                      type="text"
+                      className="input w-full px-3 py-1.5 text-xs"
+                      aria-label={`${L.waitSelector} ${i + 1}`}
+                      value={r.waitSelector ?? ''}
+                      onChange={(e) => update(i, { waitSelector: e.target.value || undefined })}
+                      placeholder="[data-loaded]"
+                    />
+                  </label>
+
+                  <label className="block space-y-1">
+                    <span className="text-xs font-medium text-ink-subtle">{L.waitMs}</span>
+                    <input
+                      type="number"
+                      className="input w-full px-3 py-1.5 text-xs"
+                      aria-label={`${L.waitMs} ${i + 1}`}
+                      value={r.waitMs ?? ''}
+                      onChange={(e) =>
+                        update(i, {
+                          waitMs: e.target.value ? Number(e.target.value) : undefined,
+                        })
+                      }
+                    />
+                  </label>
+                </div>
+
+                <div className="pt-2">
+                  <label className="inline-flex items-center gap-2 text-xs cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="checkbox h-4 w-4"
+                      aria-label={`${L.ignore} ${i + 1}`}
+                      checked={!!r.ignore}
+                      onChange={(e) => update(i, { ignore: e.target.checked })}
+                    />
+                    <span className="font-medium text-ink-subtle">{L.ignore}</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        /* Desktop Table View */
+        <div className="panel overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-panel-2 text-xs uppercase text-ink-muted">
+              <tr>
+                <th className="px-3 py-2 text-left w-8">#</th>
+                <th className="px-3 py-2 text-left">{L.pattern}</th>
+                <th className="px-3 py-2 text-left w-24">{L.ttl}</th>
+                <th className="px-3 py-2 text-left w-32">{L.waitUntil}</th>
+                <th className="px-3 py-2 text-left">{L.waitSelector}</th>
+                <th className="px-3 py-2 text-left w-20">{L.waitMs}</th>
+                <th className="px-3 py-2 text-center w-16">{L.ignore}</th>
+                <th className="px-3 py-2 text-right w-20">{L.actions}</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {filtered.map(({ row: r, idx: i }) => (
+                <tr
+                  key={`${i}-${r.pattern}`}
+                  className={`drag-row ${dragSrc === i ? 'dragging' : ''}`}
+                  draggable={reorderable}
+                  onDragStart={(e) => {
+                    setDragSrc(i)
+                    e.dataTransfer.effectAllowed = 'move'
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault()
+                    e.dataTransfer.dropEffect = 'move'
+                    e.currentTarget.classList.add('drag-over')
+                  }}
+                  onDragLeave={(e) => {
+                    e.currentTarget.classList.remove('drag-over')
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault()
+                    e.currentTarget.classList.remove('drag-over')
+                    onDrop(i)
+                  }}
+                  onDragEnd={() => setDragSrc(null)}
+                >
+                  <td className="px-3 py-2 text-ink-subtle select-none">{i + 1}</td>
+                  <td className="px-3 py-2">
+                    <input
+                      ref={i === routes.length - 1 ? lastPatternRef : undefined}
+                      type="text"
+                      className="input w-full px-2 py-1 font-mono text-xs"
+                      aria-label={`${L.pattern} ${i + 1}`}
+                      value={r.pattern}
+                      onChange={(e) => update(i, { pattern: e.target.value })}
+                      placeholder="^/products/[0-9]+"
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <input
+                      type="number"
+                      className="input w-full px-2 py-1 text-xs"
+                      aria-label={`${L.ttl} ${i + 1}`}
+                      value={r.ttlMs ?? ''}
+                      onChange={(e) =>
+                        update(i, {
+                          ttlMs: e.target.value ? Number(e.target.value) : undefined,
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <select
+                      className="input w-full px-2 py-1 text-xs"
+                      aria-label={`${L.waitUntil} ${i + 1}`}
+                      value={r.waitUntil ?? ''}
+                      onChange={(e) =>
+                        update(i, {
+                          waitUntil: (e.target.value as ScopedRoute['waitUntil']) || undefined,
+                        })
+                      }
+                    >
+                      <option value="">(default)</option>
+                      <option value="load">load</option>
+                      <option value="domcontentloaded">domcontentloaded</option>
+                      <option value="networkidle0">networkidle0</option>
+                      <option value="networkidle2">networkidle2</option>
+                    </select>
+                  </td>
+                  <td className="px-3 py-2">
+                    <input
+                      type="text"
+                      className="input w-full px-2 py-1 text-xs"
+                      aria-label={`${L.waitSelector} ${i + 1}`}
+                      value={r.waitSelector ?? ''}
+                      onChange={(e) => update(i, { waitSelector: e.target.value || undefined })}
+                      placeholder="[data-loaded]"
+                    />
+                  </td>
+                  <td className="px-3 py-2">
+                    <input
+                      type="number"
+                      className="input w-full px-2 py-1 text-xs"
+                      aria-label={`${L.waitMs} ${i + 1}`}
+                      value={r.waitMs ?? ''}
+                      onChange={(e) =>
+                        update(i, {
+                          waitMs: e.target.value ? Number(e.target.value) : undefined,
+                        })
+                      }
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-center">
+                    <input
+                      type="checkbox"
+                      className="checkbox h-4 w-4"
+                      aria-label={`${L.ignore} ${i + 1}`}
+                      checked={!!r.ignore}
+                      onChange={(e) => update(i, { ignore: e.target.checked })}
+                    />
+                  </td>
+                  <td className="px-3 py-2 text-right">
+                    <button
+                      type="button"
+                      className="text-err hover:text-err-fg text-xs rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                      aria-label={`${t('btn.delete')} ${L.pattern} ${i + 1}`}
+                      onClick={() => remove(i)}
+                    >
+                      {t('btn.delete')}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
