@@ -1,0 +1,26 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "declaration": false,
+    "sourceMap": true,
+    // verbatimModuleSyntax must stay OFF for the NestJS app: emit is CommonJS
+    // (module: "CommonJS"), so the flag rejects every ESM import (TS1295), and
+    // it would strip the runtime type-imports that Nest DI relies on via
+    // emitDecoratorMetadata. The repo-wide extra-strict flags
+    // (noUnusedLocals/Parameters, noUncheckedIndexedAccess, isolatedModules)
+    // are inherited from tsconfig.base.json — only this one is overridden.
+    "verbatimModuleSyntax": false
+  },
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
+}

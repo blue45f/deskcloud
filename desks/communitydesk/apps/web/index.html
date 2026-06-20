@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#16140f" />
+
+    <!-- PWA: apple-touch-icon + iOS 스탠드얼론 메타 (manifest link · SW 등록은 vite-plugin-pwa 가 자동 주입) -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CommunityDesk" />
+    <meta
+      name="description"
+      content="CommunityDesk — 멀티테넌트 커뮤니티·게시판·카페(board/cafe) SaaS. 외부 서비스가 publishable 키로 게시판을 붙이고, 운영자는 secret 키로 검수·운영합니다."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="CommunityDesk" />
+    <meta property="og:title" content="CommunityDesk — 임베드 커뮤니티·게시판·카페" />
+    <meta
+      property="og:description"
+      content="게시판·카페·중첩 댓글·반응을 임베드 위젯으로 붙이고, 검수 큐로 고정·잠금·숨김·삭제까지 운영합니다. SaaS·셀프호스팅."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CommunityDesk — 임베드 커뮤니티·게시판·카페" />
+    <meta
+      name="twitter:description"
+      content="게시판·카페·중첩 댓글·반응을 임베드 위젯으로 붙이고, 검수 큐로 운영합니다."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>CommunityDesk — 임베드 커뮤니티·게시판·카페</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
