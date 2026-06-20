@@ -1,0 +1,7 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AIDigestDesk">
+  <rect width="32" height="32" rx="7" fill="#20242c"/>
+  <path d="M16 7.5l1.7 4.6 4.6 1.7-4.6 1.7L16 20.1l-1.7-4.6-4.6-1.7 4.6-1.7L16 7.5z" fill="#19a884"/>
+  <circle cx="23" cy="9" r="1.8" fill="#e0a23a"/>
+  <rect x="9.5" y="22.5" width="13" height="2" rx="1" fill="#5b8def"/>
+  <rect x="9.5" y="26" width="8.5" height="2" rx="1" fill="#5b8def" fill-opacity="0.6"/>
+</svg>

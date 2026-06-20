@@ -1,0 +1,689 @@
+{
+  "generatedAt": "2026-06-18T03:03:31.872Z",
+  "items": [
+    {
+      "id": "update-openai-gpt55",
+      "title": "OpenAI GPT-5.5가 최신 프런티어 모델로 문서화됨",
+      "provider": "OpenAI",
+      "date": "2026-04-23",
+      "summary": "1M급 컨텍스트, 128K 출력, xhigh reasoning, 웹 검색·파일 검색·컴퓨터 사용·MCP 등 도구 지원을 전면에 둔다.",
+      "impact": "복잡한 코딩/전문 업무 포털에서는 GPT-5.5를 기본 비교 축으로 삼고, 비용 민감 작업은 GPT-5.4 mini/nano로 내려가는 전략이 적합하다.",
+      "tags": [
+        "모델 업데이트",
+        "도구 호출",
+        "코딩"
+      ],
+      "url": "https://developers.openai.com/api/docs/models/gpt-5.5"
+    },
+    {
+      "id": "update-anthropic-fable",
+      "title": "Claude Fable 5 일반 제공, Mythos 5는 제한 제공",
+      "provider": "Anthropic",
+      "date": "2026-06-09",
+      "summary": "Fable 5는 광범위 공개 모델, Mythos 5는 Project Glasswing 승인 고객 대상이다. Fable 5는 refusal/fallback 처리를 통합해야 한다.",
+      "impact": "업무 자동화에서 Claude를 붙일 때는 거절 응답과 fallback credit 흐름을 앱 설계에 반영해야 한다.",
+      "tags": [
+        "모델 업데이트",
+        "안전",
+        "에이전트"
+      ],
+      "url": "https://platform.claude.com/docs/en/about-claude/models/introducing-claude-fable-5-and-claude-mythos-5"
+    },
+    {
+      "id": "update-google-gemini31",
+      "title": "Gemini 3.1 Pro Preview, 에이전트형 도구 사용과 grounding 강화",
+      "provider": "Google",
+      "date": "2026-04-28",
+      "summary": "텍스트·이미지·비디오·오디오·PDF 입력과 검색 grounding, 코드 실행, URL context, 구조화 출력을 지원한다.",
+      "impact": "멀티모달 자료 분석과 Google 검색 기반 답변이 중요한 한국어 리서치 워크플로에서 강점이 크다.",
+      "tags": [
+        "멀티모달",
+        "검색 grounding",
+        "프리뷰"
+      ],
+      "url": "https://ai.google.dev/gemini-api/docs/models/gemini-3.1-pro-preview"
+    },
+    {
+      "id": "update-xai-grok43",
+      "title": "Grok 4.3, 1M 컨텍스트와 저렴한 토큰 가격으로 문서화",
+      "provider": "xAI",
+      "date": "2026-05-29",
+      "summary": "텍스트·이미지 입력, 함수 호출, 구조화 출력, configurable reasoning을 제공하며 X Search/Web Search 도구로 최신성을 보강한다.",
+      "impact": "실시간 이슈 요약이나 X 기반 여론 탐색은 Grok을 별도 후보로 비교할 가치가 있다.",
+      "tags": [
+        "실시간 검색",
+        "저비용",
+        "구조화 출력"
+      ],
+      "url": "https://docs.x.ai/developers/models/grok-4.3"
+    },
+    {
+      "id": "update-manus-api",
+      "title": "Manus API v2가 최신 API로 안내됨",
+      "provider": "Manus",
+      "date": "2026-06-17",
+      "summary": "Manus API v2는 태스크 생성, 후속 메시지, 결과 조회, 프로젝트 지시, 파일, 웹훅, 스킬, 에이전트를 제공한다.",
+      "impact": "마누스는 단일 LLM 모델 비교보다 “에이전트 실행 플랫폼” 카테고리로 비교하는 것이 정확하다.",
+      "tags": [
+        "에이전트",
+        "API",
+        "자동화"
+      ],
+      "url": "https://manus.im/"
+    },
+    {
+      "id": "update-kimi-k27-code",
+      "title": "Kimi K2.7 Code와 HighSpeed 모델이 공식 문서에 최신 코딩 모델로 안내됨",
+      "provider": "Moonshot AI",
+      "date": "2026-06-18",
+      "summary": "K2.7 Code는 256K 컨텍스트, 강한 코딩/에이전트 성능, 이미지·비디오 입력, OpenAI SDK 호환을 제공하며 HighSpeed 변형은 고속 출력에 초점을 둔다.",
+      "impact": "코딩 에이전트와 멀티모달 코드 분석을 비교할 때 Kimi를 GPT/Claude/Mistral과 별도 후보로 평가할 수 있다.",
+      "tags": [
+        "코딩",
+        "에이전트",
+        "멀티모달",
+        "OpenAI 호환"
+      ],
+      "url": "https://platform.kimi.ai/docs/models"
+    },
+    {
+      "id": "update-deepseek-v4",
+      "title": "DeepSeek V4 Flash/Pro, 1M 컨텍스트와 OpenAI/Anthropic 호환 API 제공",
+      "provider": "DeepSeek",
+      "date": "2026-04-24",
+      "summary": "DeepSeek V4는 V4 Flash와 V4 Pro로 제공되며 thinking/non-thinking, JSON output, tool calls, 384K 최대 출력, 캐시 hit/miss 가격 체계를 문서화했다.",
+      "impact": "대량 장문 처리와 저비용 API 대체를 검토하는 팀은 DeepSeek V4 Flash를 비용 계산기에 넣고 캐시 hit 전략을 함께 봐야 한다.",
+      "tags": [
+        "저비용",
+        "1M 컨텍스트",
+        "API 호환",
+        "캐시"
+      ],
+      "url": "https://api-docs.deepseek.com/quick_start/pricing"
+    },
+    {
+      "id": "update-qwen3-2507",
+      "title": "Qwen3-2507, Instruct-only와 Thinking-only 라인으로 문서화",
+      "provider": "Alibaba Qwen",
+      "date": "2026-06-18",
+      "summary": "Qwen3-2507은 256K 장문 이해와 1M 확장 가능성을 내세우며, Qwen3 문서는 100개 이상 언어/방언과 로컬 실행·배포 프레임워크를 함께 안내한다.",
+      "impact": "오픈웨이트와 자체 호스팅을 중시하는 한국어 서비스는 Qwen을 vLLM/SGLang/Ollama 기준으로 별도 평가해야 한다.",
+      "tags": [
+        "오픈웨이트",
+        "로컬 실행",
+        "다국어",
+        "장문"
+      ],
+      "url": "https://qwen.readthedocs.io/en/latest/"
+    },
+    {
+      "id": "update-mistral-medium-35",
+      "title": "Mistral Medium 3.5, 오픈웨이트 멀티모달 코딩/에이전트 모델로 공개",
+      "provider": "Mistral AI",
+      "date": "2026-04-28",
+      "summary": "Mistral Medium 3.5는 256K 컨텍스트, Modified MIT 오픈웨이트, function calling, agents/conversations, OCR, structured outputs, FIM을 모델 카드에 공개했다.",
+      "impact": "유럽/오픈웨이트/자체 배포 전략을 고려하는 팀은 Mistral Medium 3.5와 Small 4, Ministral 3를 같은 Mistral 축에서 비교할 수 있다.",
+      "tags": [
+        "오픈웨이트",
+        "코딩",
+        "에이전트",
+        "OCR"
+      ],
+      "url": "https://docs.mistral.ai/models/model-cards/mistral-medium-3-5-26-04"
+    },
+    {
+      "id": "update-ministral-3",
+      "title": "Ministral 3 14B, 로컬 배포용 256K 경량 모델 후보로 정리",
+      "provider": "Mistral AI",
+      "date": "2025-12-02",
+      "summary": "Ministral 3 14B는 로컬 배포 최적화와 256K 컨텍스트를 내세우며 입력/출력 각각 $0.2/1M 토큰 단가를 모델 카드에 공개했다.",
+      "impact": "사내 챗봇, 보안 민감 문서 QnA, 온프레미스 배포 후보를 고를 때 초대형 모델과 별도 카테고리로 비교해야 한다.",
+      "tags": [
+        "Ministral",
+        "로컬 배포",
+        "저비용",
+        "오픈웨이트"
+      ],
+      "url": "https://docs.mistral.ai/models/model-cards/ministral-3-14b-25-12"
+    },
+    {
+      "id": "update-g7-ai-sovereignty",
+      "title": "G7 AI 논의에서 기술 주권과 오픈웨이트 대안 수요가 부각",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "AP와 Axios 보도 기준, G7 AI 논의와 Anthropic 모델 접근 제한 논란은 미국 폐쇄형 모델 의존과 각국 AI 주권 논쟁을 다시 끌어올렸다.",
+      "impact": "모델 비교는 단순 성능표를 넘어 배포 통제권, 자체 호스팅 가능성, 지역 규제 리스크까지 포함해야 한다.",
+      "tags": [
+        "AI 뉴스",
+        "AI 주권",
+        "규제",
+        "오픈웨이트"
+      ],
+      "url": "https://apnews.com/article/7d783c6de4356962e338b8b8563d48ea"
+    },
+    {
+      "id": "update-community-korean-ai-learning",
+      "title": "한국어 AI 학습 자료는 공식 문서와 커뮤니티 채널을 함께 봐야 함",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "Claude/Gemini/Azure OpenAI/AWS Bedrock은 한국어 공식 문서가 있고, 테디노트·조코딩·Google Developers Korea·AWS Korea·Microsoft Developer Korea 같은 채널은 실습/세션 추적에 유용하다.",
+      "impact": "한국어 사용자용 포털은 공식 문서, 유튜브 채널, 블로그, 도서 검색 허브를 언어와 형식으로 필터링해야 탐색 비용이 줄어든다.",
+      "tags": [
+        "한국어 자료",
+        "커뮤니티",
+        "유튜브",
+        "블로그"
+      ],
+      "url": "https://platform.claude.com/docs/ko/intro"
+    },
+    {
+      "id": "update-korean-public-ai-training",
+      "title": "고용24 K-디지털·AI추천 훈련까지 한국어 교육 축에 추가",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "고용24는 공식 전자정부 누리집으로 훈련 통합검색, 국민내일배움카드, K-디지털 훈련, AI추천(훈련), K-디지털 아카데미 훈련과정을 제공하므로 국내 AI 개발자 교육 탐색의 공공 기준점으로 넣었다.",
+      "impact": "인프런/패스트캠퍼스 같은 민간 강좌뿐 아니라 국비지원, 내일배움카드, K-DT, 훈련기관 평가, 모집 기간과 자부담 여부를 같이 필터링해야 한다.",
+      "tags": [
+        "한국어 자료",
+        "K-디지털",
+        "국비지원",
+        "고용24"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-boostcamp-2026-education-status",
+      "title": "부스트캠프는 2026년 AI 시대 개발자 교육 방향과 운영 상태를 별도 추적",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "부스트캠프 공식 페이지는 AI Tech와 Web·Mobile의 누적 수료생, AI Production 교육, 지속 가능한 개발자 교육 철학, 2026년 방향성을 안내한다.",
+      "impact": "국내 부트캠프 자료는 단순 링크가 아니라 모집 중/마감/운영 중단/재개 여부를 함께 추적해야 실제 학습 추천으로 쓸 수 있다.",
+      "tags": [
+        "한국어 자료",
+        "부스트캠프",
+        "AI Tech",
+        "모집 상태"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-korean-ai-community-newsletters",
+      "title": "GeekNews·요즘IT·Disquiet·Maily를 한국어 AI 커뮤니티/뉴스레터 축에 추가",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "GeekNews, 요즘IT AI/개발 매거진, Disquiet, EO Planet, Maily 검색은 공식 문서와 유튜브 강좌 사이의 최신 한국어 실무 경험, 출시 사례, 뉴스레터 후보를 보강한다.",
+      "impact": "웹진형 뉴스/커뮤니티 섹션에서는 공식 릴리스와 별도로 한국어 커뮤니티 반응, AI 제품 출시, 바이브 코딩 경험담, 뉴스레터를 필터링할 수 있어야 한다.",
+      "tags": [
+        "한국어 자료",
+        "뉴스레터",
+        "커뮤니티",
+        "웹진"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-korean-llm-official-sources",
+      "title": "국내 자체 LLM 공식 출처를 HyperCLOVA X·Solar·EXAONE·Kanana 축으로 분리",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "NAVER Cloud CLOVA Studio, Upstage Solar Pro 3, LG AI Research EXAONE, Kakao Kanana를 한국어 LLM/오픈웨이트/국내 API 비교의 별도 출처 축으로 추가했다.",
+      "impact": "한국어 사용자 추천은 GPT/Claude/Gemini 중심 비교와 별도로 국내 규제, 한국어 성능, 온프레미스/하이브리드, 원화 과금, 오픈웨이트 여부를 필터링해야 한다.",
+      "tags": [
+        "한국어 LLM",
+        "HyperCLOVA X",
+        "Solar",
+        "EXAONE"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-upstage-solar-pro3-pricing",
+      "title": "Upstage Solar Pro 3와 API 가격/크레딧 혜택을 비용 섹션 후보로 추가",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "Upstage 공식 가격 페이지는 Solar Pro 3/2, Solar Mini, Embed, Document Parse/OCR/Classify/Extract, Studio agent 가격과 commitment tier bonus credit, 교육/공익 무료 지원 프로그램을 공개한다.",
+      "impact": "비용 비교에서는 토큰 단가뿐 아니라 문서 처리 page 단가, cache 입력 단가, commitment bonus, 무료 지원 프로그램을 별도 이벤트/비용 레버로 분리해야 한다.",
+      "tags": [
+        "Upstage",
+        "Solar Pro 3",
+        "가격",
+        "크레딧"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-korean-benchmark-suite",
+      "title": "한국어 LLM 벤치마크를 KMMLU·KMMMU·KoBALT·HRET·KITE까지 확장",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "KMMLU, KMMMU, KoBALT, HRET, KITE, Open Ko-LLM Leaderboard, HAE-RAE Bench를 한국어 평가 세트로 묶어 한국어 reasoning, 멀티모달, 언어학, 지시 따르기, 리더보드 재현성을 비교한다.",
+      "impact": "한국어 모델 추천에서 단순 영어권 코딩/종합 리더보드만 보면 한국 문화·제도·존대법·원천 한국어 시험 문제 성능을 놓칠 수 있다.",
+      "tags": [
+        "한국어 벤치마크",
+        "KMMLU",
+        "KMMMU",
+        "KoBALT"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-cursor-comparison",
+      "title": "Cursor를 AI 바이브 코딩 비교군에 추가",
+      "provider": "Cursor",
+      "date": "2026-06-18",
+      "summary": "Cursor는 Hobby 무료, Pro/Teams 플랜, Agent/Tab, MCP·skills·hooks, Cloud agents, Bugbot, CLI와 학생 Pro 혜택을 갖춘 AI IDE라 모델 표면과 별도 비교가 필요하다.",
+      "impact": "실제 코딩 생산성 비교에서는 GPT/Claude/Gemini 같은 기저 모델뿐 아니라 Cursor처럼 repo와 IDE를 직접 다루는 실행 표면을 함께 필터링해야 한다.",
+      "tags": [
+        "Cursor",
+        "AI IDE",
+        "바이브 코딩",
+        "Bugbot"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-ai-coding-tool-directory",
+      "title": "AI 코딩 도구 디렉터리를 IDE·CLI·PR 리뷰·클라우드 에이전트 축으로 확장",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "Cursor, GitHub Copilot, JetBrains Junie, Amazon Q Developer, Gemini Code Assist/Jules, Amp, Zed, Augment, Tabnine, CodeRabbit, TRAE, 오픈소스 agent stack, Lovable/Bolt/v0, Devin/Replit/Manus를 별도 비교군으로 추가했다.",
+      "impact": "모델 성능표만으로는 바이브 코딩 도구 선택이 어렵기 때문에, 사용 표면·가격·이벤트·한국어 자료·권한 리스크를 함께 필터링할 수 있다.",
+      "tags": [
+        "AI 코딩 도구",
+        "도구 디렉터리",
+        "Cursor",
+        "Copilot"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-github-copilot-student-pack",
+      "title": "GitHub Copilot Student와 Education Pack 상태 확인",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "GitHub Docs는 Copilot Student 무료 접근을 안내하지만, Student Developer Pack의 Copilot 신규 plan sign-up은 일시 중단 상태로 표시된다.",
+      "impact": "학생 대상 AI 코딩 혜택 비교에서는 Copilot 공식 플랜 문서와 Education Pack 상태를 동시에 보여주고, Cursor/JetBrains 학생 혜택과 같이 비교해야 한다.",
+      "tags": [
+        "이벤트",
+        "학생 혜택",
+        "Copilot",
+        "Education Pack"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-trae-trial",
+      "title": "TRAE Pro 7일 체험과 cloud task 플랜 비교",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "TRAE 가격표는 Pro 7일 무료 체험, Lite/Pro/Pro+/Ultra 월 가격, Basic usage와 concurrent cloud tasks 차이를 안내한다.",
+      "impact": "Cursor/Windsurf/TRAE 같은 AI IDE 비교에서 무료 체험, SOLO mode, cloud task 병렬 수를 이벤트 비용 축으로 필터링할 수 있다.",
+      "tags": [
+        "이벤트",
+        "TRAE",
+        "무료 체험",
+        "AI IDE"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-openai-academy",
+      "title": "OpenAI Academy 온라인 학습 이벤트",
+      "provider": "OpenAI",
+      "date": "2026-06-18",
+      "summary": "OpenAI Academy는 Builder Bootcamp, Agents, SME Accelerator 등 온라인 학습 이벤트를 공개 이벤트 허브에서 운영한다.",
+      "impact": "Codex/Agents 학습 이벤트는 강좌 리소스와 뉴스레터 후보로 연결하고, 등록 마감·언어·대상자 조건을 편집 큐에서 확인한다.",
+      "tags": [
+        "이벤트",
+        "OpenAI Academy",
+        "Agents",
+        "Codex"
+      ],
+      "url": "https://developers.openai.com/codex/cli"
+    },
+    {
+      "id": "event-claude-corps",
+      "title": "Claude Corps 2026 펠로십과 비영리 AI 활용 프로그램",
+      "provider": "Anthropic",
+      "date": "2026-06-11",
+      "summary": "Anthropic은 Claude Corps를 통해 초기 경력 인재를 비영리 조직에 배치하고 Claude 교육, 토큰 예산, 멘토링을 제공하는 프로그램을 발표했다.",
+      "impact": "Claude 이벤트는 단순 할인보다 교육/비영리/AI 역량 확산 관점의 혜택으로 분류하고, 신청 마감과 참여 조건을 별도 표시한다.",
+      "tags": [
+        "이벤트",
+        "Claude",
+        "교육",
+        "비영리"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-gemini-students",
+      "title": "Gemini 학생/교육 혜택 확인",
+      "provider": "Google",
+      "date": "2026-06-18",
+      "summary": "Gemini 공식 학생 허브는 국가·언어별 학생용 Gemini 학습 파트너와 교육 혜택 진입점을 제공한다.",
+      "impact": "학생 혜택은 국가와 인증 조건이 바뀔 수 있으므로 한국어 포털에서는 공식 학생 페이지, AI 블로그, 가격 문서를 함께 연결한다.",
+      "tags": [
+        "이벤트",
+        "Gemini",
+        "학생 혜택",
+        "교육"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-cursor-students",
+      "title": "Cursor 학생 1년 Pro 무료 혜택",
+      "provider": "Cursor",
+      "date": "2026-06-18",
+      "summary": "Cursor는 자격을 갖춘 대학생에게 Cursor Pro 1년 무료 혜택을 제공하며, Pro 기능과 월 $20 상당 포함 사용량을 안내한다.",
+      "impact": "학생·부트캠프·동아리 대상 AI 코딩 교육 자료에서는 Cursor 혜택을 공식 학생 페이지와 함께 우선 노출할 수 있다.",
+      "tags": [
+        "이벤트",
+        "Cursor",
+        "학생 혜택",
+        "Pro"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-qwen-free-quota",
+      "title": "Qwen/Alibaba Model Studio 무료 quota와 Batch 반값 확인",
+      "provider": "Alibaba Qwen",
+      "date": "2026-06-18",
+      "summary": "Alibaba Model Studio 과금 문서는 일부 Qwen 모델에 지역별 무료 quota와 Batch 호출 50% 과금, 컨텍스트 캐시 할인 조건을 안내한다.",
+      "impact": "Qwen API와 자체 배포를 비교할 때 무료 quota, Batch 반값, 캐시 할인은 이벤트성 비용 절감 축으로 따로 표시한다.",
+      "tags": [
+        "이벤트",
+        "Qwen",
+        "무료 quota",
+        "Batch 50%"
+      ],
+      "url": "https://qwen.readthedocs.io/en/latest/"
+    },
+    {
+      "id": "event-openai-promotions",
+      "title": "OpenAI 이벤트/크레딧/초대 혜택 확인 루프",
+      "provider": "OpenAI",
+      "date": "2026-06-18",
+      "summary": "OpenAI는 모델 가격, API 크레딧, ChatGPT 플랜/팀/교육 혜택, Codex 관련 이벤트가 수시로 바뀔 수 있으므로 공식 모델·가격 문서와 뉴스 페이지를 분리 감시한다.",
+      "impact": "2배 크레딧, 친구 초대, 신규 플랜 할인, 교육 혜택이 확인되면 이벤트 카드로 승격하고 만료일과 적용 국가를 별도 표시한다.",
+      "tags": [
+        "이벤트",
+        "크레딧",
+        "초대",
+        "가격"
+      ],
+      "url": "https://developers.openai.com/api/docs/models"
+    },
+    {
+      "id": "event-claude-promotions",
+      "title": "Claude 플랜/크레딧/추천 이벤트 확인 루프",
+      "provider": "Anthropic",
+      "date": "2026-06-18",
+      "summary": "Claude API 가격, Pro/Team/Enterprise 플랜, Claude Code 관련 행사·할인·초대 혜택은 Anthropic pricing/news와 Claude Code 문서를 함께 확인한다.",
+      "impact": "친구 초대, 팀 플랜 프로모션, Claude Code 사용량 이벤트는 공식 근거가 확인된 경우에만 게시한다.",
+      "tags": [
+        "이벤트",
+        "Claude",
+        "Claude Code",
+        "추천"
+      ],
+      "url": "https://code.claude.com/docs/en/setup"
+    },
+    {
+      "id": "event-gemini-promotions",
+      "title": "Gemini 무료 quota, 학생/교육, AI Pro 이벤트 확인 루프",
+      "provider": "Google",
+      "date": "2026-06-18",
+      "summary": "Gemini API pricing, free tier, batch/caching 비용, Google AI Pro/교육 이벤트를 공식 가격 문서와 Google AI 블로그에서 확인한다.",
+      "impact": "학생/교육 혜택, 무료 quota 확대, 2배 크레딧성 이벤트는 지역·계정 조건이 달라질 수 있어 조건 필터를 함께 표시한다.",
+      "tags": [
+        "이벤트",
+        "Gemini",
+        "무료 quota",
+        "학생 혜택"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-grok-promotions",
+      "title": "Grok/X Premium/API 이벤트 확인 루프",
+      "provider": "xAI",
+      "date": "2026-06-18",
+      "summary": "Grok은 API 가격, X Premium 연계, 검색/사용량 이벤트가 제품 플랜과 함께 움직일 수 있어 xAI 모델 문서와 가격 정보를 분리 감시한다.",
+      "impact": "무료 사용량, X Premium 번들, API 할인 이벤트는 적용 지역과 플랜 조건을 확인한 뒤 게시한다.",
+      "tags": [
+        "이벤트",
+        "Grok",
+        "X Premium",
+        "API"
+      ],
+      "url": "https://docs.x.ai/developers/models"
+    },
+    {
+      "id": "event-manus-promotions",
+      "title": "Manus 크레딧/초대/플랜 이벤트 확인 루프",
+      "provider": "Manus",
+      "date": "2026-06-18",
+      "summary": "Manus는 태스크형 서비스라 친구 초대, 크레딧, 플랜 이벤트가 실제 사용 비용에 직접 영향을 주므로 pricing과 API 문서를 함께 감시한다.",
+      "impact": "초대 보상, 신규 가입 크레딧, 태스크 크레딧 2배 이벤트가 확인되면 이벤트 카드와 비용 계산기에 반영한다.",
+      "tags": [
+        "이벤트",
+        "Manus",
+        "초대",
+        "크레딧"
+      ],
+      "url": "https://open.manus.ai/docs/v2/introduction"
+    },
+    {
+      "id": "event-kimi-promotions",
+      "title": "Kimi/Moonshot API 무료·할인 이벤트 확인 루프",
+      "provider": "Moonshot AI",
+      "date": "2026-06-18",
+      "summary": "Kimi API pricing과 K2.7 Code 문서를 기준으로 무료 quota, 신규 개발자 크레딧, 고속 모델 할인 이벤트를 확인한다.",
+      "impact": "Kimi K2.7 Code를 aider/Cursor류 도구에 붙일 때 프로모션 여부가 초기 실험 비용에 영향을 줄 수 있다.",
+      "tags": [
+        "이벤트",
+        "Kimi",
+        "Moonshot",
+        "무료 quota"
+      ],
+      "url": "https://platform.kimi.ai/docs/guide/kimi-k2-7-code-quickstart"
+    },
+    {
+      "id": "event-deepseek-promotions",
+      "title": "DeepSeek 캐시/할인/모델 전환 이벤트 확인 루프",
+      "provider": "DeepSeek",
+      "date": "2026-06-18",
+      "summary": "DeepSeek은 이미 cache hit/miss 가격 차이가 크므로, 추가 할인·무료 quota보다 캐시 정책과 레거시 모델 중단 일정까지 함께 감시한다.",
+      "impact": "저비용 장문 처리 캠페인에서는 이벤트보다 cache hit율이 더 큰 비용 변수일 수 있어 이벤트 카드와 비용 계산기를 같이 갱신한다.",
+      "tags": [
+        "이벤트",
+        "DeepSeek",
+        "캐시",
+        "할인"
+      ],
+      "url": "https://api-docs.deepseek.com/quick_start/pricing"
+    },
+    {
+      "id": "event-qwen-promotions",
+      "title": "Qwen/DashScope 무료 quota·할인 이벤트 확인 루프",
+      "provider": "Alibaba Qwen",
+      "date": "2026-06-18",
+      "summary": "Qwen/Model Studio 과금 문서에서 무료 quota, 모델별 과금, 할인 이벤트, 개발자 크레딧 변동을 확인한다.",
+      "impact": "오픈웨이트 자체 배포와 API 사용 비용을 비교할 때 무료 quota와 이벤트성 크레딧을 분리해야 한다.",
+      "tags": [
+        "이벤트",
+        "Qwen",
+        "DashScope",
+        "무료 quota"
+      ],
+      "url": "https://qwen.readthedocs.io/en/latest/"
+    },
+    {
+      "id": "event-mistral-promotions",
+      "title": "Mistral La Plateforme 가격/크레딧 이벤트 확인 루프",
+      "provider": "Mistral AI",
+      "date": "2026-06-18",
+      "summary": "Mistral pricing과 news를 기준으로 La Plateforme, Devstral, 오픈웨이트/호스팅 이벤트, 가격 변경을 감시한다.",
+      "impact": "유럽/오픈웨이트 전략에서는 프로모션보다 자체 배포 비용과 API 할인 이벤트를 함께 비교해야 한다.",
+      "tags": [
+        "이벤트",
+        "Mistral",
+        "La Plateforme",
+        "크레딧"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-ai-status-outage-watch",
+      "title": "AI 서비스 상태/장애 비용 리스크 감시",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "OpenAI, Claude, Google Cloud/Gemini, GitHub Copilot, Vercel, Cursor, Hugging Face 상태 페이지는 API 장애, elevated errors, degraded performance, model provider outage를 운영 비용과 fallback 판단에 직접 연결한다.",
+      "impact": "비용 비교 표에는 가격뿐 아니라 장애 중 fallback provider, Codex/Claude Code/Copilot/Cursor 가용성, incident start/end, 영향 서비스, 우회 경로를 함께 보여줘야 한다.",
+      "tags": [
+        "이벤트",
+        "장애",
+        "상태",
+        "SLA"
+      ],
+      "url": ""
+    },
+    {
+      "id": "event-openai-cost-optimization-watch",
+      "title": "OpenAI Batch/Flex/Cost Optimization 비용 절감 경로",
+      "provider": "OpenAI",
+      "date": "2026-06-18",
+      "summary": "OpenAI 비용 최적화 가이드는 이벤트성 할인과 별개로 모델 선택, prompt caching, Batch API, Flex processing을 구조적 비용 절감 수단으로 분리해 본다.",
+      "impact": "이벤트 비용 비교에서는 2배 크레딧 같은 프로모션과 Batch/Flex/cache/model downgrade 같은 상시 비용 레버를 서로 다른 라벨로 표시해야 한다.",
+      "tags": [
+        "비용",
+        "Batch",
+        "Flex",
+        "비용 최적화"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-official-release-note-watch",
+      "title": "공식 릴리스 노트는 모델 교체/가격 변경의 1차 근거",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "OpenAI API changelog, Claude release notes, Gemini API release notes, Cursor changelog, DeepSeek updates, Mistral news를 함께 보면 모델명, API 기능, 도구 호출, 가격/무료 한도, 지원 중단 변경을 빠르게 추적할 수 있다.",
+      "impact": "커뮤니티 뉴스보다 공식 changelog/release note를 먼저 비교하고, 확인된 변경만 웹진 업데이트와 모델 추천 매트릭스에 반영해야 한다.",
+      "tags": [
+        "릴리스 노트",
+        "Changelog",
+        "가격 변경",
+        "모델 변경"
+      ],
+      "url": "https://api-docs.deepseek.com/updates"
+    },
+    {
+      "id": "update-vibe-coding-focus",
+      "title": "바이브 코딩은 모델보다 실행 표면을 함께 비교해야 함",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "Codex, Claude Code, Gemini CLI는 전용 CLI/IDE 표면이 강하고, Kimi·DeepSeek는 OpenAI 호환 API로 기존 코딩 도구에 붙이기 쉽다. Qwen/Mistral은 자체 배포와 공식 SDK 중심으로 운영 난이도가 달라진다.",
+      "impact": "AI 코딩 도입 평가는 모델 점수뿐 아니라 CLI, repo 접근 권한, 테스트 실행, 비용, fallback, 로컬 배포 가능성까지 같은 표로 비교해야 한다.",
+      "tags": [
+        "바이브 코딩",
+        "CLI",
+        "코딩 에이전트",
+        "명령어"
+      ],
+      "url": "https://developers.openai.com/codex/cli"
+    },
+    {
+      "id": "update-ppt-design-workflows",
+      "title": "PPT/디자인 산출물은 Manus, Gemini, Mistral을 분리 비교",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "Manus는 태스크형 산출물 제작, Gemini는 문서·이미지·영상·PDF 이해, Mistral은 OCR/Document QnA와 자체 배포 가능성을 축으로 본다.",
+      "impact": "PPT와 웹진형 콘텐츠 제작은 단일 LLM 점수보다 입력 자료 종류, 파일 처리, 산출물 검수, 브라우저/디자인 도구 연동 여부가 중요하다.",
+      "tags": [
+        "PPT",
+        "디자인",
+        "문서 제작",
+        "에이전트"
+      ],
+      "url": "https://manus.im/"
+    },
+    {
+      "id": "update-aa-leaderboard",
+      "title": "Artificial Analysis 기준 최상위권은 Claude Fable 5, Claude Opus 4.8, GPT-5.5",
+      "provider": "시장",
+      "date": "2026-06-17",
+      "summary": "Intelligence Index 상단에는 Claude Fable 5 with fallback, Claude Opus 4.8 max, GPT-5.5 xhigh가 위치한다.",
+      "impact": "벤치마크 결과는 가격·속도·컨텍스트와 함께 봐야 하며, 사용 시나리오별 최적 모델은 달라진다.",
+      "tags": [
+        "벤치마크",
+        "가격",
+        "성능"
+      ],
+      "url": "https://artificialanalysis.ai/leaderboards/models"
+    },
+    {
+      "id": "update-benchmark-coverage-expanded",
+      "title": "벤치마크 자료를 코딩·에이전트·PPT·모바일·MCP 축으로 대폭 확장",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "SWE-bench Live/++, SWE-Skills-Bench, SWE-Explore, CodeElo, DS-1000, AppWorld, WorkArena++, VisualWebArena, AndroidWorld, iOSWorld, MCP-Bench, PresentBench, SlidesGen-Bench 등 실무형 평가 자료를 추가했다.",
+      "impact": "사용자는 코딩, PPT/문서, 모바일 앱 조작, MCP tool-use, white-collar 업무 자동화처럼 실제 작업 유형별로 더 촘촘하게 모델/도구를 필터링할 수 있다.",
+      "tags": [
+        "벤치마크",
+        "자료 확장",
+        "AI 에이전트",
+        "바이브 코딩"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-benchmark-validity-watch",
+      "title": "SWE-bench류 점수는 오염·테스트 품질·감사 결과를 같이 봐야 함",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "SWE-Bench Illusion, UTBoost, Automated Benchmark Auditing은 static benchmark 점수만으로 frontier coding agent를 판단하기 어렵다는 점을 보여준다.",
+      "impact": "벤치마크 필터에는 leaderboards뿐 아니라 live/fresh task, test augmentation, contamination diagnostic, benchmark audit 자료를 함께 노출해야 한다.",
+      "tags": [
+        "벤치마크 신뢰도",
+        "오염",
+        "테스트 품질",
+        "SWE-bench"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-mobile-mcp-agent-benchmarks",
+      "title": "모바일·MCP·computer-use 에이전트 평가 축 추가",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "AndroidWorld, iOSWorld, MobileWorld, MCPWorld, MCP-Bench, MCP-Persona, LiveMCPBench를 추가해 앱 조작, 개인화 도구, MCP 서버 선택, hybrid GUI/API 작업을 비교할 수 있게 했다.",
+      "impact": "Claude Code/Codex/Cursor 같은 코딩 표면뿐 아니라 실제 앱 조작형 에이전트와 MCP 도구 연결 품질을 별도 분야로 필터링할 수 있다.",
+      "tags": [
+        "MCP",
+        "모바일 에이전트",
+        "computer-use",
+        "Tool use"
+      ],
+      "url": ""
+    },
+    {
+      "id": "update-ppt-slide-benchmarks",
+      "title": "PPT·슬라이드 생성 벤치마크를 별도 비교 축으로 추가",
+      "provider": "시장",
+      "date": "2026-06-18",
+      "summary": "PPTC, PPTC-R, PresentBench, SlidesGen-Bench, APEX-Agents를 추가해 PowerPoint 편집, 슬라이드 생성 품질, white-collar 산출물 자동화를 분리 평가한다.",
+      "impact": "PPT/문서 제작 비교가 단순 멀티모달 점수에 머물지 않고 파일 편집, checklist 기반 산출물 품질, editability, 업무 맥락까지 볼 수 있다.",
+      "tags": [
+        "PPT",
+        "슬라이드",
+        "문서 제작",
+        "업무 자동화"
+      ],
+      "url": ""
+    }
+  ]
+}
