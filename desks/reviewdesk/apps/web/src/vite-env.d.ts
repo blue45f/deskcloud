@@ -1,0 +1,18 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+  readonly VITE_API_BASE_URL?: string
+  /** desk-platform 공개 문의 API 베이스 URL(없으면 prod 기본값). */
+  readonly VITE_DESK_PLATFORM_URL?: string
+  /** 통합 로그인(Firebase Auth) 설정 — 리터럴 금지, env로만 주입(config.ts 참고). */
+  readonly VITE_FIREBASE_API_KEY?: string
+  readonly VITE_FIREBASE_AUTH_DOMAIN?: string
+  readonly VITE_FIREBASE_PROJECT_ID?: string
+  readonly VITE_FIREBASE_STORAGE_BUCKET?: string
+  readonly VITE_FIREBASE_SENDER_ID?: string
+  readonly VITE_FIREBASE_APP_ID?: string
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv
+}
