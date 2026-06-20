@@ -13,7 +13,7 @@ const NAV = [
   { to: '/catalog', label: '서비스 카탈로그' },
   { to: '/pricing', label: '요금제' },
   { to: '/docs', label: '문서' },
-  { to: '/design', label: '디자인' },
+  { to: '/sitemap', label: '사이트맵' },
 ] as const
 
 function ThemeToggle() {

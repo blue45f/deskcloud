@@ -35,7 +35,7 @@ export function ConsolePreviewNotice({ title }: { title: string }) {
           <Link to="/docs">문서</Link>
         </Button>
         <Button asChild variant="secondary">
-          <Link to="/design">디자인 시스템</Link>
+          <Link to="/sitemap">사이트맵</Link>
         </Button>
       </div>
     </div>

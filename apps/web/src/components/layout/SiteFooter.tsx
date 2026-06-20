@@ -22,7 +22,7 @@ const COLUMNS = [
   {
     title: '리소스',
     links: [
-      { to: '/design', label: '디자인 시스템' },
+      { to: '/sitemap', label: '사이트맵' },
       { to: '/docs', label: '통합 가이드' },
     ],
   },
