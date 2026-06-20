@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#2f5fe0" />
+    <meta
+      name="description"
+      content="AuthDesk — 드롭인 로그인/인증 모듈(auth-as-a-service). publishable 키로 가입·로그인 폼을 임베드하고, secret 키로 사용자·통계를 관리합니다."
+    />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="AuthDesk" />
+    <meta property="og:title" content="AuthDesk — 임베드 로그인/인증" />
+    <meta
+      property="og:description"
+      content="가입·로그인 위젯 + 멀티테넌트 end-user 풀 + JWT 세션. scrypt 비밀번호 해시, 테넌트별 서명 키."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- PWA: apple-touch-icon + iOS 홈화면 standalone 메타. 매니페스트 링크와 SW 등록은
+         vite-plugin-pwa 가 자동 주입하므로 여기서 중복 선언하지 않는다. -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="AuthDesk" />
+    <title>AuthDesk — 임베드 로그인/인증</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
