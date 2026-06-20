@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NotifyDesk Widget — Demo</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #1a1d23;
+        background: #f4f5f7;
+        line-height: 1.6;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 24px;
+        background: #fff;
+        border-bottom: 1px solid #d7dae0;
+        position: sticky;
+        top: 0;
+      }
+      .brand { font-weight: 700; font-size: 15px; letter-spacing: -0.01em; }
+      .topbar-spacer { flex: 1; }
+      #bell-host { display: inline-flex; }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 56px 24px 160px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+      p.lead { color: #4a4f57; margin: 0 0 28px; max-width: 60ch; }
+      .panel {
+        background: #fff;
+        border: 1px solid #d7dae0;
+        border-radius: 14px;
+        padding: 20px 22px;
+        margin: 16px 0;
+      }
+      label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+      input {
+        width: 100%; padding: 9px 11px; font: inherit; font-size: 14px;
+        border: 1px solid #d7dae0; border-radius: 9px;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      code { background: #eef0f3; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+      .hint { font-size: 12px; color: #6b7280; margin-top: 8px; }
+      pre { overflow: auto; background: #f4f5f7; padding: 12px; border-radius: 9px; }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <span class="brand">Acme 앱</span>
+      <span class="topbar-spacer"></span>
+      <div id="bell-host"></div>
+    </div>
+
+    <div class="wrap">
+      <h1>NotifyDesk 알림 벨 위젯</h1>
+      <p class="lead">
+        우상단 <strong>벨</strong> 아이콘을 눌러 인박스를 확인하세요. 미읽음이 있으면 배지가
+        뜨고(주기적 폴링), 패널을 열면 읽음 처리됩니다. 아래 설정을 바꾸면 즉시 다시 마운트됩니다.
+      </p>
+
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="recipientId">recipientId</label>
+            <input id="recipientId" value="user_demo" />
+          </div>
+          <div>
+            <label for="endpoint">endpoint</label>
+            <input id="endpoint" value="http://localhost:4095" />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+          <div>
+            <label for="publishableKey">publishableKey</label>
+            <input id="publishableKey" value="pk_demo" />
+          </div>
+          <div>
+            <label for="accent">accent</label>
+            <input id="accent" type="color" value="#2f5fe0" style="height: 38px; padding: 4px" />
+          </div>
+        </div>
+        <p class="hint">
+          로컬 API 가 떠 있어야 합니다.
+          <code>NOTIFYDESK_MODE=self-hosted pnpm --filter @notifydesk/api run dev</code>
+          (기본 포트 4095, PGlite 폴백). 시드된 <code>pk_demo</code> 테넌트 인박스가 보입니다.
+        </p>
+      </div>
+
+      <div class="panel">
+        <strong>바닐라(비-React) 임베드</strong>
+        <p class="hint" style="margin-top: 6px">빌드한 IIFE 를 비-React 페이지에 붙일 때:</p>
+        <pre><code>&lt;div id="notify-bell"&gt;&lt;/div&gt;
+&lt;script src="https://notify.example.com/notify-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  NotifyDesk.init({
+    target: '#notify-bell',
+    recipientId: 'user_42',
+    publishableKey: 'pk_…',
+    endpoint: 'https://notify.example.com',
+  })
+&lt;/script&gt;</code></pre>
+      </div>
+    </div>
+
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

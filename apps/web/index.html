@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#13161c" />
+
+    <!-- PWA (manifest 링크 + SW 등록은 vite-plugin-pwa 가 자동 주입) -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="NotifyDesk" />
+    <meta
+      name="description"
+      content="NotifyDesk — 외부 온보딩형(멀티테넌트) Notifications-as-a-Service. 테넌트가 셀프 가입(pk_/sk_)해 알림을 보내면 사용자 인박스에 쌓인다. in-app·email·web-push."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="NotifyDesk" />
+    <meta property="og:title" content="NotifyDesk — 알림을 한 줄로 보내는 인프라" />
+    <meta
+      property="og:description"
+      content="셀프 가입으로 publishable/secret 키를 받고, 서버에서 알림을 보내면 사용자 인박스에 쌓입니다. in-app·email·web-push. SaaS·셀프호스팅."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="NotifyDesk — 알림을 한 줄로 보내는 인프라" />
+    <meta
+      name="twitter:description"
+      content="셀프 가입으로 키를 받고, 서버에서 알림을 보내면 사용자 인박스에 쌓입니다. in-app·email·web-push."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>NotifyDesk — 알림을 한 줄로 보내는 인프라</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

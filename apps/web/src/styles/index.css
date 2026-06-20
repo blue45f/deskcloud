@@ -1,0 +1,417 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ── 디자인 토큰. @theme = 라이트 기본값(유틸 생성), .dark = 런타임 오버라이드. ── */
+@theme {
+  --color-bg: oklch(0.991 0.002 250);
+  --color-surface: oklch(0.985 0.003 250);
+  --color-surface-2: oklch(0.965 0.005 250);
+  --color-border: oklch(0.915 0.006 250);
+  --color-border-strong: oklch(0.86 0.008 250);
+
+  --color-text: oklch(0.27 0.018 260);
+  --color-text-muted: oklch(0.52 0.016 258);
+  --color-text-subtle: oklch(0.63 0.014 258);
+
+  --color-ink: oklch(0.26 0.02 262);
+  --color-ink-hover: oklch(0.32 0.024 262);
+  --color-ink-fg: oklch(0.99 0.002 250);
+
+  --color-accent: oklch(0.62 0.16 262);
+  --color-accent-strong: oklch(0.55 0.18 262);
+  --color-accent-soft: oklch(0.95 0.035 262);
+  --color-accent-fg: oklch(0.34 0.12 262);
+
+  --color-success: oklch(0.6 0.13 150);
+  --color-success-soft: oklch(0.95 0.04 150);
+  --color-info: oklch(0.58 0.12 240);
+  --color-info-soft: oklch(0.95 0.04 240);
+  --color-warning: oklch(0.68 0.15 60);
+  --color-warning-soft: oklch(0.95 0.05 70);
+  --color-danger: oklch(0.57 0.18 25);
+  --color-danger-soft: oklch(0.95 0.04 25);
+
+  --font-sans:
+    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI',
+    'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.06);
+  --shadow-sm:
+    0 1px 3px 0 hsl(var(--shadow-color) / 0.1), 0 1px 2px -1px hsl(var(--shadow-color) / 0.08);
+  --shadow-md:
+    0 4px 12px -2px hsl(var(--shadow-color) / 0.12), 0 2px 6px -2px hsl(var(--shadow-color) / 0.08);
+  --shadow-lg:
+    0 16px 40px -8px hsl(var(--shadow-color) / 0.22),
+    0 6px 14px -6px hsl(var(--shadow-color) / 0.12);
+
+  /* 모션 이징 — 기존 다이얼로그/시트 곡선과 동일 계열(ease-out-quint)을 토큰화. */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --shadow-color: 240 30% 12%;
+  color-scheme: light;
+  /* 히어로 앰비언트 글로우 — 강조색 토큰에서만 합성(새 색 없음). 라이트=옅게. */
+  --hero-glow-1: oklch(0.62 0.16 262 / 0.18);
+  --hero-glow-2: oklch(0.55 0.18 262 / 0.12);
+  --hero-glow-3: oklch(0.6 0.13 240 / 0.1);
+  --hero-grid-line: oklch(0.55 0.02 262 / 0.05);
+}
+
+.dark {
+  --color-bg: oklch(0.19 0.012 262);
+  --color-surface: oklch(0.228 0.013 262);
+  --color-surface-2: oklch(0.27 0.015 262);
+  --color-border: oklch(0.32 0.016 262);
+  --color-border-strong: oklch(0.4 0.018 262);
+
+  --color-text: oklch(0.93 0.008 255);
+  --color-text-muted: oklch(0.72 0.012 256);
+  --color-text-subtle: oklch(0.6 0.012 256);
+
+  --color-ink: oklch(0.93 0.01 255);
+  --color-ink-hover: oklch(0.85 0.01 255);
+  --color-ink-fg: oklch(0.19 0.012 262);
+
+  --color-accent: oklch(0.72 0.15 262);
+  --color-accent-strong: oklch(0.78 0.15 262);
+  --color-accent-soft: oklch(0.32 0.07 262);
+  --color-accent-fg: oklch(0.92 0.04 262);
+
+  --color-success: oklch(0.7 0.13 150);
+  --color-success-soft: oklch(0.3 0.05 150);
+  --color-info: oklch(0.72 0.12 240);
+  --color-info-soft: oklch(0.32 0.06 240);
+  --color-warning: oklch(0.76 0.14 65);
+  --color-warning-soft: oklch(0.33 0.06 65);
+  --color-danger: oklch(0.68 0.17 25);
+  --color-danger-soft: oklch(0.32 0.07 25);
+
+  --shadow-color: 255 40% 2%;
+  color-scheme: dark;
+  /* 다크에서는 글로우를 더 살려 깊이를 준다(같은 강조 색조, 채도/투명도만 조정). */
+  --hero-glow-1: oklch(0.72 0.15 262 / 0.26);
+  --hero-glow-2: oklch(0.78 0.15 262 / 0.16);
+  --hero-glow-3: oklch(0.72 0.12 240 / 0.14);
+  --hero-grid-line: oklch(0.8 0.02 262 / 0.05);
+}
+
+/* ── 베이스 (반드시 @layer base: 언레이어드면 유틸리티를 덮어써 버림) ── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0;
+    font-weight: 650;
+    letter-spacing: -0.014em;
+    color: var(--color-text);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+    color: var(--color-accent-fg);
+  }
+}
+
+/* ── 스크롤바 ── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border-strong);
+  border-radius: 9999px;
+  border: 3px solid var(--color-bg);
+}
+
+/* ── a11y: 스킵링크 · 포커스 · 모션 · sr-only ── */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  background: var(--color-ink);
+  color: var(--color-ink-fg);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  transform: translateY(-180%);
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-strong);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* 리빌/진입은 즉시 최종 상태로 — 모션 없이도 콘텐츠가 온전히 보이게. */
+  .reveal,
+  .anim-rise {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* 본문 prose 줄길이 제한 */
+.prose-measure {
+  max-width: 72ch;
+}
+
+/* ── 모션 keyframes (Dialog/Sheet/토스트 등) ── */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+@keyframes slide-up {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+   랜딩 모션 — 히어로 오케스트레이션 · 스크롤 리빌 · 장식 액센트.
+   설계 원칙:
+   - 리빌은 "이미 보이는" 기본값을 강화한다. 콘텐츠 가시성을 클래스 토글에 걸지
+     않는다(헤드리스/비활성 탭에서 리빌이 안 떠도 내용은 보여야 함).
+   - 모든 애니메이션은 prefers-reduced-motion 에서 전역 규칙으로 무력화된다(맨 아래).
+   ────────────────────────────────────────────────────────────────────────── */
+
+/* 진입(아래에서 위로 + 페이드). 스태거는 --i 커스텀 프로퍼티로 calc. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 히어로 글로우가 천천히 호흡 — 살아있는 느낌(레이아웃 비유발: transform/opacity만). */
+@keyframes aurora-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate3d(2%, -2%, 0) scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 0.85;
+  }
+}
+
+/* 인박스 카드가 미세하게 떠다님. */
+@keyframes float-soft {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* 강조 바/링이 좌우로 흐르는 그라데이션(배경 위치만 이동). */
+@keyframes accent-pan {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+/* 벨 글리프가 새 알림처럼 살짝 흔들림(hover/주기). */
+@keyframes bell-swing {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  10%,
+  30%,
+  50% {
+    transform: rotate(11deg);
+  }
+  20%,
+  40%,
+  60% {
+    transform: rotate(-9deg);
+  }
+}
+
+/* 미읽음 배지가 톡 나타남. */
+@keyframes badge-pop {
+  0% {
+    transform: scale(0);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 발송 경로 위로 흐르는 펄스(SVG/요소 무관, 작은 점 하나). */
+@keyframes pulse-trail {
+  0% {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+/* 진입 유틸 — 기본은 보이는 상태. .reveal 이 붙으면 잠깐 가렸다가 rise-in 으로 들어온다.
+   JS 가 IntersectionObserver 로 .is-in 을 붙이면 재생, 안 붙어도(헤드리스) 곧 보인다. */
+.anim-rise {
+  animation: rise-in 0.62s var(--ease-out-expo) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+/* 스크롤 리빌: 관측 전 살짝 내려가 있고, .is-in 이 붙으면 제자리로. transition 기반이라
+   리빌이 안 떠도(JS 미실행) 폴백으로 곧장 보이게 처리(아래 no-js / reduced-motion). */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.6s var(--ease-out-expo),
+    transform 0.6s var(--ease-out-expo);
+  transition-delay: calc(var(--i, 0) * 60ms);
+  will-change: opacity, transform;
+}
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+/* 장식 격자(히어로 배경) — 토큰 색의 옅은 라인. */
+.hero-grid {
+  background-image:
+    linear-gradient(to right, var(--hero-grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--hero-grid-line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 0%, #000 35%, transparent 78%);
+}
+
+/* 강조 그라데이션 텍스트 금지(스킬 절대 금지) → 대신 움직이는 강조 바/링으로 표현. */
+.accent-pan {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-accent),
+    var(--color-accent-strong),
+    var(--color-info),
+    var(--color-accent)
+  );
+  background-size: 200% 100%;
+  animation: accent-pan 5.5s linear infinite;
+}
