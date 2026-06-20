@@ -1,0 +1,30 @@
+#cloud-config
+# OCI Always-Free ARM(Ampere A1) Ubuntu 22.04/24.04 부트스트랩.
+# Docker + repo clone 까지. 시크릿은 cloud-init 에 넣지 않고 수동으로 .env 작성.
+package_update: true
+package_upgrade: false
+packages:
+  - git
+  - ca-certificates
+  - curl
+  - iptables-persistent
+
+write_files:
+  - path: /opt/termsdesk/NEXT_STEPS.txt
+    content: |
+      1) cd /opt/termsdesk/deploy/oci
+      2) cp .env.example .env  &&  편집(DOMAIN/ACME_EMAIL/POSTGRES_PASSWORD/JWT_SECRET/관리자)
+      3) docker compose up -d --build
+      4) https://$DOMAIN 접속 (Caddy 자동 HTTPS)
+      * OCI 콘솔의 Security List/NSG 에서 80,443 인바운드 허용 필수
+
+runcmd:
+  - curl -fsSL https://get.docker.com | sh
+  - systemctl enable --now docker
+  - usermod -aG docker ubuntu
+  # OCI 기본 iptables 가 막혀 있어 80/443 허용
+  - iptables -I INPUT 6 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+  - iptables -I INPUT 6 -m state --state NEW -p tcp --dport 443 -j ACCEPT
+  - netfilter-persistent save
+  - install -d -o ubuntu -g ubuntu /opt/termsdesk
+  - sudo -u ubuntu git clone https://github.com/blue45f/termsdesk.git /opt/termsdesk || true

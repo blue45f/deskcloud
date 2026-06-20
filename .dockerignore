@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/.data
+**/coverage
+**/*.tsbuildinfo
+.git
+.github
+**/.env
+**/.env.*
+!**/.env.example
+.playwright-mcp
+*.png
+.idea
+.vscode

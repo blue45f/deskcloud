@@ -1,0 +1,60 @@
+name: SonarQube
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**', '**/*.txt', 'LICENSE', '.gitignore', '.editorconfig']
+  pull_request:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**', '**/*.txt', 'LICENSE', '.gitignore', '.editorconfig']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  sonarqube:
+    name: SonarQube quality gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # 포크 PR 은 시크릿 접근이 없으므로 제외.
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      # 시크릿은 if: 에서 직접 못 쓰므로 잡 env 로 올린 뒤 스텝 if: 에서 env.* 로 분기.
+      # SONAR_TOKEN 미설정 레포에서는 스캔 스텝을 건너뛰어 잡을 녹색으로 유지.
+      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    steps:
+      - name: Skip notice
+        if: env.SONAR_TOKEN == ''
+        run: echo "SONAR_TOKEN 미설정 — SonarQube 스캔을 건너뜁니다."
+
+      - uses: actions/checkout@v6
+        if: env.SONAR_TOKEN != ''
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v6
+        if: env.SONAR_TOKEN != ''
+
+      - uses: actions/setup-node@v6
+        if: env.SONAR_TOKEN != ''
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        if: env.SONAR_TOKEN != ''
+        run: pnpm install --frozen-lockfile
+
+      - name: SonarQube scan
+        if: env.SONAR_TOKEN != ''
+        uses: SonarSource/sonarqube-scan-action@v8.2.0
+        env:
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}

@@ -1,0 +1,54 @@
+# TermsDesk 사내 설치(self-hosted) 스택: postgres + api + web(nginx).
+#   docker compose up --build  →  http://localhost:8080
+name: termsdesk
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: termsdesk
+      POSTGRES_PASSWORD: termsdesk
+      POSTGRES_DB: termsdesk
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U termsdesk']
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      TERMSDESK_MODE: self-hosted
+      PORT: 4070
+      DATABASE_URL: postgresql://termsdesk:termsdesk@postgres:5432/termsdesk
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      WEB_ORIGIN: http://localhost:8080
+      COOKIE_SECURE: 'false'
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@termsdesk.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-termsdesk-admin}
+    ports:
+      - '4070:4070' # 직접 API 접근 / Swagger(/api/docs)
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_API_BASE_URL: ''
+    ports:
+      - '8080:80'
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  pgdata:

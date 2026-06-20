@@ -1,0 +1,29 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+	header -Server
+
+	# 공개 약관 렌더(/api/public/*)는 임베드·iframe·팝업을 위해 교차 출처를 허용 —
+	# 클릭재킹 헤더(X-Frame-Options)를 제거한다. CORP cross-origin 은 API 가 설정.
+	@public path /api/public/*
+	header @public {
+		>X-Content-Type-Options nosniff
+		>Referrer-Policy strict-origin-when-cross-origin
+		>Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		-X-Frame-Options
+	}
+
+	# 그 외 전 경로(앱·대시보드): 표준 보안 헤더 + 클릭재킹 보호.
+	@app not path /api/public/*
+	header @app {
+		>X-Content-Type-Options nosniff
+		>X-Frame-Options SAMEORIGIN
+		>Referrer-Policy strict-origin-when-cross-origin
+		>Strict-Transport-Security "max-age=63072000; includeSubDomains"
+	}
+
+	reverse_proxy web:80
+}

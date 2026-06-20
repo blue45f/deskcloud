@@ -1,0 +1,28 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# pnpm 11: 빌드 스크립트가 있는 패키지는 명시적으로 승인해야 설치가 통과합니다.
+# (설치 시 ERR_PNPM_IGNORED_BUILDS가 나면 해당 패키지를 여기에 추가)
+allowBuilds:
+  esbuild: true
+  '@tailwindcss/oxide': true
+  '@electric-sql/pglite': true
+  '@parcel/watcher': true
+  unrs-resolver: true
+  '@swc/core': true
+  '@nestjs/core': true
+  '@scarf/scarf': false
+
+auditConfig:
+  ignoreGhsas:
+    - GHSA-2p57-rm9w-gvfp
+
+minimumReleaseAgeExclude:
+  - '@heejun/eslint-config@5.0.0'
+  - '@heejun/prettier-config@3.0.0'
+  - '@heejun/deskcloud@0.1.0'
+
+overrides:
+  handlebars: '>=4.7.9'
+  multer: '>=2.2.0'

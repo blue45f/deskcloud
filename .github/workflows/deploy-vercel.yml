@@ -1,0 +1,49 @@
+name: Deploy Web to Vercel
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'api/**'
+      - 'apps/api/src/public/**'
+      - 'apps/web/**'
+      - 'packages/shared/**'
+      - 'packages/sdk/**'
+      - 'vercel.json'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/deploy-vercel.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Skip when Vercel token is not configured
+        if: env.VERCEL_TOKEN == ''
+        run: echo "VERCEL_TOKEN 미설정 — Vercel 배포를 건너뜁니다."
+
+      - uses: actions/setup-node@v6
+        if: env.VERCEL_TOKEN != ''
+        with:
+          node-version: 24
+
+      - name: Install Vercel CLI
+        if: env.VERCEL_TOKEN != ''
+        run: npm i -g vercel@latest
+
+      - name: Deploy to Vercel production
+        if: env.VERCEL_TOKEN != ''
+        run: vercel deploy --prod --yes --token "$VERCEL_TOKEN"
