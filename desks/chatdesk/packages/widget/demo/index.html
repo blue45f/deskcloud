@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ChatDesk Widget — Demo</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        color: #1a1d23;
+        background: #f4f5f7;
+        line-height: 1.6;
+      }
+      .wrap { max-width: 760px; margin: 0 auto; padding: 72px 24px 160px; }
+      h1 { font-size: 28px; letter-spacing: -0.02em; margin: 0 0 8px; }
+      p.lead { color: #4a4f57; margin: 0 0 28px; max-width: 60ch; }
+      .panel {
+        background: #fff;
+        border: 1px solid #d7dae0;
+        border-radius: 14px;
+        padding: 20px 22px;
+        margin: 16px 0;
+      }
+      label { display: block; font-size: 13px; font-weight: 600; margin: 0 0 6px; }
+      input, select {
+        width: 100%; padding: 9px 11px; font: inherit; font-size: 14px;
+        border: 1px solid #d7dae0; border-radius: 9px;
+      }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      code { background: #eef0f3; padding: 2px 6px; border-radius: 5px; font-size: 13px; }
+      .hint { font-size: 12px; color: #6b7280; margin-top: 8px; }
+      pre { overflow: auto; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>ChatDesk 채팅 위젯</h1>
+      <p class="lead">
+        우하단의 <strong>채팅</strong> 버튼을 눌러 위젯을 확인하세요. 시드된 demo 테넌트의
+        DM·그룹 대화가 보입니다. <code>memberId</code> 를 <code>alice</code> /
+        <code>bob</code> 로 바꿔 두 창을 띄우면 실시간으로 메시지가 오갑니다.
+      </p>
+
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="publishableKey">publishableKey</label>
+            <input id="publishableKey" value="pk_demo" />
+          </div>
+          <div>
+            <label for="endpoint">endpoint</label>
+            <input id="endpoint" value="http://localhost:4094" />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+          <div>
+            <label for="memberId">memberId</label>
+            <input id="memberId" value="alice" />
+          </div>
+          <div>
+            <label for="position">position</label>
+            <select id="position">
+              <option value="bottom-right">bottom-right</option>
+              <option value="bottom-left">bottom-left</option>
+              <option value="top-right">top-right</option>
+              <option value="top-left">top-left</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+          <div>
+            <label for="accent">accent</label>
+            <input id="accent" type="color" value="#2f5fe0" style="height: 38px; padding: 4px" />
+          </div>
+        </div>
+        <p class="hint">
+          로컬 API 가 떠 있어야 합니다.
+          <code>PORT=4094 pnpm --filter @chatdesk/api run start:dev</code>
+          (PGlite 폴백, 시드 demo 테넌트 pk_demo/sk_demo). 멤버는 alice·bob·carol.
+        </p>
+      </div>
+
+      <div class="panel">
+        <strong>바닐라(비-React) 임베드</strong>
+        <p class="hint" style="margin-top: 6px">빌드한 IIFE 를 비-React 페이지에 붙일 때:</p>
+        <pre><code>&lt;script src="https://chat.example.com/chat-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  ChatDesk.init({
+    publishableKey: 'pk_demo',
+    endpoint: 'https://chat.example.com',
+    memberId: 'alice',
+  })
+&lt;/script&gt;</code></pre>
+      </div>
+    </div>
+
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

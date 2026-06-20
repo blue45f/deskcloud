@@ -1,0 +1,65 @@
+{
+  "name": "@chatdesk/widget",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ChatDesk 임베드 채팅 위젯 — 형제 앱에 떠 있는 채팅 런처 + 패널(대화 목록·메시지 스레드·작성기). pk + memberId 로 실시간 메시징(타이핑·읽음·presence·unread). React 컴포넌트 + 바닐라 IIFE 로더. 의존성은 react(peer)와 @chatdesk/sdk(socket.io-client)뿐, 외부 CSS 프레임워크 0.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js",
+      "require": "./dist/react.cjs"
+    },
+    "./vanilla": {
+      "types": "./dist/vanilla.d.ts",
+      "import": "./dist/vanilla.js",
+      "require": "./dist/vanilla.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup && vite build --config vite.iife.config.ts",
+    "build:demo": "vite build --config demo/vite.config.ts",
+    "dev": "tsup --watch",
+    "dev:demo": "vite --config demo/vite.config.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist demo/dist"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@chatdesk/sdk": "workspace:*",
+    "@chatdesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.16",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "socket.io-client": "^4.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16",
+    "vitest": "^4.1.8"
+  }
+}
