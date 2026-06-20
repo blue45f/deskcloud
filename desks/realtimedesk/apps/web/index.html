@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko" class="">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#0f1729" />
+    <meta
+      name="description"
+      content="RealtimeDesk — 멀티테넌트 실시간(WebSocket pub/sub + presence) as a service. 가입하면 pk·sk 키를 받아, 브라우저는 채널을 구독·presence, 서버는 publish/broadcast 한다."
+    />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="RealtimeDesk" />
+    <meta property="og:title" content="RealtimeDesk — 실시간 pub/sub·presence as a service" />
+    <meta
+      property="og:description"
+      content="채널 구독·publish·presence·메시지 히스토리를 키 한 쌍으로. 브라우저는 pk, 서버는 sk. SaaS·셀프호스팅."
+    />
+    <meta property="og:locale" content="ko_KR" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="RealtimeDesk — 실시간 pub/sub·presence as a service" />
+    <meta
+      name="twitter:description"
+      content="채널 구독·publish·presence·메시지 히스토리를 키 한 쌍으로. 브라우저는 pk, 서버는 sk."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- PWA(iOS): 매니페스트 link 와 SW 등록은 vite-plugin-pwa 가 자동 주입.
+         아래는 iOS 홈 화면 설치용 보강(Apple 은 매니페스트 일부만 인식). -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="RealtimeDesk" />
+
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link
+      rel="stylesheet"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css"
+    />
+    <title>RealtimeDesk — 실시간 pub/sub·presence as a service</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

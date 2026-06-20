@@ -1,0 +1,60 @@
+{
+  "name": "realtimedesk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RealtimeDesk — 멀티테넌트 실시간(WebSocket pub/sub + presence) as a service. 외부 테넌트가 가입하면 publishable(pk_)·secret(sk_) 키를 받아, 브라우저는 pk로 채널 구독·presence, 서버는 sk로 publish/broadcast 한다. SurveyDesk의 자매 프로젝트.",
+  "type": "module",
+  "packageManager": "pnpm@11.4.0",
+  "engines": {
+    "node": ">=24.16.0",
+    "pnpm": ">=11"
+  },
+  "scripts": {
+    "build:libs": "pnpm --filter @realtimedesk/shared run build",
+    "dev": "pnpm run build:libs && pnpm -r --parallel --stream run dev",
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm run build:libs && pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "lint": "eslint .",
+    "lint:strict": "eslint . --max-warnings=0",
+    "lint:ci": "pnpm run lint:strict",
+    "audit:security": "pnpm audit --audit-level high --ignore GHSA-2p57-rm9w-gvfp",
+    "lint:security": "pnpm run lint:strict && pnpm run audit:security",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build",
+    "verify:push": "pnpm run verify && pnpm run lint:security",
+    "ci": "pnpm run verify",
+    "db:seed": "pnpm --filter @realtimedesk/api run db:seed",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.0.2",
+    "@commitlint/config-conventional": "^21.0.2",
+    "@eslint/js": "^10.0.1",
+    "@heejun/eslint-config": "^5.0.0",
+    "@heejun/prettier-config": "^3.0.0",
+    "@types/node": "^25.9.1",
+    "eslint": "^10.4.0",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-react-compiler": "19.1.0-rc.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "globals": "^17.6.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "prettier": "^3.8.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.60.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --no-warn-ignored --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml,html,css}": [
+      "prettier --write"
+    ]
+  },
+  "prettier": "@heejun/prettier-config"
+}

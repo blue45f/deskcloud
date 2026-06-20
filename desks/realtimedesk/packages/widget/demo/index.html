@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>RealtimeDesk Widget — Demo</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        color: #1a1d23;
+        background: #f4f5f7;
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 72px 24px 160px;
+      }
+      h1 {
+        font-size: 28px;
+        letter-spacing: -0.02em;
+        margin: 0 0 8px;
+      }
+      p.lead {
+        color: #4a4f57;
+        margin: 0 0 28px;
+        max-width: 60ch;
+      }
+      .panel {
+        background: #fff;
+        border: 1px solid #d7dae0;
+        border-radius: 14px;
+        padding: 20px 22px;
+        margin: 16px 0;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin: 0 0 6px;
+      }
+      input {
+        width: 100%;
+        padding: 9px 11px;
+        font: inherit;
+        font-size: 14px;
+        border: 1px solid #d7dae0;
+        border-radius: 9px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      code {
+        background: #eef0f3;
+        padding: 2px 6px;
+        border-radius: 5px;
+        font-size: 13px;
+      }
+      .hint {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 8px;
+      }
+      pre {
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>RealtimeDesk Presence 위젯</h1>
+      <p class="lead">
+        아래 <strong>PresenceBar</strong> 는 채널에 접속한 사람들을 실시간
+        아바타·카운트로 보여줍니다. 다른 탭에서 같은 채널로 접속하면 카운트가
+        즉시 올라갑니다.
+      </p>
+
+      <div class="panel">
+        <div class="row">
+          <div>
+            <label for="channel">channel</label>
+            <input id="channel" value="room:42" />
+          </div>
+          <div>
+            <label for="endpoint">endpoint</label>
+            <input id="endpoint" value="http://localhost:4092" />
+          </div>
+        </div>
+        <div class="row" style="margin-top: 14px">
+          <div>
+            <label for="publishableKey">publishableKey (pk_)</label>
+            <input id="publishableKey" value="pk_demo" />
+          </div>
+          <div>
+            <label for="accent">accent</label>
+            <input
+              id="accent"
+              type="color"
+              value="#2f5fe0"
+              style="height: 38px; padding: 4px"
+            />
+          </div>
+        </div>
+        <p class="hint">
+          로컬 API 가 떠 있어야 합니다.
+          <code>pnpm --filter @realtimedesk/api run dev</code>
+          (기본 포트 4092, PGlite 폴백). 시드된
+          <code>pk_demo</code> 테넌트(corsOrigins ['*'])로 접속합니다.
+        </p>
+      </div>
+
+      <div id="app"></div>
+
+      <div class="panel">
+        <strong>바닐라(비-React) 임베드</strong>
+        <p class="hint" style="margin-top: 6px">
+          빌드한 IIFE 를 비-React 페이지에 붙일 때:
+        </p>
+        <pre><code>&lt;div id="presence"&gt;&lt;/div&gt;
+&lt;script src="https://realtime.example.com/realtime-widget.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  RealtimeDesk.init({
+    target: '#presence',
+    channel: 'room:42',
+    publishableKey: 'pk_...',
+    endpoint: 'https://realtime.example.com',
+  })
+&lt;/script&gt;</code></pre>
+      </div>
+    </div>
+
+    <script type="module" src="./main.tsx"></script>
+  </body>
+</html>

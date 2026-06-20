@@ -1,0 +1,47 @@
+{
+  "name": "@realtimedesk/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RealtimeDesk SDK — 브라우저 클라이언트 RealtimeClient(pk: connect·subscribe·presence) + 서버 publisher(sk: publish). socket.io-client 래핑. 의존성 0(타입은 @realtimedesk/shared, 런타임은 socket.io-client peer).",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.cjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js",
+      "require": "./dist/server.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "peerDependencies": {
+    "socket.io-client": ">=4.7"
+  },
+  "dependencies": {
+    "@realtimedesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.1",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
