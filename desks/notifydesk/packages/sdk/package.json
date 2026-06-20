@@ -1,0 +1,33 @@
+{
+  "name": "@notifydesk/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NotifyDesk 서버 SDK — 외부 백엔드가 secret(sk_) 키로 알림을 보내고 테넌트/템플릿을 관리하는 얇은 클라이언트. 의존성 0(타입만 @notifydesk/shared). Node·엣지·Deno(전역 fetch) 호환.",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@notifydesk/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  }
+}
