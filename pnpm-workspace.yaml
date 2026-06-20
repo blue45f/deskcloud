@@ -7,9 +7,9 @@ packages:
   # platform — @desk/* 코어
   - 'platform/apps/*'
   - 'platform/packages/*'
-  # desks/seo-gateway
-  - 'desks/seo-gateway/apps/*'
-  - 'desks/seo-gateway/packages/*'
+  # desks/* — 흡수된 모든 Desk (seo-gateway + 동질 백엔드 Desk). 와일드카드로 자동 포함.
+  - 'desks/*/apps/*'
+  - 'desks/*/packages/*'
   # NOTE: remote-devtools 는 격리(OUT) — 299MB 벤더 Chromium 포크 때문에 sibling 레포로 분리.
   # docs/MONOREPO-CONSOLIDATION-PLAN.md §4.3 참조. @desk/* 는 발행 caret 로 소비.
 
