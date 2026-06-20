@@ -1,0 +1,1238 @@
+/* AdDesk 어드민 — 자체 디자인 토큰(외부 CSS 프레임워크 0). 라이트/다크 자동. */
+:root {
+  --ax-bg: #f6f7f9;
+  --ax-surface: #ffffff;
+  --ax-surface-2: #f0f2f5;
+  --ax-ink: #15181d;
+  --ax-ink-soft: #41464e;
+  --ax-muted: #6b7280;
+  --ax-border: #d9dce2;
+  --ax-border-strong: #b9bec8;
+  --ax-accent: #2f5fe0;
+  --ax-accent-ink: #ffffff;
+  --ax-accent-soft: #eaf0ff;
+  /* 보조 액센트(그라데이션/장식 전용) — 코어 블루를 보라/시안 쪽으로 확장. 시스템 교체 아님. */
+  --ax-accent-2: #7c5cff;
+  --ax-accent-3: #18b6c9;
+  --ax-danger: #b42318;
+  --ax-success: #1a7f47;
+  --ax-radius: 14px;
+  --ax-radius-sm: 9px;
+  --ax-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 12px 32px -10px rgba(16, 24, 40, 0.18);
+  /* 떠 있는 표면용 강조 그림자(호버 리프트). */
+  --ax-shadow-lift: 0 2px 4px rgba(16, 24, 40, 0.06), 0 24px 56px -16px rgba(47, 95, 224, 0.28);
+  /* 액센트 글로우(히어로/CTA 발광). */
+  --ax-glow: 0 18px 44px -14px rgba(47, 95, 224, 0.5);
+  /* 코어 브랜드 그라데이션 — 버튼·마크·텍스트 하이라이트가 공유. */
+  --ax-gradient: linear-gradient(120deg, #2f5fe0 0%, #5b6dff 48%, #7c5cff 100%);
+  --ax-gradient-soft: linear-gradient(135deg, #eaf0ff 0%, #f1ecff 100%);
+  --ax-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ax-bg: #0e1014;
+    --ax-surface: #161a20;
+    --ax-surface-2: #1d222a;
+    --ax-ink: #eef1f5;
+    --ax-ink-soft: #c2c8d0;
+    --ax-muted: #8b929d;
+    --ax-border: #2a313b;
+    --ax-border-strong: #3a424e;
+    --ax-accent: #6f97ff;
+    --ax-accent-ink: #0e1014;
+    --ax-accent-soft: #1a2233;
+    --ax-accent-2: #9d86ff;
+    --ax-accent-3: #3fd0e0;
+    --ax-shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 16px 40px -12px rgba(0, 0, 0, 0.6);
+    --ax-shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.3), 0 28px 60px -18px rgba(111, 151, 255, 0.4);
+    --ax-glow: 0 20px 50px -14px rgba(111, 151, 255, 0.45);
+    --ax-gradient: linear-gradient(120deg, #6f97ff 0%, #8a8cff 48%, #9d86ff 100%);
+    --ax-gradient-soft: linear-gradient(135deg, #1a2233 0%, #221d38 100%);
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+  background: var(--ax-bg);
+  color: var(--ax-ink);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ax-accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--ax-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* 레이아웃 */
+.ax-shell {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.ax-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 24px;
+  background: var(--ax-surface);
+  border-bottom: 1px solid var(--ax-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.ax-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-size: 16px;
+  color: var(--ax-ink);
+}
+.ax-brand:hover {
+  text-decoration: none;
+}
+.ax-brand-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: var(--ax-accent);
+  display: grid;
+  place-items: center;
+  color: var(--ax-accent-ink);
+  font-size: 14px;
+}
+.ax-nav-spacer {
+  flex: 1;
+}
+.ax-nav-links {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.ax-nav-link {
+  padding: 7px 11px;
+  border-radius: 8px;
+  color: var(--ax-ink-soft);
+  font-size: 14px;
+  font-weight: 500;
+}
+.ax-nav-link:hover {
+  background: var(--ax-surface-2);
+  text-decoration: none;
+}
+.ax-nav-link.ax-active {
+  background: var(--ax-accent-soft);
+  color: var(--ax-accent);
+}
+
+.ax-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 36px 24px 96px;
+}
+
+.ax-hero {
+  text-align: center;
+  padding: 56px 0 28px;
+}
+.ax-hero h1 {
+  font-size: 40px;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+  line-height: 1.1;
+}
+.ax-hero p {
+  color: var(--ax-ink-soft);
+  font-size: 17px;
+  max-width: 60ch;
+  margin: 0 auto 24px;
+}
+
+h2 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  margin: 0 0 14px;
+}
+.ax-section {
+  margin-top: 40px;
+}
+.ax-muted {
+  color: var(--ax-muted);
+}
+
+/* 카드 */
+.ax-card {
+  background: var(--ax-surface);
+  border: 1px solid var(--ax-border);
+  border-radius: var(--ax-radius);
+  padding: 22px;
+  box-shadow: var(--ax-shadow);
+}
+.ax-grid {
+  display: grid;
+  gap: 16px;
+}
+.ax-grid.cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+.ax-grid.cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+.ax-grid.cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 720px) {
+  .ax-grid.cols-2,
+  .ax-grid.cols-3,
+  .ax-grid.cols-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 스탯 */
+.ax-stat-label {
+  font-size: 13px;
+  color: var(--ax-muted);
+  margin: 0;
+}
+.ax-stat-value {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 4px 0 0;
+}
+.ax-stat-caption {
+  font-size: 12px;
+  color: var(--ax-muted);
+  margin: 6px 0 0;
+}
+
+/* 버튼 */
+.ax-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 16px;
+  border-radius: var(--ax-radius-sm);
+  border: 1px solid var(--ax-border-strong);
+  background: var(--ax-surface);
+  color: var(--ax-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    opacity 0.12s;
+}
+.ax-btn:hover {
+  background: var(--ax-surface-2);
+}
+.ax-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.ax-btn-primary {
+  background: var(--ax-accent);
+  border-color: var(--ax-accent);
+  color: var(--ax-accent-ink);
+}
+.ax-btn-primary:hover {
+  background: var(--ax-accent);
+  filter: brightness(1.06);
+}
+.ax-btn-danger {
+  color: var(--ax-danger);
+  border-color: var(--ax-border);
+}
+.ax-btn-danger:hover {
+  background: color-mix(in srgb, var(--ax-danger) 10%, var(--ax-surface));
+}
+.ax-btn-sm {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+/* 폼 */
+.ax-field {
+  display: block;
+  margin-bottom: 16px;
+}
+.ax-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.ax-input {
+  width: 100%;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid var(--ax-border-strong);
+  border-radius: var(--ax-radius-sm);
+  background: var(--ax-surface);
+  color: var(--ax-ink);
+}
+.ax-input:focus-visible {
+  border-color: var(--ax-accent);
+}
+
+/* 표 */
+.ax-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.ax-table th,
+.ax-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ax-border);
+}
+.ax-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ax-muted);
+}
+.ax-table tr:last-child td {
+  border-bottom: 0;
+}
+
+/* 뱃지 */
+.ax-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--ax-surface-2);
+  color: var(--ax-ink-soft);
+}
+.ax-badge.ax-on {
+  background: var(--ax-accent-soft);
+  color: var(--ax-accent);
+}
+.ax-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--ax-gradient);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: var(--ax-glow);
+}
+
+/* 코드 블록 */
+.ax-code {
+  font-family: var(--ax-mono);
+  font-size: 13px;
+  background: var(--ax-surface-2);
+  border: 1px solid var(--ax-border);
+  border-radius: var(--ax-radius-sm);
+  padding: 14px 16px;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+}
+code.ax-inline {
+  font-family: var(--ax-mono);
+  font-size: 0.92em;
+  background: var(--ax-surface-2);
+  padding: 1px 6px;
+  border-radius: 5px;
+}
+
+/* 알림 */
+.ax-alert {
+  padding: 12px 14px;
+  border-radius: var(--ax-radius-sm);
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+.ax-alert-error {
+  background: color-mix(in srgb, var(--ax-danger) 10%, var(--ax-surface));
+  color: var(--ax-danger);
+  border: 1px solid color-mix(in srgb, var(--ax-danger) 30%, var(--ax-surface));
+}
+.ax-alert-success {
+  background: color-mix(in srgb, var(--ax-success) 10%, var(--ax-surface));
+  color: var(--ax-success);
+  border: 1px solid color-mix(in srgb, var(--ax-success) 30%, var(--ax-surface));
+}
+
+.ax-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ax-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ax-pricing-price {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.ax-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--ax-accent);
+  color: var(--ax-accent-ink);
+  padding: 8px 14px;
+  border-radius: 0 0 8px 0;
+  z-index: 100;
+}
+.ax-skip:focus {
+  left: 0;
+}
+.ax-swatch {
+  height: 56px;
+  border-radius: 10px;
+  border: 1px solid var(--ax-border);
+  display: flex;
+  align-items: flex-end;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* 시각적으로만 숨김(스크린리더엔 노출되지만 허니팟은 aria-hidden로 함께 숨긴다). */
+.ax-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* 문의 카테고리 세그먼트 토글 */
+.ax-segment {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--ax-border-strong);
+  background: var(--ax-surface);
+  color: var(--ax-ink-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.12s,
+    border-color 0.12s,
+    color 0.12s;
+}
+.ax-segment:hover {
+  background: var(--ax-surface-2);
+}
+.ax-segment[aria-pressed='true'] {
+  background: var(--ax-accent);
+  border-color: var(--ax-accent);
+  color: var(--ax-accent-ink);
+}
+
+/* 상태 뱃지 톤(접수/처리중/해결/종료) */
+.ax-badge.ax-status-new {
+  background: var(--ax-accent-soft);
+  color: var(--ax-accent);
+}
+.ax-badge.ax-status-in_progress {
+  background: color-mix(in srgb, var(--ax-accent) 14%, var(--ax-surface));
+  color: var(--ax-accent);
+}
+.ax-badge.ax-status-resolved {
+  background: color-mix(in srgb, var(--ax-success) 14%, var(--ax-surface));
+  color: var(--ax-success);
+}
+.ax-badge.ax-status-closed {
+  background: var(--ax-surface-2);
+  color: var(--ax-muted);
+}
+
+/* 문의 카드 본문 3줄 말줄임 */
+.ax-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 문의 카드 스켈레톤 */
+.ax-skeleton {
+  height: 132px;
+  border-radius: var(--ax-radius);
+  border: 1px solid var(--ax-border);
+  background: var(--ax-surface-2);
+  animation: ax-pulse 1.4s ease-in-out infinite;
+}
+@keyframes ax-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ax-skeleton {
+    animation: none;
+  }
+}
+
+/* 글자 수 카운터 */
+.ax-counter {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ax-muted);
+}
+
+/* 회원 로그인 컨트롤(헤더) — Firebase 통합 로그인 모듈 진입점 */
+.ax-member {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ax-member-name {
+  display: inline-flex;
+  align-items: center;
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: var(--ax-surface-2);
+  color: var(--ax-ink-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+.ax-member-skel {
+  display: inline-block;
+  width: 64px;
+  height: 28px;
+  border-radius: var(--ax-radius-sm);
+  background: var(--ax-surface-2);
+  animation: ax-pulse 1.4s ease-in-out infinite;
+}
+@media (max-width: 560px) {
+  .ax-member-name {
+    display: none;
+  }
+}
+
+/* 회원 로그인 모달(AuthDialog) — 네이티브 오버레이(Radix 없음) */
+.ax-auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.ax-auth-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(8, 11, 16, 0.5);
+  backdrop-filter: blur(2px);
+}
+.ax-auth-panel {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  background: var(--ax-surface);
+  border: 1px solid var(--ax-border);
+  border-radius: var(--ax-radius);
+  box-shadow: var(--ax-shadow);
+  padding: 24px;
+}
+.ax-auth-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.ax-auth-mark {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: var(--ax-accent-soft);
+  color: var(--ax-accent);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+}
+.ax-auth-title {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  margin: 2px 0 0;
+}
+.ax-auth-desc {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--ax-muted);
+  line-height: 1.5;
+}
+.ax-auth-form {
+  display: block;
+}
+.ax-auth-form .ax-field {
+  margin-bottom: 14px;
+}
+.ax-auth-live {
+  min-height: 0;
+}
+.ax-auth-live .ax-alert {
+  margin-bottom: 14px;
+}
+.ax-auth-full {
+  width: 100%;
+}
+.ax-auth-toggle {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: var(--ax-accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+.ax-auth-toggle:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.ax-auth-toggle:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.ax-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+  color: var(--ax-muted);
+}
+.ax-auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background: var(--ax-border);
+}
+.ax-auth-divider-label {
+  font-size: 12px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   글로우업 — 모션 시스템 / 장식 / 히어로 / 푸터
+   원칙: 자체 --ax-* 토큰만 사용(외부 프레임워크 0). 모든 모션은
+   prefers-reduced-motion 에서 0 또는 즉시 표시로 폴백. JS 없이도 콘텐츠는
+   완전히 보인다(스크롤-리빌은 .ax-revealed 가 없으면 보이도록 폴백).
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ── 키프레임 ─────────────────────────────────────────────────────────────── */
+@keyframes ax-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes ax-float {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-18px) translateX(8px);
+  }
+}
+@keyframes ax-drift {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  50% {
+    transform: translateY(14px) translateX(-12px) scale(1.05);
+  }
+}
+@keyframes ax-aurora {
+  0% {
+    transform: translate3d(-6%, -4%, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(6%, 4%, 0) rotate(6deg);
+  }
+  100% {
+    transform: translate3d(-6%, -4%, 0) rotate(0deg);
+  }
+}
+@keyframes ax-sheen {
+  0% {
+    background-position: 180% center;
+  }
+  100% {
+    background-position: -80% center;
+  }
+}
+@keyframes ax-pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ── 진입 애니메이션(첫 화면) ────────────────────────────────────────────── */
+/* 히어로 자식들이 위로 떠오르며 순차 등장. 콘텐츠는 항상 최종 상태가 기본값. */
+.ax-enter {
+  animation: ax-rise 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ax-enter-1 {
+  animation-delay: 0.05s;
+}
+.ax-enter-2 {
+  animation-delay: 0.14s;
+}
+.ax-enter-3 {
+  animation-delay: 0.24s;
+}
+.ax-enter-4 {
+  animation-delay: 0.34s;
+}
+
+/* ── 스크롤 리빌 ──────────────────────────────────────────────────────────── */
+/* JS(IntersectionObserver)가 data-reveal 요소에 .ax-revealed 를 부여한다.
+   .ax-reveal 만 있고 아직 보이지 않은 상태에서만 숨긴다 — JS 미적용/무관찰 시엔
+   기본값(보임)이라 CLS·blank-on-no-JS 가 없다. */
+.ax-reveal.ax-reveal-armed {
+  opacity: 0;
+  transform: translateY(22px);
+}
+.ax-reveal.ax-revealed {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── 히어로 무대(오로라 + 그리드) ────────────────────────────────────────── */
+.ax-hero-stage {
+  position: relative;
+  overflow: clip;
+  isolation: isolate;
+  border-radius: 28px;
+  margin-top: 8px;
+  padding: 4px;
+}
+.ax-hero-aurora {
+  position: absolute;
+  inset: -30% -10%;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      40% 50% at 20% 20%,
+      color-mix(in srgb, var(--ax-accent) 42%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 48% at 82% 18%,
+      color-mix(in srgb, var(--ax-accent-2) 40%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      46% 52% at 64% 88%,
+      color-mix(in srgb, var(--ax-accent-3) 30%, transparent),
+      transparent 72%
+    );
+  filter: blur(18px);
+  opacity: 0.85;
+  animation: ax-aurora 22s ease-in-out infinite;
+}
+.ax-hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--ax-border) 60%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--ax-border) 60%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 38px 38px;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 35%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(70% 70% at 50% 35%, #000 0%, transparent 78%);
+  opacity: 0.5;
+}
+/* 떠다니는 장식 오브(히어로 배경). 모션 끄면 정지. */
+.ax-orb {
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  filter: blur(2px);
+  pointer-events: none;
+  opacity: 0.5;
+}
+.ax-orb-a {
+  width: 88px;
+  height: 88px;
+  top: 14%;
+  left: 7%;
+  background: radial-gradient(circle at 35% 30%, var(--ax-accent), transparent 70%);
+  animation: ax-float 9s ease-in-out infinite;
+}
+.ax-orb-b {
+  width: 120px;
+  height: 120px;
+  bottom: 12%;
+  right: 9%;
+  background: radial-gradient(circle at 60% 40%, var(--ax-accent-2), transparent 70%);
+  animation: ax-drift 11s ease-in-out infinite;
+}
+
+.ax-hero {
+  position: relative;
+  z-index: 1;
+}
+/* 히어로 안내 칩(eyebrow). */
+.ax-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  margin-bottom: 18px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ax-accent) 35%, var(--ax-border));
+  background: color-mix(in srgb, var(--ax-accent-soft) 70%, var(--ax-surface));
+  color: var(--ax-accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  box-shadow: var(--ax-shadow);
+}
+.ax-hero-eyebrow .ax-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ax-success);
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--ax-success) 70%, transparent);
+  animation: ax-ping 2.4s ease-out infinite;
+}
+@keyframes ax-ping {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ax-success) 60%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+/* 그라데이션 텍스트 강조(히어로 헤드라인 키워드). */
+.ax-grad-text {
+  background: var(--ax-gradient);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: ax-sheen 6s linear infinite;
+}
+/* 히어로 보조 메트릭(신뢰 신호). */
+.ax-hero-stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px 30px;
+  margin-top: 30px;
+  color: var(--ax-muted);
+  font-size: 13px;
+}
+.ax-hero-stats b {
+  display: block;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ax-ink);
+}
+
+/* ── 그라데이션 / 발광 버튼 ───────────────────────────────────────────────── */
+.ax-btn-primary {
+  background: var(--ax-gradient);
+  background-size: 160% auto;
+  border-color: transparent;
+  box-shadow: var(--ax-glow);
+  transition:
+    transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.16s ease,
+    background-position 0.4s ease,
+    filter 0.16s ease;
+}
+.ax-btn-primary:hover {
+  filter: none;
+  background-position: right center;
+  transform: translateY(-2px);
+  box-shadow:
+    var(--ax-glow),
+    0 8px 18px -6px rgba(47, 95, 224, 0.45);
+}
+.ax-btn-primary:active {
+  transform: translateY(0) scale(0.985);
+}
+/* CTA 라벨 슬라이드 광택. */
+.ax-btn-lg {
+  padding: 14px 26px;
+  font-size: 15px;
+  border-radius: 12px;
+}
+
+/* ── 카드 호버 리프트 + 상단 액센트 라인 ─────────────────────────────────── */
+.ax-card-i {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.ax-card-i::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: var(--ax-gradient);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ax-card-i:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ax-shadow-lift);
+  border-color: color-mix(in srgb, var(--ax-accent) 40%, var(--ax-border));
+}
+.ax-card-i:hover::before {
+  transform: scaleX(1);
+}
+/* 기능 카드 아이콘 칩. */
+.ax-feature-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  background: var(--ax-gradient-soft);
+  color: var(--ax-accent);
+  font-size: 20px;
+  border: 1px solid color-mix(in srgb, var(--ax-accent) 22%, var(--ax-border));
+  transition:
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.24s ease;
+}
+.ax-card-i:hover .ax-feature-icon {
+  transform: translateY(-2px) rotate(-4deg) scale(1.06);
+  box-shadow: var(--ax-glow);
+}
+
+/* ── 브랜드 마크 그라데이션 + 호버 ───────────────────────────────────────── */
+.ax-brand-mark {
+  background: var(--ax-gradient);
+  box-shadow: 0 4px 12px -4px rgba(47, 95, 224, 0.5);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ax-brand:hover .ax-brand-mark {
+  transform: rotate(-8deg) scale(1.08);
+}
+.ax-nav {
+  backdrop-filter: saturate(1.4) blur(8px);
+  background: color-mix(in srgb, var(--ax-surface) 86%, transparent);
+}
+.ax-nav-link {
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+
+/* ── 코드 블록 — 카피 가능 + 라벨 ────────────────────────────────────────── */
+.ax-code-wrap {
+  position: relative;
+}
+.ax-code {
+  position: relative;
+}
+.ax-code-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 7px;
+  border: 1px solid var(--ax-border-strong);
+  background: color-mix(in srgb, var(--ax-surface) 88%, transparent);
+  color: var(--ax-ink-soft);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-2px);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease,
+    background 0.14s ease,
+    color 0.14s ease;
+}
+.ax-code-wrap:hover .ax-code-copy,
+.ax-code-copy:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ax-code-copy:hover {
+  background: var(--ax-surface);
+  color: var(--ax-accent);
+  border-color: var(--ax-accent);
+}
+.ax-code-copy.ax-copied {
+  opacity: 1;
+  transform: translateY(0);
+  color: var(--ax-success);
+  border-color: color-mix(in srgb, var(--ax-success) 50%, var(--ax-border));
+}
+
+/* ── CTA 밴드(랜딩 하단) ─────────────────────────────────────────────────── */
+.ax-cta-band {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 48px 28px;
+  border-radius: 24px;
+  color: var(--ax-accent-ink);
+  background: var(--ax-gradient);
+  box-shadow: var(--ax-shadow-lift);
+}
+.ax-cta-band::after {
+  content: '';
+  position: absolute;
+  inset: -40% -10%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(40% 60% at 80% 10%, rgba(255, 255, 255, 0.35), transparent 60%);
+  animation: ax-float 12s ease-in-out infinite;
+}
+.ax-cta-band > * {
+  position: relative;
+  z-index: 1;
+}
+.ax-cta-band h2 {
+  color: var(--ax-accent-ink);
+  font-size: 26px;
+}
+.ax-cta-band p {
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 52ch;
+  margin: 8px auto 0;
+}
+.ax-btn-on-accent {
+  background: #fff;
+  color: var(--ax-accent);
+  border-color: #fff;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.35);
+}
+.ax-btn-on-accent:hover {
+  background: #fff;
+  transform: translateY(-2px);
+  filter: brightness(1.02);
+}
+
+/* ── 푸터 ─────────────────────────────────────────────────────────────────── */
+.ax-footer {
+  border-top: 1px solid var(--ax-border);
+  background: var(--ax-surface);
+  margin-top: auto;
+}
+.ax-footer-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+}
+.ax-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin-left: auto;
+}
+.ax-footer-links a {
+  color: var(--ax-muted);
+  font-size: 14px;
+  transition: color 0.14s ease;
+}
+.ax-footer-links a:hover {
+  color: var(--ax-accent);
+  text-decoration: none;
+}
+.ax-footer-copy {
+  color: var(--ax-muted);
+  font-size: 13px;
+}
+
+.ax-sitemap-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.ax-sitemap-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--ax-border);
+  border-radius: var(--ax-radius-sm);
+  color: var(--ax-ink);
+  background: color-mix(in srgb, var(--ax-surface-2) 74%, transparent);
+  transition:
+    border-color 0.14s ease,
+    transform 0.14s ease,
+    box-shadow 0.14s ease;
+}
+.ax-sitemap-link:hover {
+  border-color: var(--ax-accent);
+  box-shadow: var(--ax-shadow-lift);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+.ax-sitemap-link small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ax-muted);
+  font-size: 12px;
+}
+
+@media (max-width: 720px) {
+  .ax-sitemap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── 모션 축소 존중 — 모든 장식/진입/리빌 모션 정지 ──────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .ax-enter,
+  .ax-hero-aurora,
+  .ax-orb,
+  .ax-grad-text,
+  .ax-hero-eyebrow .ax-dot,
+  .ax-cta-band::after,
+  .ax-float,
+  .ax-drift {
+    animation: none !important;
+  }
+  .ax-enter {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  .ax-reveal.ax-reveal-armed {
+    opacity: 1;
+    transform: none;
+  }
+  .ax-reveal.ax-revealed {
+    transition: none;
+  }
+  .ax-grad-text {
+    background-position: 0 center;
+  }
+  .ax-btn-primary,
+  .ax-card-i,
+  .ax-feature-icon,
+  .ax-brand:hover .ax-brand-mark,
+  .ax-btn-on-accent:hover {
+    transition: none;
+  }
+  .ax-card-i:hover,
+  .ax-btn-primary:hover,
+  .ax-btn-on-accent:hover {
+    transform: none;
+  }
+}
