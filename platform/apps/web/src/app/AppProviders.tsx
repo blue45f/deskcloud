@@ -1,0 +1,27 @@
+import { QueryClientProvider } from '@tanstack/react-query'
+import { RouterProvider } from 'react-router-dom'
+
+import { queryClient } from './queryClient'
+import { ThemeProvider } from './ThemeProvider'
+
+import ErrorBoundary from '@/components/common/ErrorBoundary'
+import { TooltipProvider } from '@/components/ui/tooltip'
+import { AuthProvider } from '@/lib/firebaseAuth'
+import { router } from '@/router'
+
+/** 앱 루트 — Query · Theme · Auth · Tooltip · 에러바운더리 · 라우터를 배선한다. */
+export default function AppProviders() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <TooltipProvider delayDuration={200} skipDelayDuration={300}>
+            <ErrorBoundary>
+              <RouterProvider router={router} />
+            </ErrorBoundary>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  )
+}
