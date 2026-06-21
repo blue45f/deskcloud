@@ -47,6 +47,7 @@ import {
   deskReadiness,
   type ReadinessStatus,
 } from '@/data/deskCatalog'
+import { buildPlatformIntegrationAudit } from '@/data/integrationVerification'
 import {
   buildWorkspaceDeskConsoleState,
   type WorkspaceDeskConsoleItem,
@@ -571,6 +572,196 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
               </div>
             )
           })}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function IntegrationVerificationPanel({ tenant }: { tenant?: TenantDto }) {
+  const audit = useMemo(() => buildPlatformIntegrationAudit(), [])
+  const hasCriticalIssues = audit.criticalIssues.length > 0
+  const originCount = tenant?.corsOrigins.length ?? 0
+
+  return (
+    <Card id="integration-verification">
+      <CardHeader
+        action={
+          <Button asChild variant="secondary" size="sm">
+            <Link to="/docs#verification-matrix">
+              검증 문서 <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        }
+      >
+        <CardTitle>
+          <span className="inline-flex items-center gap-1.5">
+            <ListChecks className="size-4" aria-hidden /> 전수 통합 검증
+          </span>
+        </CardTitle>
+        <CardDescription>
+          전체 제품 Desk, 공개 라우트, 운영 허브, TermsDesk 런타임, workspace Desk manifest를 같은
+          계약으로 대조합니다.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Product desks
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {audit.verifiedDeskCount}/{audit.productDeskCount}
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              마이크로사이트·운영 허브 계약 통과
+            </p>
+          </div>
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">Route smoke</p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {audit.publicRoutes.length + audit.micrositeRouteCount}개
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              공개 라우트 + Desk 마이크로사이트
+            </p>
+          </div>
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Matrix areas
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {audit.verificationAreaCount}/{audit.requiredAreaCount}
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">문서화된 전수 검증 표면</p>
+          </div>
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Domain config
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {originCount > 0 ? `${originCount}개` : '대기'}
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              {audit.openConfigItems}개 readiness 항목은 운영 origin/secret 설정 확인 필요
+            </p>
+          </div>
+        </div>
+
+        {hasCriticalIssues ? (
+          <Banner tone="error">
+            통합 계약 실패: {audit.criticalIssues.slice(0, 3).join(' / ')}
+            {audit.criticalIssues.length > 3 ? ` 외 ${audit.criticalIssues.length - 3}건` : ''}
+          </Banner>
+        ) : (
+          <Banner tone="success">
+            {audit.productDeskCount}개 제품 Desk가 모두 마이크로사이트, 운영 허브, gateway, runbook
+            계약을 통과했습니다. 전수 smoke 대상은 공개 {audit.publicRoutes.length}개 + Desk{' '}
+            {audit.micrositeRouteCount}개 라우트입니다.
+          </Banner>
+        )}
+
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div>
+            <SectionTitle>Desk별 통합 계약</SectionTitle>
+            <div className="grid max-h-[30rem] gap-2 overflow-y-auto pr-1 md:grid-cols-2">
+              {audit.deskChecks.map((check) => (
+                <div key={check.id} className="rounded-md border border-border bg-surface p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-text">{check.name}</p>
+                      <code className="mt-0.5 block truncate text-[0.75rem] text-text-muted">
+                        {check.micrositePath}
+                      </code>
+                    </div>
+                    <Badge
+                      tone={check.contractStatus === 'verified' ? 'success' : 'danger'}
+                      size="sm"
+                      dot
+                    >
+                      {check.contractStatus === 'verified' ? '검증됨' : '실패'}
+                    </Badge>
+                  </div>
+                  <dl className="mt-3 grid gap-2 text-[0.75rem] sm:grid-cols-2">
+                    <div className="min-w-0 rounded bg-surface-2 px-2 py-1.5">
+                      <dt className="text-text-subtle">Admin</dt>
+                      <dd className="truncate font-mono text-text-muted">{check.adminPath}</dd>
+                    </div>
+                    <div className="min-w-0 rounded bg-surface-2 px-2 py-1.5">
+                      <dt className="text-text-subtle">Gateway</dt>
+                      <dd className="truncate font-mono text-text-muted">{check.gatewayPath}</dd>
+                    </div>
+                  </dl>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    <Badge tone="outline" size="sm">
+                      {check.mode}
+                    </Badge>
+                    {check.needsConfigCount > 0 ? (
+                      <Badge tone="warning" size="sm">
+                        설정 {check.needsConfigCount}
+                      </Badge>
+                    ) : null}
+                    {check.watchCheckCount > 0 ? (
+                      <Badge tone="info" size="sm">
+                        관찰 {check.watchCheckCount}
+                      </Badge>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <SectionTitle>특수 런타임 경계</SectionTitle>
+              <div className="space-y-2 rounded-md border border-border bg-surface p-3 text-[0.8125rem] leading-5 text-text-muted">
+                <p>
+                  <strong className="text-text">TermsDesk:</strong>{' '}
+                  <a
+                    className="underline-offset-4 hover:underline"
+                    href={audit.termsDeskBrokerageUrl}
+                  >
+                    의뢰 중계
+                  </a>{' '}
+                  ·{' '}
+                  <a
+                    className="underline-offset-4 hover:underline"
+                    href={audit.termsDeskExpertsUrl}
+                  >
+                    전문가 디렉터리
+                  </a>
+                </p>
+                <p>
+                  <strong className="text-text">Workspace:</strong>{' '}
+                  {audit.workspaceDeskIds.join(', ')}
+                </p>
+                <p>
+                  <strong className="text-text">Linked:</strong> {audit.linkedDeskIds.join(', ')}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <SectionTitle>Smoke 라우트</SectionTitle>
+              <div className="rounded-md border border-border bg-surface p-3">
+                <div className="flex flex-wrap gap-1.5">
+                  {audit.publicRoutes.map((route) => (
+                    <Badge key={route} tone="outline" size="sm">
+                      {route}
+                    </Badge>
+                  ))}
+                  <Badge tone="accent" size="sm">
+                    /desks/* {audit.micrositeRouteCount}
+                  </Badge>
+                </div>
+                <p className="mt-3 text-[0.8125rem] leading-5 text-text-muted">
+                  실제 검증은 Playwright와 HTTP smoke에서 공개 라우트, 모든 Desk 마이크로사이트,
+                  TermsDesk 외부 런타임, workspace manifest API를 함께 확인합니다.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -1247,6 +1438,7 @@ export default function DashboardPage() {
         <ConsolePreviewNotice title="콘솔" />
         <AdminCommandCenter />
         <DomainIsolationPanel />
+        <IntegrationVerificationPanel />
         <WorkspaceDeskPanel />
         <DeskOperationsHub />
       </div>
@@ -1281,6 +1473,8 @@ export default function DashboardPage() {
       </div>
 
       <DomainIsolationPanel tenant={tenant} />
+
+      <IntegrationVerificationPanel tenant={tenant} />
 
       <WorkspaceDeskPanel tenant={tenant} />
 
