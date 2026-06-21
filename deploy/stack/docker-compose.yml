@@ -325,6 +325,7 @@ services:
       PORT: "4000"
       DESK_MODE: self-hosted
       ADMIN_TOKEN: ${DESKPLATFORM_ADMIN_TOKEN:?set DESKPLATFORM_ADMIN_TOKEN in .env}
+      ADMIN_ACCOUNTS: ${DESKPLATFORM_ADMIN_ACCOUNTS:-}
       WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
       # 빌링 어댑터는 TEST/STUB 전용 — 실제 자금 이동 없음.
       DESK_BILLING_PROVIDER: ${DESK_BILLING_PROVIDER:-stub}

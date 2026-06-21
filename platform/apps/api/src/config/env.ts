@@ -32,6 +32,7 @@ export const envSchema = z.object({
   DATABASE_URL: optionalNonEmpty,
   PGLITE_DIR: optionalNonEmpty,
   ADMIN_TOKEN: optionalNonEmpty,
+  ADMIN_ACCOUNTS: optionalNonEmpty,
   DESK_KEY_PEPPER: optionalNonEmpty,
   DESK_BILLING_PROVIDER: z.enum(['stub', 'toss', 'stripe']).optional(),
 })
@@ -61,7 +62,9 @@ export function validateEnv(
   // neon.tech 사용 방지(이 프로젝트 안전 규칙).
   const dbUrl = env.DATABASE_URL?.trim()
   if (dbUrl && /neon\.tech/i.test(dbUrl)) {
-    warn('[env] 안전 경고: DATABASE_URL 에 neon.tech 가 감지되었습니다. 로컬 PGlite 또는 qa-postgres 를 쓰세요.')
+    warn(
+      '[env] 안전 경고: DATABASE_URL 에 neon.tech 가 감지되었습니다. 로컬 PGlite 또는 qa-postgres 를 쓰세요.'
+    )
   }
 
   // 운영에서 개발 전용 기본값을 그대로 쓰면 보안상 위험 — 큰 경고.

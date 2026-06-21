@@ -7,7 +7,7 @@ import { TenantService } from '../tenant-service'
 import { AdminTokenGuard } from './admin-token.guard'
 import { PublishableKeyGuard } from './publishable-key.guard'
 import { SecretKeyGuard } from './secret-key.guard'
-import { TENANT_CONTEXT_KEY } from './tokens'
+import { ADMIN_CONTEXT_KEY, TENANT_CONTEXT_KEY } from './tokens'
 
 import type { ExecutionContext } from '@nestjs/common'
 
@@ -30,6 +30,62 @@ describe('AdminTokenGuard', () => {
       UnauthorizedException
     )
     expect(() => guard.canActivate(ctxOf({ headers: {} }))).toThrow(UnauthorizedException)
+  })
+
+  it('운영자별 토큰이면 request 에 안전한 계정 정보를 부착', () => {
+    const accountGuard = new AdminTokenGuard({
+      adminToken: 'legacy',
+      adminAccounts: [
+        {
+          id: 'support',
+          label: 'Support Desk',
+          role: 'support',
+          scopes: ['inquiries:read'],
+          token: 'support-token',
+        },
+      ],
+    })
+    const req: Record<string, unknown> = { headers: { 'x-admin-token': 'support-token' } }
+
+    expect(accountGuard.canActivate(ctxOf(req))).toBe(true)
+    expect(req[ADMIN_CONTEXT_KEY]).toEqual({
+      id: 'support',
+      label: 'Support Desk',
+      role: 'support',
+      scopes: ['inquiries:read'],
+    })
+  })
+
+  it('필요 scope 가 없으면 403, owner(admin:*)는 통과', () => {
+    class ScopedAdminTokenGuard extends AdminTokenGuard {
+      protected override readonly requiredScopes = ['inquiries:read', 'inquiries:write'] as const
+    }
+    const scopedGuard = new ScopedAdminTokenGuard({
+      adminToken: '',
+      adminAccounts: [
+        {
+          id: 'auditor',
+          label: 'Audit Viewer',
+          role: 'auditor',
+          scopes: ['inquiries:read'],
+          token: 'auditor-token',
+        },
+        {
+          id: 'owner',
+          label: 'Owner',
+          role: 'owner',
+          scopes: ['admin:*'],
+          token: 'owner-token',
+        },
+      ],
+    })
+
+    expect(() =>
+      scopedGuard.canActivate(ctxOf({ headers: { 'x-admin-token': 'auditor-token' } }))
+    ).toThrow(ForbiddenException)
+    expect(scopedGuard.canActivate(ctxOf({ headers: { 'x-admin-token': 'owner-token' } }))).toBe(
+      true
+    )
   })
 })
 

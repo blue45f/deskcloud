@@ -23,6 +23,7 @@ function cfg(): AppConfig {
     databaseUrl: null,
     pgliteDir: '',
     adminToken: 'x',
+    adminAccounts: [],
     keyPepper: PEPPER,
     billingProvider: 'stub',
   }

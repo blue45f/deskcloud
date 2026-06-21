@@ -1,4 +1,3 @@
-import { AdminTokenGuard } from '@desk/core/nest'
 import {
   inquiryListQuerySchema,
   submitInquirySchema,
@@ -27,6 +26,7 @@ import { ApiOperation, ApiSecurity, ApiTags } from '@nestjs/swagger'
 import { Throttle } from '@nestjs/throttler'
 
 import { ZodValidationPipe } from '../common/zod.pipe'
+import { InquiryReadAdminGuard, InquiryWriteAdminGuard } from '../core/admin-scope.guards'
 
 import { InquiriesService } from './inquiries.service'
 
@@ -80,7 +80,7 @@ export class InquiriesController {
   }
 
   @Get('admin')
-  @UseGuards(AdminTokenGuard)
+  @UseGuards(InquiryReadAdminGuard)
   @ApiSecurity('adminToken')
   @ApiOperation({
     summary: '어드민 목록(X-Admin-Token) — 회신 이메일·출처 URL 포함, status/originHost 필터',
@@ -94,7 +94,7 @@ export class InquiriesController {
 
   @Patch(':id/status')
   @HttpCode(200)
-  @UseGuards(AdminTokenGuard)
+  @UseGuards(InquiryWriteAdminGuard)
   @ApiSecurity('adminToken')
   @ApiOperation({ summary: '문의 상태 변경(X-Admin-Token) — new/in_progress/resolved/closed' })
   async setStatus(

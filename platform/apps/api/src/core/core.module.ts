@@ -8,6 +8,8 @@ import { DrizzleMemberStore } from '../stores/drizzle-member.store'
 import { DrizzleTenantStore } from '../stores/drizzle-tenant.store'
 import { DrizzleUsageStore } from '../stores/drizzle-usage.store'
 
+import { InquiryReadAdminGuard, InquiryWriteAdminGuard } from './admin-scope.guards'
+
 /** 멤버 스토어 DI 토큰(api 로컬). */
 export const MEMBER_STORE = Symbol('MEMBER_STORE')
 
@@ -39,10 +41,24 @@ export const MEMBER_STORE = Symbol('MEMBER_STORE')
     },
     {
       provide: CORE_OPTIONS,
-      useFactory: (cfg: AppConfig): CoreOptions => ({ adminToken: cfg.adminToken }),
+      useFactory: (cfg: AppConfig): CoreOptions => ({
+        adminToken: cfg.adminToken,
+        adminAccounts: cfg.adminAccounts,
+      }),
       inject: [APP_CONFIG],
     },
+    InquiryReadAdminGuard,
+    InquiryWriteAdminGuard,
   ],
-  exports: [APP_CONFIG, DatabaseService, TENANT_SERVICE, USAGE_METER, MEMBER_STORE, CORE_OPTIONS],
+  exports: [
+    APP_CONFIG,
+    DatabaseService,
+    TENANT_SERVICE,
+    USAGE_METER,
+    MEMBER_STORE,
+    CORE_OPTIONS,
+    InquiryReadAdminGuard,
+    InquiryWriteAdminGuard,
+  ],
 })
 export class CoreModule {}
