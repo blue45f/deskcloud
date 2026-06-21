@@ -126,6 +126,25 @@ export interface DeskOperations {
   recommendedPlan: Plan
 }
 
+export type ReadinessStatus = 'ready' | 'needs_config' | 'watch'
+
+export interface DeskReadinessItem {
+  label: string
+  description: string
+  status: ReadinessStatus
+}
+
+export interface DeskReadiness {
+  /** 통합 운영 판단을 위한 한 줄 요약. */
+  summary: string
+  /** DeskCloud가 중앙에서 책임지는 운영 경계. */
+  controlPlane: string
+  /** 각 Desk 런타임이 유지하는 실행 경계. */
+  dataPlane: string
+  /** 운영 배포 전 확인할 체크 항목. */
+  checks: readonly DeskReadinessItem[]
+}
+
 export interface DeskDataObject {
   name: string
   description: string
@@ -314,6 +333,132 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
 
 export function deskOperations(desk: Pick<DeskEntry, 'id'>): DeskOperations {
   return DESK_OPERATIONS[desk.id] ?? ops(desk.id, {})
+}
+
+const READINESS_BASE: DeskReadiness = {
+  summary:
+    'DeskCloud 콘솔에서 가입회사, 서비스 도메인, 키, 사용량, 플랜을 통합 관리합니다. 실제 배포 전 서비스 origin과 서버 secret key 보관 경계를 확인하면 같은 테넌트 아래에서 안전하게 운영할 수 있습니다.',
+  controlPlane: 'DeskCloud tenant, service origin allowlist, key rotation, usage, billing',
+  dataPlane: 'DeskCloud API gateway and browser/server SDK runtime',
+  checks: [
+    {
+      label: '서비스 도메인 등록',
+      description: '운영 배포 전에 실제 제품 origin을 CORS allowlist에 등록합니다.',
+      status: 'needs_config',
+    },
+    {
+      label: 'pk/sk 키 경계',
+      description: 'pk_ 키는 브라우저에만, sk_ 키는 서버/BFF 환경변수에만 배치합니다.',
+      status: 'ready',
+    },
+    {
+      label: '사용량 메트릭 확인',
+      description: 'Desk별 primary metric이 월간 테넌트 사용량에 합산되는지 확인합니다.',
+      status: 'watch',
+    },
+  ],
+}
+
+function readiness(value: Partial<DeskReadiness>): DeskReadiness {
+  return {
+    ...READINESS_BASE,
+    ...value,
+    checks: value.checks ?? READINESS_BASE.checks,
+  }
+}
+
+export const DESK_READINESS: Readonly<Record<string, DeskReadiness>> = {
+  aidigestdesk: readiness({
+    summary:
+      'AIDigestDesk는 공개 콘텐츠 포털과 편집 데이터플레인을 유지하면서 DeskCloud에서 서비스 도메인, 콘텐츠 운영 이벤트, export run을 통합 관리합니다.',
+    controlPlane:
+      'DeskCloud tenant, Pages base path, source snapshot usage, editorial export audit',
+    dataPlane: 'desks/aidigestdesk Vite portal and @aidigestdesk/content package',
+    checks: [
+      {
+        label: 'Pages base path',
+        description: 'Vercel 운영 URL과 GitHub Pages 보조 URL의 base path를 함께 검증합니다.',
+        status: 'ready',
+      },
+      {
+        label: '소스 스냅샷 큐',
+        description:
+          '공식 출처 해시 변화, 실패 상태, 업데이트 후보 생성을 운영 이벤트로 추적합니다.',
+        status: 'watch',
+      },
+      {
+        label: '편집 내보내기',
+        description: '뉴스레터, CSV, 런북 export가 같은 테넌트 사용량으로 집계되는지 확인합니다.',
+        status: 'ready',
+      },
+    ],
+  }),
+  'seo-gateway': readiness({
+    summary:
+      'SEOGatewayDesk는 별도 제품으로 분리 운영하지 않습니다. Fastify 렌더 데이터플레인은 desks/seo-gateway에 두고, 가입회사·서비스 도메인·렌더 사용량·요금 한도는 DeskCloud 콘솔에서 통합 운영합니다.',
+    controlPlane: 'DeskCloud tenant, service origin, gateway path, render usage, plan limit',
+    dataPlane: 'desks/seo-gateway Fastify renderer, Puppeteer pool, cache/SWR, quality gates',
+    checks: [
+      {
+        label: '원본 SPA origin',
+        description:
+          '프리렌더링할 SPA origin을 서비스 도메인 allowlist와 Site 설정에 함께 등록합니다.',
+        status: 'needs_config',
+      },
+      {
+        label: '통합 gateway route',
+        description:
+          '봇 트래픽은 DeskCloud /seo-gateway 경계로 보내고 일반 사용자는 원본 SPA로 통과시킵니다.',
+        status: 'ready',
+      },
+      {
+        label: '캐시/품질 게이트',
+        description: 'TTL, SWR, 워밍, Lighthouse, VisualDiff 결과를 배포 전 확인합니다.',
+        status: 'watch',
+      },
+      {
+        label: 'admin token 분리',
+        description: 'Fastify admin UI 토큰은 sk_ 키처럼 서버 환경변수에만 보관합니다.',
+        status: 'needs_config',
+      },
+    ],
+  }),
+  'remote-devtools': readiness({
+    summary:
+      'RemoteDevTools도 분리 운영 대상이 아닙니다. CDP/rrweb/WebSocket 데이터플레인은 desks/remote-devtools에 보존하고, 조직·origin·세션 사용량·연동 상태는 DeskCloud 운영 콘솔에서 통합 관리합니다.',
+    controlPlane:
+      'DeskCloud tenant, SDK allowed origin, WS gateway, session usage, integration status',
+    dataPlane: 'desks/remote-devtools NestJS/TypeORM CDP gateway, rrweb replay, S3 backup',
+    checks: [
+      {
+        label: 'SDK origin allowlist',
+        description:
+          '디버깅 SDK를 삽입할 고객 서비스 origin만 DeskCloud 서비스 도메인으로 허용합니다.',
+        status: 'needs_config',
+      },
+      {
+        label: '통합 WS gateway',
+        description:
+          'SDK 스크립트와 WebSocket 연결은 DeskCloud /remote-devtools 경계를 사용합니다.',
+        status: 'ready',
+      },
+      {
+        label: 'org/origin namespace',
+        description:
+          '세션, CDP 이벤트, 리플레이 산출물이 조직 또는 origin 네임스페이스로 분리되는지 봅니다.',
+        status: 'watch',
+      },
+      {
+        label: '외부 연동 secret',
+        description: 'Jira, Slack, Sheets, S3 credential은 테넌트별 secret 경계로 분리합니다.',
+        status: 'needs_config',
+      },
+    ],
+  }),
+}
+
+export function deskReadiness(desk: Pick<DeskEntry, 'id'>): DeskReadiness {
+  return DESK_READINESS[desk.id] ?? READINESS_BASE
 }
 
 const DETAILS_BASE: DeskDetails = {

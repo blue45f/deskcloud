@@ -3,11 +3,13 @@ import { describe, expect, it } from 'vitest'
 import {
   DESK_DETAILS,
   DESK_OPERATIONS,
+  DESK_READINESS,
   PRODUCT_DESKS,
   apiEndpoint,
   deskDetails,
   deskMicrositePath,
   deskOperations,
+  deskReadiness,
   sdkSnippet,
 } from './deskCatalog'
 
@@ -24,6 +26,7 @@ describe('DeskCloud catalog contracts', () => {
 
       const operations = deskOperations(desk)
       const details = deskDetails(desk)
+      const readiness = deskReadiness(desk)
 
       expect(operations.adminPath).toBe(`/dashboard?desk=${desk.id}`)
       expect(operations.gatewayPath).toMatch(/^\/[a-z]/)
@@ -35,6 +38,15 @@ describe('DeskCloud catalog contracts', () => {
       expect(details.adminGuide.length).toBeGreaterThan(0)
       expect(details.integrationGuide.length).toBeGreaterThan(0)
       expect(details.domainIsolation.length).toBeGreaterThan(40)
+      expect(readiness.summary.length).toBeGreaterThan(80)
+      expect(readiness.controlPlane.length).toBeGreaterThan(20)
+      expect(readiness.dataPlane.length).toBeGreaterThan(20)
+      expect(readiness.checks.length).toBeGreaterThanOrEqual(3)
+      for (const check of readiness.checks) {
+        expect(['ready', 'needs_config', 'watch']).toContain(check.status)
+        expect(check.label.length).toBeGreaterThan(3)
+        expect(check.description.length).toBeGreaterThan(20)
+      }
       expect(deskMicrositePath(desk)).toBe(`/desks/${desk.id}`)
     }
   })
@@ -51,6 +63,7 @@ describe('DeskCloud catalog contracts', () => {
     for (const desk of workspaceDesks) {
       const operations = deskOperations(desk)
       const details = deskDetails(desk)
+      const readiness = deskReadiness(desk)
 
       expect(desk.workspacePath).toMatch(/^desks\//)
       expect(desk.integrationPackage).toBeTruthy()
@@ -59,6 +72,10 @@ describe('DeskCloud catalog contracts', () => {
       expect(operations.recommendedPlan).toBeTruthy()
       expect(details.summary).toContain(desk.name)
       expect(details.domainIsolation).toContain('DeskCloud')
+      expect(DESK_READINESS).toHaveProperty(desk.id)
+      expect(readiness.summary).toContain('DeskCloud')
+      expect(readiness.controlPlane).toContain('DeskCloud')
+      expect(readiness.dataPlane).toContain(desk.workspacePath)
     }
   })
 
@@ -103,12 +120,16 @@ describe('DeskCloud catalog contracts', () => {
 
       const operations = deskOperations(desk!)
       const details = deskDetails(desk!)
+      const readiness = deskReadiness(desk!)
 
       expect(operations.adminPath).toBe(`/dashboard?desk=${id}`)
       expect(operations.gatewayPath).toBe(`/${id}`)
       expect(details.summary).toContain('DeskCloud')
       expect(details.summary).toContain('콘솔')
       expect(details.integrationGuide.join('\n')).toContain('DeskCloud')
+      expect(readiness.summary).toContain('분리 운영')
+      expect(readiness.controlPlane).toContain('DeskCloud')
+      expect(readiness.checks.map((check) => check.status)).toContain('needs_config')
     }
   })
 })

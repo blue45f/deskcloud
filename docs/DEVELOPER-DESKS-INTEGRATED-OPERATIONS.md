@@ -20,6 +20,37 @@
 운영을 뜻하지 않는다. 성능과 상태 관리가 중요한 런타임만 유지하고, 고객이 보는 운영 경계는
 DeskCloud control-plane으로 통합한다.
 
+## 통합 운영 원칙
+
+`SEOGatewayDesk`와 `RemoteDevTools`는 제품, 콘솔, 과금, 사용량 관점에서 DeskCloud의
+일급 Desk이다. 다만 런타임 특성이 달라 데이터플레인을 억지로 `platform/apps/api` 안으로
+이식하지 않는다.
+
+| 구분          | DeskCloud control-plane                                 | 각 Desk data-plane                              |
+| ------------- | ------------------------------------------------------- | ----------------------------------------------- |
+| 계정/권한     | 가입회사 테넌트, pk/sk 키, origin allowlist             | 렌더 admin token, SDK/WS 세션 credential        |
+| 서비스 도메인 | 콘솔의 service origin 등록과 운영 감사                  | Site origin, route rule, org/origin namespace   |
+| 사용량/요금   | 테넌트 월간 사용량, 플랜 한도, billing 상태             | render job, cache hit/miss, debug session event |
+| 배포 검증     | `pnpm run verify:developer-desks`, 카탈로그 계약 테스트 | Fastify renderer, NestJS gateway, rrweb replay  |
+| 운영 진입점   | `/dashboard?desk=...`, `/desks/...`                     | 내부 패널과 runtime-specific admin API          |
+
+이 경계 때문에 통합 운영이 가능하다. 운영자는 DeskCloud에서 고객, 도메인, 키, 사용량을
+통제하고, 각 런타임은 성능·세션 상태·전용 어댑터만 책임진다.
+
+## 운영 준비도 체크
+
+운영 콘솔의 `Desk 운영 허브`는 카탈로그의 `deskReadiness()` 계약을 사용해 아래 기준을
+표시한다.
+
+| Desk           | 반드시 확인할 항목                                                                               | 상태 의미                                       |
+| -------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------- |
+| SEOGatewayDesk | 원본 SPA origin, 통합 `/seo-gateway` route, cache/SWR, admin token                               | 검색 봇 트래픽을 통합 gateway로 보낼 준비       |
+| RemoteDevTools | SDK origin allowlist, 통합 `/remote-devtools` WS gateway, org/origin namespace, 외부 연동 secret | 디버깅 세션과 리플레이를 테넌트별로 격리할 준비 |
+
+`설정 필요` 항목은 고객 서비스 도메인이나 secret이 실제 운영 환경마다 달라서 남겨 둔
+체크포인트다. `통합됨`은 DeskCloud 라우팅/카탈로그/워크스페이스 계약이 이미 적용된
+상태이고, `관찰`은 배포 후 사용량·캐시·세션 상태를 운영자가 계속 봐야 하는 항목이다.
+
 ## 루트 명령
 
 분리된 sibling repo로 이동하지 말고 루트에서 실행한다.

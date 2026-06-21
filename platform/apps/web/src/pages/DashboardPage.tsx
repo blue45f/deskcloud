@@ -23,7 +23,7 @@ import type { TenantDto, TenantWithSecretDto, UsageMetric } from '@desk/shared/b
 import { useTheme } from '@/app/ThemeContext'
 import { ConsolePreviewNotice } from '@/components/ConsolePreviewNotice'
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
-import { Badge, PlanBadge, StatusBadge } from '@/components/ui/badge'
+import { Badge, type BadgeProps, PlanBadge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -44,6 +44,8 @@ import {
   deskDetails,
   deskMicrositePath,
   deskOperations,
+  deskReadiness,
+  type ReadinessStatus,
 } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { PoweredByDeskCloud } from '@/PoweredByDeskCloud'
@@ -72,6 +74,13 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
     </h2>
   )
 }
+
+const READINESS_STATUS_META: Record<ReadinessStatus, { label: string; tone: BadgeProps['tone'] }> =
+  {
+    ready: { label: '통합됨', tone: 'success' },
+    needs_config: { label: '설정 필요', tone: 'warning' },
+    watch: { label: '관찰', tone: 'info' },
+  }
 
 function originLabel(origin: string): string {
   if (origin === '*') return '전체 origin'
@@ -489,6 +498,7 @@ function DeskOperationsHub() {
   const selected = PRODUCT_DESKS.find((d) => d.id === selectedId) ?? fallbackDesk
   const operations = deskOperations(selected)
   const detail = deskDetails(selected)
+  const readiness = deskReadiness(selected)
   const format = metricFormat(operations.primaryMetric)
 
   const selectDesk = (id: string) => {
@@ -592,6 +602,57 @@ function DeskOperationsHub() {
                   {operations.recommendedPlan.toUpperCase()}
                 </p>
               </div>
+            </div>
+
+            <div className="mt-5 rounded-md border border-border bg-surface p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <SectionTitle>통합 운영 준비도</SectionTitle>
+                  <p className="max-w-3xl text-sm leading-6 text-text-muted">{readiness.summary}</p>
+                </div>
+                <Badge tone="accent" size="sm">
+                  DeskCloud control-plane
+                </Badge>
+              </div>
+
+              <dl className="mt-4 grid gap-3 lg:grid-cols-2">
+                <div className="min-w-0 rounded-md bg-surface-2 p-3">
+                  <dt className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                    Control plane
+                  </dt>
+                  <dd className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                    {readiness.controlPlane}
+                  </dd>
+                </div>
+                <div className="min-w-0 rounded-md bg-surface-2 p-3">
+                  <dt className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                    Data plane
+                  </dt>
+                  <dd className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                    {readiness.dataPlane}
+                  </dd>
+                </div>
+              </dl>
+
+              <ul className="mt-3 grid gap-2 xl:grid-cols-2">
+                {readiness.checks.map((check) => {
+                  const meta = READINESS_STATUS_META[check.status]
+
+                  return (
+                    <li key={check.label} className="rounded-md bg-surface-2 p-3">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-text">{check.label}</p>
+                        <Badge tone={meta.tone} size="sm" dot={check.status === 'ready'}>
+                          {meta.label}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                        {check.description}
+                      </p>
+                    </li>
+                  )
+                })}
+              </ul>
             </div>
 
             <div className="mt-5 grid gap-5 lg:grid-cols-2">
