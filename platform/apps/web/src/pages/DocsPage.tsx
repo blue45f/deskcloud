@@ -28,6 +28,14 @@ import {
   deskOperations,
   sdkSnippet,
 } from '@/data/deskCatalog'
+import {
+  FULL_VERIFICATION_MATRIX,
+  ROLE_MANUALS,
+  SAMPLE_SITES,
+  SAMPLE_UX_CHECKS,
+  TERMSDESK_RUNTIME,
+  TUTORIALS,
+} from '@/data/docsContent'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 const NAV = [
@@ -36,6 +44,9 @@ const NAV = [
   { id: 'quickstart', label: '빠른 시작' },
   { id: 'tutorials', label: '튜토리얼' },
   { id: 'sample-sites', label: '샘플 사이트' },
+  { id: 'manuals', label: '역할별 매뉴얼' },
+  { id: 'verification-matrix', label: '전수 검증' },
+  { id: 'sample-ux', label: 'UI/UX 검수' },
   { id: 'react', label: 'React 통합' },
   { id: 'auth', label: '인증·키' },
   { id: 'api-reference', label: 'API Reference' },
@@ -69,8 +80,6 @@ function Section({
 const endpoint = apiEndpoint()
 
 const survey = PRODUCT_DESKS.find((d) => d.id === 'surveydesk') ?? PRODUCT_DESKS[0]!
-const termsdesk = PRODUCT_DESKS.find((d) => d.id === 'termsdesk')
-const termsdeskRuntime = termsdesk?.liveUrl ?? 'https://3.107.235.143.nip.io'
 
 const reactSnippet = `import { useEffect, useState } from 'react'
 import { createReviewClient, type PublicReviews } from '${SDK_PACKAGE}'
@@ -123,13 +132,13 @@ curl '${endpoint}/api/usage?period=current' \\
   -H 'authorization: Bearer sk_…'`
 
 const termsdeskBrokerageSnippet = `# TermsDesk 약관 의뢰 중계 런타임 확인
-open '${termsdeskRuntime}/app/marketplace'
-open '${termsdeskRuntime}/app/requests'
-open '${termsdeskRuntime}/app/moderation'
+open '${TERMSDESK_RUNTIME}/app/marketplace'
+open '${TERMSDESK_RUNTIME}/app/requests'
+open '${TERMSDESK_RUNTIME}/app/moderation'
 
 # API는 인증 필요 라우트가 401을 반환하면 배포/라우팅은 살아있는 상태입니다.
-curl -i '${termsdeskRuntime}/api/marketplace'
-curl -i '${termsdeskRuntime}/api/public/providers'`
+curl -i '${TERMSDESK_RUNTIME}/api/marketplace'
+curl -i '${TERMSDESK_RUNTIME}/api/public/providers'`
 
 const API_REFERENCE = [
   {
@@ -191,66 +200,6 @@ const API_REFERENCE = [
     path: '/api/v1/apps/:appId/inquiries/admin',
     auth: 'X-Admin-Token',
     purpose: '문의 운영 보드 목록 조회, status/originHost 필터',
-  },
-] as const
-
-const TUTORIALS = [
-  {
-    title: '가입회사와 서비스 도메인 등록',
-    summary: '테넌트 생성, pk_/sk_ 키 발급, origin allowlist 등록까지 콘솔 운영의 첫 경로입니다.',
-    steps: ['POST /api/tenants', '서비스 origin 등록', '대시보드에서 키/사용량 확인'],
-    href: '/signup',
-  },
-  {
-    title: '첫 Desk SDK 붙이기',
-    summary: '카탈로그에서 Desk를 고르고 createXClient 패턴으로 앱 컴포넌트에 직접 렌더합니다.',
-    steps: ['pnpm add @heejun/deskcloud', 'createXClient 생성', 'pk_ 키와 endpoint 주입'],
-    href: '/catalog',
-  },
-  {
-    title: 'Workspace Desk 운영 검증',
-    summary:
-      'SEOGatewayDesk와 RemoteDevTools가 별도 제품이 아니라 통합 manifest에 묶였는지 확인합니다.',
-    steps: ['GET /api/workspace-desks', '콘솔 parity 확인', 'gateway path와 adminPath 대조'],
-    href: '/dashboard?desk=seo-gateway',
-  },
-  {
-    title: 'TermsDesk 약관 의뢰 중계 접근',
-    summary:
-      'DeskPlatform 마이크로사이트에서 TermsDesk 런타임으로 이동해 의뢰자, 전문가, 운영자 큐를 확인합니다.',
-    steps: [
-      'TermsDesk 마이크로사이트 열기',
-      '의뢰 중계 열기',
-      'marketplace/requests/moderation 확인',
-    ],
-    href: '/desks/termsdesk',
-  },
-] as const
-
-const SAMPLE_SITES = [
-  {
-    title: 'DeskPlatform 통합 포털',
-    href: 'https://desk-platform.vercel.app',
-    kind: 'production',
-    description: '카탈로그, 문서, 운영 콘솔, Desk 마이크로사이트의 단일 진입점입니다.',
-  },
-  {
-    title: 'TermsDesk 의뢰 중계',
-    href: `${termsdeskRuntime}/app/marketplace`,
-    kind: 'production',
-    description: '약관 작성·검토·개정 의뢰 마켓플레이스와 운영 큐로 들어가는 실제 런타임입니다.',
-  },
-  {
-    title: 'TermsDesk 전문가 디렉터리',
-    href: `${termsdeskRuntime}/experts`,
-    kind: 'public',
-    description: '인증 없이 전문가 목록과 공개 프로필이 렌더되는 샘플 공개 사이트입니다.',
-  },
-  {
-    title: 'Workspace manifest API',
-    href: 'https://desk-platform.vercel.app/api/workspace-desks',
-    kind: 'api',
-    description: 'SEOGatewayDesk와 RemoteDevTools의 통합 운영 manifest를 확인합니다.',
   },
 ] as const
 
@@ -443,6 +392,164 @@ export default function DocsPage() {
               ))}
             </div>
             <CodeBlock code={termsdeskBrokerageSnippet} language="bash" />
+          </Section>
+
+          <Section id="manuals" title="역할별 매뉴얼">
+            <p className="text-sm leading-6 text-text-muted">
+              같은 통합 플랫폼이라도 개발자, 운영자, 약관 담당자, 플랫폼 관리자가 확인해야 할 경계는
+              다릅니다. 아래 매뉴얼은 실제 콘솔/마이크로사이트/샘플 런타임을 기준으로 작업 순서와
+              통과 조건을 분리합니다.
+            </p>
+            <div className="grid gap-4 md:grid-cols-2">
+              {ROLE_MANUALS.map((manual) => (
+                <article
+                  key={manual.title}
+                  className="rounded-lg border border-border bg-surface p-5"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <p className="font-mono text-[0.6875rem] text-accent-strong uppercase">
+                        {manual.audience}
+                      </p>
+                      <h3 className="mt-1 text-base font-semibold text-text">{manual.title}</h3>
+                    </div>
+                    <Button asChild variant="secondary" size="sm">
+                      <a href={manual.href}>
+                        열기 <ArrowRight className="size-4" />
+                      </a>
+                    </Button>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-text-muted">{manual.outcome}</p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div>
+                      <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+                        절차
+                      </p>
+                      <ol className="mt-2 space-y-1.5">
+                        {manual.steps.map((step, index) => (
+                          <li key={step} className="flex gap-2 text-[0.8125rem] text-text-muted">
+                            <span className="font-mono text-accent-strong">{index + 1}</span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+                        통과 조건
+                      </p>
+                      <ul className="mt-2 space-y-1.5">
+                        {manual.checks.map((check) => (
+                          <li key={check} className="flex gap-2 text-[0.8125rem] text-text-muted">
+                            <ShieldCheck
+                              className="mt-0.5 size-3.5 shrink-0 text-success"
+                              aria-hidden
+                            />
+                            <span>{check}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Section>
+
+          <Section id="verification-matrix" title="전수 검증 매트릭스">
+            <p className="text-sm leading-6 text-text-muted">
+              전수 검증은 페이지가 200인지 보는 것으로 끝내지 않습니다. 각 표면마다 사용자에게
+              보여야 하는 기대 결과, 자동화/브라우저 증거, 재현 가능한 명령을 함께 둬서 배포 후에도
+              같은 기준으로 반복 확인합니다.
+            </p>
+            <div className="grid gap-3 md:hidden">
+              {FULL_VERIFICATION_MATRIX.map((item) => (
+                <article key={item.area} className="rounded-lg border border-border bg-surface p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-sm font-semibold text-text">{item.area}</h3>
+                      <p className="mt-1 break-all font-mono text-[0.75rem] text-accent-strong">
+                        {item.entry}
+                      </p>
+                    </div>
+                    <ShieldCheck className="size-4 shrink-0 text-success" aria-hidden />
+                  </div>
+                  <p className="mt-3 text-[0.8125rem] leading-5 text-text-muted">{item.expected}</p>
+                  <p className="mt-2 text-[0.75rem] leading-5 text-text-subtle">{item.proof}</p>
+                  <code className="mt-3 block break-words rounded-md bg-surface-2 px-2 py-1.5 text-[0.75rem] text-text-muted">
+                    {item.command}
+                  </code>
+                </article>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
+              <table className="w-full min-w-[58rem] text-left text-sm">
+                <thead className="border-b border-border bg-surface-2 text-xs text-text-subtle">
+                  <tr>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      표면
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      진입점
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      기대 결과
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      증거
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      명령
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {FULL_VERIFICATION_MATRIX.map((item) => (
+                    <tr key={item.area} className="border-b border-border last:border-0">
+                      <th scope="row" className="px-4 py-3 font-medium text-text">
+                        {item.area}
+                      </th>
+                      <td className="px-4 py-3 font-mono text-[0.8125rem] text-accent-strong">
+                        {item.entry}
+                      </td>
+                      <td className="px-4 py-3 text-[0.8125rem] leading-5 text-text-muted">
+                        {item.expected}
+                      </td>
+                      <td className="px-4 py-3 text-[0.8125rem] leading-5 text-text-muted">
+                        {item.proof}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-[0.75rem] leading-5 text-text-subtle">
+                        {item.command}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Section>
+
+          <Section id="sample-ux" title="샘플 사이트 UI/UX 검수">
+            <p className="text-sm leading-6 text-text-muted">
+              샘플 사이트는 예쁜 링크 모음이 아니라 운영 장애를 빨리 찾는 도구여야 합니다. 아래
+              항목은 Desk 마이크로사이트, 샘플 런타임, 문서 예제에 동일하게 적용하는 화면 검수
+              기준입니다.
+            </p>
+            <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+              {SAMPLE_UX_CHECKS.map((check) => (
+                <article
+                  key={check.target}
+                  className="rounded-lg border border-border bg-surface p-4"
+                >
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="size-4 text-success" aria-hidden />
+                    <h3 className="text-sm font-semibold text-text">{check.target}</h3>
+                  </div>
+                  <p className="mt-2 text-[0.8125rem] leading-5 text-text-muted">
+                    {check.expectation}
+                  </p>
+                </article>
+              ))}
+            </div>
           </Section>
 
           <Section id="react" title="React 통합">
