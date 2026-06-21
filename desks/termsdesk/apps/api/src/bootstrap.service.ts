@@ -22,9 +22,9 @@ export class BootstrapService implements OnApplicationBootstrap {
     try {
       const result = await runSeed(this.dbs, this.cfg, { demo })
       if (result.seeded) {
-        this.logger.log(
-          `데모 데이터 시드 완료 — 로그인: ${this.cfg.seedAdminEmail} / ${this.cfg.seedAdminPassword}`
-        )
+        this.logger.log(`데모 데이터 시드 완료 — 관리자 이메일: ${this.cfg.seedAdminEmail}`)
+      } else if (result.adminCreated || result.adminUpdated) {
+        this.logger.log(`관리자 계정 보장 완료 — 이메일: ${this.cfg.seedAdminEmail}`)
       }
     } catch (err) {
       this.logger.error('시드 중 오류', err as Error)

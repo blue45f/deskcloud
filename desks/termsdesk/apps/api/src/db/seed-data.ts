@@ -1,7 +1,7 @@
 import { computeContentHash } from '@termsdesk/shared'
 import { eq, sql } from 'drizzle-orm'
 
-import { hashApiKey, hashPassword, randomUUID } from '../common/crypto'
+import { hashApiKey, hashPassword, randomUUID, verifyPassword } from '../common/crypto'
 
 import { DatabaseService } from './database.service'
 import {
@@ -70,6 +70,8 @@ const REFUND_DRAFT = `환불 정책 (초안)
 export interface SeedResult {
   seeded: boolean
   orgId?: string
+  adminCreated?: boolean
+  adminUpdated?: boolean
 }
 
 /** 멱등 시드 — 조직/관리자 보장 + (데모) 비어 있으면 샘플 데이터 채움. */
@@ -89,6 +91,8 @@ export async function runSeed(
 
   // 관리자(owner) 보장
   const adminEmail = cfg.seedAdminEmail.toLowerCase()
+  let adminCreated = false
+  let adminUpdated = false
   const existingAdmin = await dbs.db
     .select()
     .from(users)
@@ -103,13 +107,29 @@ export async function runSeed(
       role: 'owner',
       passwordHash: hashPassword(cfg.seedAdminPassword),
     })
+    adminCreated = true
+  } else {
+    const admin = existingAdmin[0]
+    const passwordMatches = admin.passwordHash
+      ? verifyPassword(cfg.seedAdminPassword, admin.passwordHash)
+      : false
+    const patch: Partial<typeof users.$inferInsert> = {}
+    if (admin.orgId !== orgId) patch.orgId = orgId
+    if (admin.role !== 'owner') patch.role = 'owner'
+    if (!passwordMatches) patch.passwordHash = hashPassword(cfg.seedAdminPassword)
+    if (admin.provider !== 'password') patch.provider = 'password'
+    if (Object.keys(patch).length > 0) {
+      await dbs.db.update(users).set(patch).where(eq(users.id, admin.id))
+      adminUpdated = true
+    }
   }
 
-  if (!opts.demo) return { seeded: false, orgId }
+  if (!opts.demo) return { seeded: false, orgId, adminCreated, adminUpdated }
 
   // 이미 정책이 있으면 데모 시드 건너뜀
   const policyCount = await dbs.db.select({ c: sql<number>`count(*)` }).from(policies)
-  if (Number(policyCount[0]?.c ?? 0) > 0) return { seeded: false, orgId }
+  if (Number(policyCount[0]?.c ?? 0) > 0)
+    return { seeded: false, orgId, adminCreated, adminUpdated }
 
   // 추가 멤버(역할 시연)
   const editorId = randomUUID()
@@ -595,7 +615,7 @@ export async function runSeed(
   // ── 약관 의뢰 중계(Brokerage) 샘플 ──
   await seedBrokerage(dbs, orgId)
 
-  return { seeded: true, orgId }
+  return { seeded: true, orgId, adminCreated, adminUpdated }
 }
 
 /**
