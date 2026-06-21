@@ -3,7 +3,13 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**", ".next/**", "storybook-static/**", "public/**", "!**/node_modules/**"]
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "storybook-static/**",
+        "public/**",
+        "!**/node_modules/**"
+      ]
     },
     "typecheck": {
       "dependsOn": ["^build"],
@@ -13,6 +19,10 @@
     "test": {
       "dependsOn": ["^build"],
       "outputs": ["coverage/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

@@ -137,15 +137,15 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
   {
     id: 'termsdesk',
     name: 'TermsDesk',
-    tagline: '약관·동의 버전 관리',
-    what: '약관/개인정보처리방침을 버전으로 관리하고, content_hash 불변·append-only 로 동의 이력을 남깁니다.',
+    tagline: '약관·동의·의뢰 중계',
+    what: '약관/개인정보처리방침의 불변 버전과 동의 영수증을 관리하고, 전문가 의뢰 중계·검수·첨부·실시간 알림까지 한 흐름에서 처리합니다.',
     icon: FileText,
     tone: 'info',
     status: 'live',
     sdkFactory: 'createTermsClient',
     sdkVar: 'terms',
     sdkUsage: "const policy = await terms.getCurrent({ slug: 'privacy' })",
-    metrics: ['약관 버전', '동의 기록', 'audit log'],
+    metrics: ['약관 버전', '동의 기록', '의뢰 중계', '실시간 알림'],
   },
   {
     id: 'surveydesk',

@@ -9,13 +9,14 @@ RUN corepack enable
 WORKDIR /app
 ENV PUPPETEER_SKIP_DOWNLOAD=1
 
+COPY . .
+
+RUN pnpm install --frozen-lockfile
+
 ARG PACKAGE
 ARG APP_DIR
 
-COPY . .
-
 RUN test -n "$PACKAGE" && test -n "$APP_DIR"
-RUN pnpm install --frozen-lockfile
 RUN pnpm exec turbo run build --filter="$PACKAGE"
 
 FROM node:24-alpine AS runtime
