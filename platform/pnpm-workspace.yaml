@@ -1,3 +1,12 @@
 packages:
   - 'apps/*'
   - 'packages/*'
+
+onlyBuiltDependencies:
+  - esbuild
+  - protobufjs
+  - unrs-resolver
+
+ignoredBuiltDependencies:
+  - '@firebase/util'
+  - '@scarf/scarf'
