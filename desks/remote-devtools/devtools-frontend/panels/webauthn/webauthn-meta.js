@@ -1,0 +1,22 @@
+import * as t from './../../core/i18n/i18n.js';
+import * as i from './../../ui/legacy/legacy.js';
+var n = { webauthn: 'WebAuthn', showWebauthn: 'Show WebAuthn' },
+  r = t.i18n.registerUIStrings('panels/webauthn/webauthn-meta.ts', n),
+  a = t.i18n.getLazilyComputedLocalizedString.bind(void 0, r),
+  e;
+async function s() {
+  return (e || (e = await import('./webauthn.js')), e);
+}
+i.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'webauthn-pane',
+  title: a(n.webauthn),
+  commandPrompt: a(n.showWebauthn),
+  order: 100,
+  persistence: 'closeable',
+  async loadView() {
+    let o = await s();
+    return new o.WebauthnPane.WebauthnPaneImpl();
+  },
+});
+//# sourceMappingURL=webauthn-meta.js.map

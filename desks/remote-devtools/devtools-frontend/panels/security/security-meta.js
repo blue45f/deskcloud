@@ -1,0 +1,21 @@
+import * as t from './../../core/i18n/i18n.js';
+import * as n from './../../ui/legacy/legacy.js';
+var i = { security: 'Security', showSecurity: 'Show Security' },
+  c = t.i18n.registerUIStrings('panels/security/security-meta.ts', i),
+  r = t.i18n.getLazilyComputedLocalizedString.bind(void 0, c),
+  e;
+async function o() {
+  return (e || (e = await import('./security.js')), e);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'security',
+  title: () => r(i.security)(),
+  commandPrompt: () => r(i.showSecurity)(),
+  order: 80,
+  persistence: 'closeable',
+  async loadView() {
+    return (await o()).SecurityPanel.SecurityPanel.instance();
+  },
+});
+//# sourceMappingURL=security-meta.js.map

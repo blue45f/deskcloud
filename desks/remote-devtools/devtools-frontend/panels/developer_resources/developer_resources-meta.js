@@ -1,0 +1,37 @@
+import * as o from './../../core/common/common.js';
+import * as n from './../../core/i18n/i18n.js';
+import * as t from './../../core/sdk/sdk.js';
+import * as a from './../../ui/legacy/legacy.js';
+var s = {
+    developerResources: 'Developer resources',
+    showDeveloperResources: 'Show Developer resources',
+  },
+  c = n.i18n.registerUIStrings('panels/developer_resources/developer_resources-meta.ts', s),
+  i = n.i18n.getLazilyComputedLocalizedString.bind(void 0, c),
+  r;
+async function l() {
+  return (r || (r = await import('./developer_resources.js')), r);
+}
+a.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'developer-resources',
+  title: i(s.developerResources),
+  commandPrompt: i(s.showDeveloperResources),
+  order: 100,
+  persistence: 'closeable',
+  async loadView() {
+    let e = await l();
+    return new e.DeveloperResourcesView.DeveloperResourcesView();
+  },
+});
+o.Revealer.registerRevealer({
+  contextTypes() {
+    return [t.PageResourceLoader.ResourceKey];
+  },
+  destination: o.Revealer.RevealerDestination.DEVELOPER_RESOURCES_PANEL,
+  async loadRevealer() {
+    let e = await l();
+    return new e.DeveloperResourcesView.DeveloperResourcesRevealer();
+  },
+});
+//# sourceMappingURL=developer_resources-meta.js.map

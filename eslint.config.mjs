@@ -15,6 +15,7 @@ export default defineConfig(
     "**/*.tsbuildinfo",
     "**/*.config.{js,mjs,cjs,ts}",
     "**/vendor/**",
+    "desks/remote-devtools/**",
   ]),
 
   base({ files: ["**/*.{ts,tsx}"], tsconfigRootDir: import.meta.dirname }),

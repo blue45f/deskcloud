@@ -1,0 +1,21 @@
+import * as a from './../../core/i18n/i18n.js';
+import * as i from './../../ui/legacy/legacy.js';
+var e,
+  n = { changes: 'Changes', showChanges: 'Show Changes' },
+  o = a.i18n.registerUIStrings('panels/changes/changes-meta.ts', n),
+  s = a.i18n.getLazilyComputedLocalizedString.bind(void 0, o);
+async function g() {
+  return (e || (e = await import('./changes.js')), e);
+}
+i.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'changes.changes',
+  title: s(n.changes),
+  commandPrompt: s(n.showChanges),
+  persistence: 'closeable',
+  async loadView() {
+    let t = await g();
+    return new t.ChangesView.ChangesView();
+  },
+});
+//# sourceMappingURL=changes-meta.js.map

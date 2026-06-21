@@ -1,0 +1,138 @@
+import * as a from './../../core/common/common.js';
+import * as s from './../../core/i18n/i18n.js';
+import * as n from './../../ui/legacy/legacy.js';
+var e = {
+    rendering: 'Rendering',
+    showRendering: 'Show Rendering',
+    paint: 'paint',
+    layout: 'layout',
+    fps: 'fps',
+    cssMediaType: 'CSS media type',
+    cssMediaFeature: 'CSS media feature',
+    visionDeficiency: 'vision deficiency',
+    colorVisionDeficiency: 'color vision deficiency',
+    reloadPage: 'Reload page',
+    hardReloadPage: 'Hard reload page',
+    forceAdBlocking: 'Force ad blocking on this site',
+    blockAds: 'Block ads on this site',
+    showAds: 'Show ads on this site, if allowed',
+    autoOpenDevTools: 'Auto-open DevTools for popups',
+    doNotAutoOpen: 'Do not auto-open DevTools for popups',
+    disablePaused: 'Disable paused state overlay',
+    toggleCssPrefersColorSchemeMedia: 'Toggle CSS media feature prefers-color-scheme',
+  },
+  l = s.i18n.registerUIStrings('entrypoints/inspector_main/inspector_main-meta.ts', e),
+  t = s.i18n.getLazilyComputedLocalizedString.bind(void 0, l),
+  r;
+async function i() {
+  return (r || (r = await import('./inspector_main.js')), r);
+}
+n.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'rendering',
+  title: t(e.rendering),
+  commandPrompt: t(e.showRendering),
+  persistence: 'closeable',
+  order: 50,
+  async loadView() {
+    let o = await i();
+    return new o.RenderingOptions.RenderingOptionsView();
+  },
+  tags: [
+    t(e.paint),
+    t(e.layout),
+    t(e.fps),
+    t(e.cssMediaType),
+    t(e.cssMediaFeature),
+    t(e.visionDeficiency),
+    t(e.colorVisionDeficiency),
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'NAVIGATION',
+  actionId: 'inspector-main.reload',
+  async loadActionDelegate() {
+    let o = await i();
+    return new o.InspectorMain.ReloadActionDelegate();
+  },
+  iconClass: 'refresh',
+  title: t(e.reloadPage),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+R' },
+    { platform: 'windows,linux', shortcut: 'F5' },
+    { platform: 'mac', shortcut: 'Meta+R' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'NAVIGATION',
+  actionId: 'inspector-main.hard-reload',
+  async loadActionDelegate() {
+    let o = await i();
+    return new o.InspectorMain.ReloadActionDelegate();
+  },
+  title: t(e.hardReloadPage),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Shift+Ctrl+R' },
+    { platform: 'windows,linux', shortcut: 'Shift+F5' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+F5' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+F5' },
+    { platform: 'mac', shortcut: 'Shift+Meta+R' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'rendering.toggle-prefers-color-scheme',
+  category: 'RENDERING',
+  title: t(e.toggleCssPrefersColorSchemeMedia),
+  async loadActionDelegate() {
+    let o = await i();
+    return new o.RenderingOptions.ReloadActionDelegate();
+  },
+});
+a.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  title: t(e.forceAdBlocking),
+  settingName: 'network.ad-blocking-enabled',
+  settingType: 'boolean',
+  storageType: 'Session',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.blockAds) },
+    { value: !1, title: t(e.showAds) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'GLOBAL',
+  storageType: 'Synced',
+  title: t(e.autoOpenDevTools),
+  settingName: 'auto-attach-to-created-pages',
+  settingType: 'boolean',
+  order: 2,
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.autoOpenDevTools) },
+    { value: !1, title: t(e.doNotAutoOpen) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'APPEARANCE',
+  storageType: 'Synced',
+  title: t(e.disablePaused),
+  settingName: 'disable-paused-state-overlay',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+n.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await i()).InspectorMain.NodeIndicatorProvider.instance();
+  },
+  order: 2,
+  location: 'main-toolbar-left',
+});
+n.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await i()).OutermostTargetSelector.OutermostTargetSelector.instance();
+  },
+  order: 97,
+  location: 'main-toolbar-right',
+});
+//# sourceMappingURL=inspector_main-meta.js.map

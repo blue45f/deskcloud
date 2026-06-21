@@ -1,0 +1,94 @@
+import * as i from './../../core/i18n/i18n.js';
+import * as r from './../../ui/legacy/legacy.js';
+var t = {
+    recorder: 'Recorder',
+    showRecorder: 'Show Recorder',
+    startStopRecording: 'Start/Stop recording',
+    createRecording: 'Create a new recording',
+    replayRecording: 'Replay recording',
+    toggleCode: 'Toggle code view',
+  },
+  l = i.i18n.registerUIStrings('panels/recorder/recorder-meta.ts', t),
+  n = i.i18n.getLazilyComputedLocalizedString.bind(void 0, l),
+  o;
+async function c() {
+  return (o || (o = await import('./recorder.js')), o);
+}
+function a(e, d) {
+  return o === void 0
+    ? []
+    : d && o.RecorderPanel.RecorderPanel.instance().isActionPossible(d)
+      ? e(o)
+      : [];
+}
+var s = 'chrome-recorder';
+r.ViewManager.defaultOptionsForTabs[s] = !0;
+r.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: s,
+  commandPrompt: n(t.showRecorder),
+  title: n(t.recorder),
+  order: 90,
+  persistence: 'closeable',
+  async loadView() {
+    return (await c()).RecorderPanel.RecorderPanel.instance();
+  },
+});
+r.ActionRegistration.registerActionExtension({
+  category: 'RECORDER',
+  actionId: 'chrome-recorder.create-recording',
+  title: n(t.createRecording),
+  async loadActionDelegate() {
+    let e = await c();
+    return new e.RecorderPanel.ActionDelegate();
+  },
+});
+r.ActionRegistration.registerActionExtension({
+  category: 'RECORDER',
+  actionId: 'chrome-recorder.start-recording',
+  title: n(t.startStopRecording),
+  contextTypes() {
+    return a((e) => [e.RecorderPanel.RecorderPanel], 'chrome-recorder.start-recording');
+  },
+  async loadActionDelegate() {
+    let e = await c();
+    return new e.RecorderPanel.ActionDelegate();
+  },
+  bindings: [
+    { shortcut: 'Ctrl+E', platform: 'windows,linux' },
+    { shortcut: 'Meta+E', platform: 'mac' },
+  ],
+});
+r.ActionRegistration.registerActionExtension({
+  category: 'RECORDER',
+  actionId: 'chrome-recorder.replay-recording',
+  title: n(t.replayRecording),
+  contextTypes() {
+    return a((e) => [e.RecorderPanel.RecorderPanel], 'chrome-recorder.replay-recording');
+  },
+  async loadActionDelegate() {
+    let e = await c();
+    return new e.RecorderPanel.ActionDelegate();
+  },
+  bindings: [
+    { shortcut: 'Ctrl+Enter', platform: 'windows,linux' },
+    { shortcut: 'Meta+Enter', platform: 'mac' },
+  ],
+});
+r.ActionRegistration.registerActionExtension({
+  category: 'RECORDER',
+  actionId: 'chrome-recorder.toggle-code-view',
+  title: n(t.toggleCode),
+  contextTypes() {
+    return a((e) => [e.RecorderPanel.RecorderPanel], 'chrome-recorder.toggle-code-view');
+  },
+  async loadActionDelegate() {
+    let e = await c();
+    return new e.RecorderPanel.ActionDelegate();
+  },
+  bindings: [
+    { shortcut: 'Ctrl+B', platform: 'windows,linux' },
+    { shortcut: 'Meta+B', platform: 'mac' },
+  ],
+});
+//# sourceMappingURL=recorder-meta.js.map

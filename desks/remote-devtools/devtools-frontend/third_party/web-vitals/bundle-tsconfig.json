@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": ".",
+    "baseUrl": ".",
+    "rootDir": "../../../../../../front_end/third_party/web-vitals"
+  },
+  "files": ["../../../../../../front_end/third_party/web-vitals/web-vitals.ts"],
+  "references": [{ "path": "./web-vitals-tsconfig.json" }]
+}

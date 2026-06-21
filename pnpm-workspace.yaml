@@ -11,11 +11,16 @@ packages:
   # platform — @desk/* 코어
   - "platform/apps/*"
   - "platform/packages/*"
-  # desks/* — 흡수된 모든 Desk (seo-gateway + 동질 백엔드 Desk). 와일드카드로 자동 포함.
+  # desks/* — 흡수된 모든 Desk. 개발자 도구형 Desk는 루트 런타임도 workspace로 명시 포함.
+  - "desks/seo-gateway"
+  - "desks/remote-devtools"
+  - "desks/remote-devtools/client"
+  - "desks/remote-devtools/sdk"
+  - "desks/remote-devtools/figma-plugin"
   - "desks/*/apps/*"
   - "desks/*/packages/*"
-  # NOTE: remote-devtools 는 격리(OUT) — 299MB 벤더 Chromium 포크 때문에 sibling 레포로 분리.
-  # docs/MONOREPO-CONSOLIDATION-PLAN.md §4.3 참조. @desk/* 는 발행 caret 로 소비.
+  # NOTE: remote-devtools 는 소스까지 통합하되, .git/node_modules/.env/build 산출물은 제외하고
+  # DevTools 벤더 프론트엔드는 desks/remote-devtools/devtools-frontend 에 보관합니다.
 
   # 빌드 스크립트 승인 (pnpm 11) — 3개 레포 union, 충돌은 안전값으로 수렴
 allowBuilds:

@@ -243,7 +243,8 @@ export default function DocsPage() {
           <Section id="clients" title="Desk별 클라이언트">
             <p className="text-sm text-text-muted">
               네이티브 Desk의 브라우저(pk_)와 서버(sk_) 팩토리는 Desk 마다 이름만 다르고 시그니처는
-              동일합니다. 연결형 Desk는 자체 SDK와 배포 URL을 유지하면서 운영 콘솔에 묶습니다.
+              동일합니다. 워크스페이스 Desk는 자체 SDK/런타임을 보존하되 같은 모노레포와 운영
+              콘솔에서 관리합니다.
             </p>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full min-w-[36rem] text-left text-sm">
@@ -279,9 +280,11 @@ export default function DocsPage() {
                       <td className="px-4 py-2.5 font-mono text-[0.8125rem] text-text-muted">
                         {d.sdkFactory
                           ? `${adminFactory(d.sdkFactory)}()`
-                          : d.integrationMode === 'linked'
-                            ? 'linked console'
-                            : '—'}
+                          : d.integrationMode === 'workspace'
+                            ? 'workspace console'
+                            : d.integrationMode === 'linked'
+                              ? 'linked console'
+                              : '—'}
                       </td>
                     </tr>
                   ))}
@@ -326,12 +329,12 @@ export default function DocsPage() {
             </div>
             <div className="rounded-lg border border-dashed border-border bg-surface p-4">
               <h3 className="text-sm font-semibold text-text">
-                Remote DevTools 같은 외부/대형 서비스
+                SEOGatewayDesk · RemoteDevTools 같은 개발자 도구형 Desk
               </h3>
               <p className="mt-1 text-sm leading-6 text-text-muted">
-                물리적으로 같은 모노레포에 흡수하지 않아도 운영 콘솔에서는 같은 방식으로 묶을 수
-                있습니다. 먼저 서비스 도메인, 운영 URL, primary metric, billing driver를 등록해 통합
-                관리하고, 벤더 자산이 큰 저장소 흡수는 별도 마이그레이션으로 검증합니다.
+                소스와 운영 메타데이터를 deskcloud workspace 안에 두고, 벤더 자산이 큰 런타임은
+                명시된 gateway path, primary metric, billing driver 기준으로 같은 콘솔에서
+                관리합니다.
               </p>
             </div>
           </Section>
@@ -339,9 +342,9 @@ export default function DocsPage() {
           <Section id="service-reference" title="서비스별 상세 설명">
             <p className="text-sm leading-6 text-text-muted">
               각 Desk는 운영 데이터, 격리 기준, 과금 메트릭이 다릅니다. 네이티브 Desk는 단일 SDK
-              패턴을 공유하고, 연결형 Desk는 자체 저장소와 런타임을 유지한 채 같은 테넌트/도메인
-              운영 모델에 묶습니다. 아래 레퍼런스는 콘솔·마이크로사이트와 같은 카탈로그 데이터를
-              사용합니다.
+              패턴을 공유하고, 워크스페이스 Desk는 자체 런타임/SDK 경계를 보존한 채 같은 테넌트와
+              서비스 도메인 운영 모델에 묶습니다. 아래 레퍼런스는 콘솔·마이크로사이트와 같은
+              카탈로그 데이터를 사용합니다.
             </p>
             <div className="grid gap-4 lg:grid-cols-2">
               {PRODUCT_DESKS.map((desk) => {

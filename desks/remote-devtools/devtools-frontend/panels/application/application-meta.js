@@ -1,0 +1,116 @@
+import * as t from './../../core/common/common.js';
+import * as c from './../../core/i18n/i18n.js';
+import * as s from './../../core/sdk/sdk.js';
+import * as n from './../../ui/legacy/legacy.js';
+import * as l from './preloading/helper/helper.js';
+var r = {
+    application: 'Application',
+    showApplication: 'Show Application',
+    pwa: 'pwa',
+    clearSiteData: 'Clear site data',
+    clearSiteDataIncludingThirdparty: 'Clear site data (including third-party cookies)',
+    startRecordingEvents: 'Start recording events',
+    stopRecordingEvents: 'Stop recording events',
+  },
+  u = c.i18n.registerUIStrings('panels/application/application-meta.ts', r),
+  a = c.i18n.getLazilyComputedLocalizedString.bind(void 0, u),
+  i;
+async function o() {
+  return (i || (i = await import('./application.js')), i);
+}
+function d(e) {
+  return i === void 0 ? [] : e(i);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'resources',
+  title: a(r.application),
+  commandPrompt: a(r.showApplication),
+  order: 70,
+  async loadView() {
+    return (await o()).ResourcesPanel.ResourcesPanel.instance();
+  },
+  tags: [a(r.pwa)],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'RESOURCES',
+  actionId: 'resources.clear',
+  title: a(r.clearSiteData),
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.StorageView.ActionDelegate();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'RESOURCES',
+  actionId: 'resources.clear-incl-third-party-cookies',
+  title: a(r.clearSiteDataIncludingThirdparty),
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.StorageView.ActionDelegate();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'background-service.toggle-recording',
+  iconClass: 'record-start',
+  toggleable: !0,
+  toggledIconClass: 'record-stop',
+  toggleWithRedColor: !0,
+  contextTypes() {
+    return d((e) => [e.BackgroundServiceView.BackgroundServiceView]);
+  },
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.BackgroundServiceView.ActionDelegate();
+  },
+  category: 'BACKGROUND_SERVICES',
+  options: [
+    { value: !0, title: a(r.startRecordingEvents) },
+    { value: !1, title: a(r.stopRecordingEvents) },
+  ],
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+E' },
+    { platform: 'mac', shortcut: 'Meta+E' },
+  ],
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return [s.Resource.Resource];
+  },
+  destination: t.Revealer.RevealerDestination.APPLICATION_PANEL,
+  async loadRevealer() {
+    let e = await o();
+    return new e.ResourcesPanel.ResourceRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return [s.ResourceTreeModel.ResourceTreeFrame];
+  },
+  destination: t.Revealer.RevealerDestination.APPLICATION_PANEL,
+  async loadRevealer() {
+    let e = await o();
+    return new e.ResourcesPanel.FrameDetailsRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return [l.PreloadingForward.RuleSetView];
+  },
+  destination: t.Revealer.RevealerDestination.APPLICATION_PANEL,
+  async loadRevealer() {
+    let e = await o();
+    return new e.ResourcesPanel.RuleSetViewRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return [l.PreloadingForward.AttemptViewWithFilter];
+  },
+  destination: t.Revealer.RevealerDestination.APPLICATION_PANEL,
+  async loadRevealer() {
+    let e = await o();
+    return new e.ResourcesPanel.AttemptViewWithFilterRevealer();
+  },
+});
+//# sourceMappingURL=application-meta.js.map

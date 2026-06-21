@@ -1,0 +1,21 @@
+import * as s from './../../core/i18n/i18n.js';
+import * as c from './../../ui/legacy/legacy.js';
+var i,
+  e = { accessibility: 'Accessibility', shoAccessibility: 'Show Accessibility' },
+  n = s.i18n.registerUIStrings('panels/accessibility/accessibility-meta.ts', e),
+  t = s.i18n.getLazilyComputedLocalizedString.bind(void 0, n);
+async function a() {
+  return (i || (i = await import('./accessibility.js')), i);
+}
+c.ViewManager.registerViewExtension({
+  location: 'elements-sidebar',
+  id: 'accessibility.view',
+  title: t(e.accessibility),
+  commandPrompt: t(e.shoAccessibility),
+  order: 10,
+  persistence: 'permanent',
+  async loadView() {
+    return (await a()).AccessibilitySidebarView.AccessibilitySidebarView.instance();
+  },
+});
+//# sourceMappingURL=accessibility-meta.js.map

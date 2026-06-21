@@ -1,0 +1,175 @@
+import * as s from './../../core/i18n/i18n.js';
+import * as l from './../../core/root/root.js';
+import * as c from './../../core/sdk/sdk.js';
+import * as o from './../../ui/legacy/legacy.js';
+var a,
+  t = {
+    memory: 'Memory',
+    liveHeapProfile: 'Live Heap Profile',
+    startRecordingHeapAllocations: 'Start recording heap allocations',
+    stopRecordingHeapAllocations: 'Stop recording heap allocations',
+    startRecordingHeapAllocationsAndReload: 'Start recording heap allocations and reload the page',
+    startStopRecording: 'Start/stop recording',
+    showMemory: 'Show Memory',
+    showLiveHeapProfile: 'Show Live Heap Profile',
+    clearAllProfiles: 'Clear all profiles',
+    saveProfile: 'Save profile\u2026',
+    loadProfile: 'Load profile\u2026',
+    deleteProfile: 'Delete profile',
+  },
+  f = s.i18n.registerUIStrings('panels/profiler/profiler-meta.ts', t),
+  r = s.i18n.getLazilyComputedLocalizedString.bind(void 0, f);
+async function i() {
+  return (a || (a = await import('./profiler.js')), a);
+}
+function n(e) {
+  return a === void 0 ? [] : e(a);
+}
+o.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'heap-profiler',
+  commandPrompt: r(t.showMemory),
+  title: r(t.memory),
+  order: 60,
+  async loadView() {
+    return (await i()).HeapProfilerPanel.HeapProfilerPanel.instance();
+  },
+});
+o.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'live-heap-profile',
+  commandPrompt: r(t.showLiveHeapProfile),
+  title: r(t.liveHeapProfile),
+  persistence: 'closeable',
+  order: 100,
+  async loadView() {
+    return (await i()).LiveHeapProfileView.LiveHeapProfileView.instance();
+  },
+  experiment: l.ExperimentNames.ExperimentName.LIVE_HEAP_PROFILE,
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'live-heap-profile.toggle-recording',
+  iconClass: 'record-start',
+  toggleable: !0,
+  toggledIconClass: 'record-stop',
+  toggleWithRedColor: !0,
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.LiveHeapProfileView.ActionDelegate();
+  },
+  category: 'MEMORY',
+  experiment: l.ExperimentNames.ExperimentName.LIVE_HEAP_PROFILE,
+  options: [
+    { value: !0, title: r(t.startRecordingHeapAllocations) },
+    { value: !1, title: r(t.stopRecordingHeapAllocations) },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'live-heap-profile.start-with-reload',
+  iconClass: 'refresh',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.LiveHeapProfileView.ActionDelegate();
+  },
+  category: 'MEMORY',
+  experiment: l.ExperimentNames.ExperimentName.LIVE_HEAP_PROFILE,
+  title: r(t.startRecordingHeapAllocationsAndReload),
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'profiler.heap-toggle-recording',
+  category: 'MEMORY',
+  iconClass: 'record-start',
+  title: r(t.startStopRecording),
+  toggleable: !0,
+  toggledIconClass: 'record-stop',
+  toggleWithRedColor: !0,
+  contextTypes() {
+    return n((e) => [e.HeapProfilerPanel.HeapProfilerPanel]);
+  },
+  async loadActionDelegate() {
+    return (await i()).HeapProfilerPanel.HeapProfilerPanel.instance();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+E' },
+    { platform: 'mac', shortcut: 'Meta+E' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'profiler.clear-all',
+  category: 'MEMORY',
+  iconClass: 'clear',
+  contextTypes() {
+    return n((e) => [e.ProfilesPanel.ProfilesPanel]);
+  },
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.ProfilesPanel.ActionDelegate();
+  },
+  title: r(t.clearAllProfiles),
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'profiler.load-from-file',
+  category: 'MEMORY',
+  iconClass: 'import',
+  contextTypes() {
+    return n((e) => [e.ProfilesPanel.ProfilesPanel]);
+  },
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.ProfilesPanel.ActionDelegate();
+  },
+  title: r(t.loadProfile),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+O' },
+    { platform: 'mac', shortcut: 'Meta+O' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'profiler.save-to-file',
+  category: 'MEMORY',
+  iconClass: 'download',
+  contextTypes() {
+    return n((e) => [e.ProfileHeader.ProfileHeader]);
+  },
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.ProfilesPanel.ActionDelegate();
+  },
+  title: r(t.saveProfile),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+S' },
+    { platform: 'mac', shortcut: 'Meta+S' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'profiler.delete-profile',
+  category: 'MEMORY',
+  iconClass: 'download',
+  contextTypes() {
+    return n((e) => [e.ProfileHeader.ProfileHeader]);
+  },
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.ProfilesPanel.ActionDelegate();
+  },
+  title: r(t.deleteProfile),
+});
+o.ContextMenu.registerProvider({
+  contextTypes() {
+    return [c.RemoteObject.RemoteObject];
+  },
+  async loadProvider() {
+    return (await i()).HeapProfilerPanel.HeapProfilerPanel.instance();
+  },
+});
+o.ContextMenu.registerItem({
+  location: 'profilerMenu/default',
+  actionId: 'profiler.save-to-file',
+  order: 10,
+});
+o.ContextMenu.registerItem({
+  location: 'profilerMenu/default',
+  actionId: 'profiler.delete-profile',
+  order: 11,
+});
+//# sourceMappingURL=profiler-meta.js.map

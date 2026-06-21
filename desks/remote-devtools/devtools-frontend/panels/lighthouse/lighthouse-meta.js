@@ -1,0 +1,21 @@
+import * as i from './../../core/i18n/i18n.js';
+import * as e from './../../ui/legacy/legacy.js';
+var n = { showLighthouse: 'Show `Lighthouse`' },
+  o = i.i18n.registerUIStrings('panels/lighthouse/lighthouse-meta.ts', n),
+  s = i.i18n.getLazilyComputedLocalizedString.bind(void 0, o),
+  t;
+async function h() {
+  return (t || (t = await import('./lighthouse.js')), t);
+}
+e.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'lighthouse',
+  title: i.i18n.lockedLazyString('Lighthouse'),
+  commandPrompt: s(n.showLighthouse),
+  order: 90,
+  async loadView() {
+    return (await h()).LighthousePanel.LighthousePanel.instance();
+  },
+  tags: [i.i18n.lockedLazyString('lighthouse'), i.i18n.lockedLazyString('pwa')],
+});
+//# sourceMappingURL=lighthouse-meta.js.map

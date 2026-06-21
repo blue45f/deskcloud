@@ -1,0 +1,126 @@
+import * as a from './../../core/common/common.js';
+import * as s from './../../core/i18n/i18n.js';
+import * as n from './../../core/root/root.js';
+import * as o from './../../ui/legacy/legacy.js';
+var e = {
+    toggleDeviceToolbar: 'Toggle device toolbar',
+    captureScreenshot: 'Capture screenshot',
+    captureFullSizeScreenshot: 'Capture full size screenshot',
+    captureNodeScreenshot: 'Capture node screenshot',
+    showMediaQueries: 'Show media queries',
+    device: 'device',
+    hideMediaQueries: 'Hide media queries',
+    showRulers: 'Show rulers in the Device Mode toolbar',
+    hideRulers: 'Hide rulers in the Device Mode toolbar',
+    showDeviceFrame: 'Show device frame',
+    hideDeviceFrame: 'Hide device frame',
+  },
+  l = s.i18n.registerUIStrings('panels/emulation/emulation-meta.ts', e),
+  t = s.i18n.getLazilyComputedLocalizedString.bind(void 0, l),
+  c;
+async function r() {
+  return (c || (c = await import('./emulation.js')), c);
+}
+o.ActionRegistration.registerActionExtension({
+  category: 'MOBILE',
+  actionId: 'emulation.toggle-device-mode',
+  toggleable: !0,
+  async loadActionDelegate() {
+    let i = await r();
+    return new i.DeviceModeWrapper.ActionDelegate();
+  },
+  condition: n.Runtime.conditions.canDock,
+  title: t(e.toggleDeviceToolbar),
+  iconClass: 'devices',
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Shift+Ctrl+M' },
+    { platform: 'mac', shortcut: 'Shift+Meta+M' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'emulation.capture-screenshot',
+  category: 'SCREENSHOT',
+  async loadActionDelegate() {
+    let i = await r();
+    return new i.DeviceModeWrapper.ActionDelegate();
+  },
+  condition: n.Runtime.conditions.canDock,
+  title: t(e.captureScreenshot),
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'emulation.capture-full-height-screenshot',
+  category: 'SCREENSHOT',
+  async loadActionDelegate() {
+    let i = await r();
+    return new i.DeviceModeWrapper.ActionDelegate();
+  },
+  condition: n.Runtime.conditions.canDock,
+  title: t(e.captureFullSizeScreenshot),
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'emulation.capture-node-screenshot',
+  category: 'SCREENSHOT',
+  async loadActionDelegate() {
+    let i = await r();
+    return new i.DeviceModeWrapper.ActionDelegate();
+  },
+  condition: n.Runtime.conditions.canDock,
+  title: t(e.captureNodeScreenshot),
+});
+a.Settings.registerSettingExtension({
+  category: 'MOBILE',
+  settingName: 'show-media-query-inspector',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.showMediaQueries) },
+    { value: !1, title: t(e.hideMediaQueries) },
+  ],
+  tags: [t(e.device)],
+});
+a.Settings.registerSettingExtension({
+  category: 'MOBILE',
+  settingName: 'emulation.show-rulers',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.showRulers) },
+    { value: !1, title: t(e.hideRulers) },
+  ],
+  tags: [t(e.device)],
+});
+a.Settings.registerSettingExtension({
+  category: 'MOBILE',
+  settingName: 'emulation.show-device-outline',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.showDeviceFrame) },
+    { value: !1, title: t(e.hideDeviceFrame) },
+  ],
+  tags: [t(e.device)],
+});
+o.Toolbar.registerToolbarItem({
+  actionId: 'emulation.toggle-device-mode',
+  condition: n.Runtime.conditions.canDock,
+  location: 'main-toolbar-left',
+  order: 1,
+});
+a.AppProvider.registerAppProvider({
+  async loadAppProvider() {
+    return (await r()).AdvancedApp.AdvancedAppProvider.instance();
+  },
+  condition: n.Runtime.conditions.canDock,
+  order: 0,
+});
+o.ContextMenu.registerItem({
+  location: 'deviceModeMenu/save',
+  order: 12,
+  actionId: 'emulation.capture-screenshot',
+});
+o.ContextMenu.registerItem({
+  location: 'deviceModeMenu/save',
+  order: 13,
+  actionId: 'emulation.capture-full-height-screenshot',
+});
+//# sourceMappingURL=emulation-meta.js.map

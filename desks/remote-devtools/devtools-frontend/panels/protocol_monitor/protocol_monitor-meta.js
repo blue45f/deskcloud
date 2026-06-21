@@ -1,0 +1,24 @@
+import * as r from './../../core/i18n/i18n.js';
+import * as n from './../../core/root/root.js';
+import * as e from './../../ui/legacy/legacy.js';
+var t = { protocolMonitor: 'Protocol monitor', showProtocolMonitor: 'Show Protocol monitor' },
+  c = r.i18n.registerUIStrings('panels/protocol_monitor/protocol_monitor-meta.ts', t),
+  i = r.i18n.getLazilyComputedLocalizedString.bind(void 0, c),
+  o;
+async function a() {
+  return (o || (o = await import('./protocol_monitor.js')), o);
+}
+e.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'protocol-monitor',
+  title: i(t.protocolMonitor),
+  commandPrompt: i(t.showProtocolMonitor),
+  order: 100,
+  persistence: 'closeable',
+  async loadView() {
+    let l = await a();
+    return new l.ProtocolMonitor.ProtocolMonitorImpl();
+  },
+  experiment: n.ExperimentNames.ExperimentName.PROTOCOL_MONITOR,
+});
+//# sourceMappingURL=protocol_monitor-meta.js.map

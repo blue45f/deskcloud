@@ -1,0 +1,492 @@
+import * as a from './../../core/common/common.js';
+import * as m from './../../core/host/host.js';
+import * as r from './../../core/i18n/i18n.js';
+import * as g from './../../core/root/root.js';
+import * as s from './../../core/sdk/sdk.js';
+import * as p from './../../models/workspace/workspace.js';
+import * as u from './../../ui/legacy/components/utils/utils.js';
+import * as o from './../../ui/legacy/legacy.js';
+var e = {
+    focusDebuggee: 'Focus page',
+    toggleDrawer: 'Toggle drawer',
+    nextPanel: 'Next panel',
+    previousPanel: 'Previous panel',
+    reloadDevtools: 'Reload DevTools',
+    restoreLastDockPosition: 'Restore last dock position',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    resetZoomLevel: 'Reset zoom level',
+    searchInPanel: 'Search in panel',
+    cancelSearch: 'Cancel search',
+    findNextResult: 'Find next result',
+    findPreviousResult: 'Find previous result',
+    theme: 'Theme:',
+    switchToBrowserPreferredTheme: "Switch to browser's preferred theme",
+    autoTheme: 'Auto',
+    switchToLightTheme: 'Switch to light theme',
+    lightCapital: 'Light',
+    switchToDarkTheme: 'Switch to dark theme',
+    darkCapital: 'Dark',
+    darkLower: 'dark',
+    lightLower: 'light',
+    panelLayout: 'Panel layout:',
+    useHorizontalPanelLayout: 'Use horizontal panel layout',
+    horizontal: 'horizontal',
+    useVerticalPanelLayout: 'Use vertical panel layout',
+    vertical: 'vertical',
+    useAutomaticPanelLayout: 'Use automatic panel layout',
+    auto: 'auto',
+    enableCtrlShortcutToSwitchPanels: 'Use Ctrl + 1-9 to switch panels',
+    enableShortcutToSwitchPanels: 'Use \u2318 + 1-9 to switch panels',
+    right: 'Right',
+    dockToRight: 'Dock to right',
+    bottom: 'Bottom',
+    dockToBottom: 'Dock to bottom',
+    left: 'Left',
+    dockToLeft: 'Dock to left',
+    undocked: 'Undocked',
+    undockIntoSeparateWindow: 'Undock into separate window',
+    devtoolsDefault: 'DevTools (Default)',
+    language: 'Language:',
+    browserLanguage: 'Browser UI language',
+    saveSettings: 'Save `DevTools` settings to your `Google` account',
+    earnBadges: 'Earn badges',
+    searchAsYouTypeSetting: 'Search as you type',
+    searchAsYouTypeCommand: 'Enable search as you type',
+    searchOnEnterCommand: 'Disable search as you type (press Enter to search)',
+    matchChromeColorScheme: 'Match Chrome color scheme',
+    matchChromeColorSchemeDocumentation:
+      'Match DevTools colors to your customized Chrome theme (when enabled)',
+    matchChromeColorSchemeCommand: 'Match Chrome color scheme',
+    dontMatchChromeColorSchemeCommand: "Don't match Chrome color scheme",
+    toggleDrawerOrientation: 'Toggle drawer orientation',
+  },
+  f = r.i18n.registerUIStrings('entrypoints/main/main-meta.ts', e),
+  t = r.i18n.getLazilyComputedLocalizedString.bind(void 0, f),
+  l,
+  c;
+async function i() {
+  return (l || (l = await import('./main.js')), l);
+}
+async function A() {
+  return (c || (c = await import('./../inspector_main/inspector_main.js')), c);
+}
+o.ActionRegistration.registerActionExtension({
+  category: 'DRAWER',
+  actionId: 'inspector-main.focus-debuggee',
+  async loadActionDelegate() {
+    let n = await A();
+    return new n.InspectorMain.FocusDebuggeeActionDelegate();
+  },
+  order: 100,
+  title: t(e.focusDebuggee),
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'DRAWER',
+  actionId: 'main.toggle-drawer',
+  async loadActionDelegate() {
+    return new o.InspectorView.ActionDelegate();
+  },
+  order: 101,
+  title: t(e.toggleDrawer),
+  bindings: [{ shortcut: 'Esc' }],
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'DRAWER',
+  actionId: 'main.toggle-drawer-orientation',
+  async loadActionDelegate() {
+    return new o.InspectorView.ActionDelegate();
+  },
+  title: t(e.toggleDrawerOrientation),
+  bindings: [{ shortcut: 'Shift+Esc' }],
+  condition: (n) => !!n?.devToolsFlexibleLayout?.verticalDrawerEnabled,
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.next-tab',
+  category: 'GLOBAL',
+  title: t(e.nextPanel),
+  async loadActionDelegate() {
+    return new o.InspectorView.ActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+]' },
+    { platform: 'mac', shortcut: 'Meta+]' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.previous-tab',
+  category: 'GLOBAL',
+  title: t(e.previousPanel),
+  async loadActionDelegate() {
+    return new o.InspectorView.ActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+[' },
+    { platform: 'mac', shortcut: 'Meta+[' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.debug-reload',
+  category: 'GLOBAL',
+  title: t(e.reloadDevtools),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.ReloadActionDelegate();
+  },
+  bindings: [{ shortcut: 'Alt+R' }],
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'GLOBAL',
+  title: t(e.restoreLastDockPosition),
+  actionId: 'main.toggle-dock',
+  async loadActionDelegate() {
+    return new o.DockController.ToggleDockActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+D' },
+    { platform: 'mac', shortcut: 'Meta+Shift+D' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.zoom-in',
+  category: 'GLOBAL',
+  title: t(e.zoomIn),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.ZoomActionDelegate();
+  },
+  bindings: [
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+Plus',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+Plus' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+NumpadPlus' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+NumpadPlus' },
+    { platform: 'mac', shortcut: 'Meta+Plus', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+Shift+Plus' },
+    { platform: 'mac', shortcut: 'Meta+NumpadPlus' },
+    { platform: 'mac', shortcut: 'Meta+Shift+NumpadPlus' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.zoom-out',
+  category: 'GLOBAL',
+  title: t(e.zoomOut),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.ZoomActionDelegate();
+  },
+  bindings: [
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+Minus',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+Minus' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+NumpadMinus' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+NumpadMinus' },
+    { platform: 'mac', shortcut: 'Meta+Minus', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+Shift+Minus' },
+    { platform: 'mac', shortcut: 'Meta+NumpadMinus' },
+    { platform: 'mac', shortcut: 'Meta+Shift+NumpadMinus' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.zoom-reset',
+  category: 'GLOBAL',
+  title: t(e.resetZoomLevel),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.ZoomActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+0' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Numpad0' },
+    { platform: 'mac', shortcut: 'Meta+Numpad0' },
+    { platform: 'mac', shortcut: 'Meta+0' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.search-in-panel.find',
+  category: 'GLOBAL',
+  title: t(e.searchInPanel),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.SearchActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+F', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+F', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'F3' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.search-in-panel.cancel',
+  category: 'GLOBAL',
+  title: t(e.cancelSearch),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.SearchActionDelegate();
+  },
+  order: 10,
+  bindings: [{ shortcut: 'Esc' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.search-in-panel.find-next',
+  category: 'GLOBAL',
+  title: t(e.findNextResult),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.SearchActionDelegate();
+  },
+  bindings: [
+    { platform: 'mac', shortcut: 'Meta+G', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+G' },
+    { platform: 'windows,linux', shortcut: 'F3', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'main.search-in-panel.find-previous',
+  category: 'GLOBAL',
+  title: t(e.findPreviousResult),
+  async loadActionDelegate() {
+    let n = await i();
+    return new n.MainImpl.SearchActionDelegate();
+  },
+  bindings: [
+    { platform: 'mac', shortcut: 'Meta+Shift+G', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+G' },
+    { platform: 'windows,linux', shortcut: 'Shift+F3', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'APPEARANCE',
+  storageType: 'Synced',
+  title: t(e.theme),
+  settingName: 'ui-theme',
+  settingType: 'enum',
+  defaultValue: 'systemPreferred',
+  reloadRequired: !1,
+  options: [
+    { title: t(e.switchToBrowserPreferredTheme), text: t(e.autoTheme), value: 'systemPreferred' },
+    { title: t(e.switchToLightTheme), text: t(e.lightCapital), value: 'default' },
+    { title: t(e.switchToDarkTheme), text: t(e.darkCapital), value: 'dark' },
+  ],
+  tags: [t(e.darkLower), t(e.lightLower)],
+});
+a.Settings.registerSettingExtension({
+  category: 'APPEARANCE',
+  storageType: 'Synced',
+  title: t(e.matchChromeColorScheme),
+  settingName: 'chrome-theme-colors',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.matchChromeColorSchemeCommand) },
+    { value: !1, title: t(e.dontMatchChromeColorSchemeCommand) },
+  ],
+  reloadRequired: !0,
+  learnMore: {
+    url: 'https://goo.gle/devtools-customize-theme',
+    tooltip: t(e.matchChromeColorSchemeDocumentation),
+  },
+});
+a.Settings.registerSettingExtension({
+  category: 'APPEARANCE',
+  storageType: 'Synced',
+  title: t(e.panelLayout),
+  settingName: 'sidebar-position',
+  settingType: 'enum',
+  defaultValue: 'auto',
+  options: [
+    { title: t(e.useHorizontalPanelLayout), text: t(e.horizontal), value: 'bottom' },
+    { title: t(e.useVerticalPanelLayout), text: t(e.vertical), value: 'right' },
+    { title: t(e.useAutomaticPanelLayout), text: t(e.auto), value: 'auto' },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'APPEARANCE',
+  storageType: 'Synced',
+  settingName: 'language',
+  settingType: 'enum',
+  title: t(e.language),
+  defaultValue: 'en-US',
+  options: [
+    { value: 'browserLanguage', title: t(e.browserLanguage), text: t(e.browserLanguage) },
+    ...r.i18n
+      .getAllSupportedDevToolsLocales()
+      .sort()
+      .map((n) => S(n)),
+  ],
+  reloadRequired: !0,
+});
+a.Settings.registerSettingExtension({
+  category: 'APPEARANCE',
+  storageType: 'Synced',
+  title:
+    m.Platform.platform() === 'mac'
+      ? t(e.enableShortcutToSwitchPanels)
+      : t(e.enableCtrlShortcutToSwitchPanels),
+  settingName: 'shortcut-panel-switch',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'GLOBAL',
+  settingName: 'currentDockState',
+  settingType: 'enum',
+  defaultValue: 'right',
+  options: [
+    { value: 'right', text: t(e.right), title: t(e.dockToRight) },
+    { value: 'bottom', text: t(e.bottom), title: t(e.dockToBottom) },
+    { value: 'left', text: t(e.left), title: t(e.dockToLeft) },
+    { value: 'undocked', text: t(e.undocked), title: t(e.undockIntoSeparateWindow) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  storageType: 'Synced',
+  settingName: 'active-keybind-set',
+  settingType: 'enum',
+  defaultValue: 'devToolsDefault',
+  options: [
+    { value: 'devToolsDefault', title: t(e.devtoolsDefault), text: t(e.devtoolsDefault) },
+    {
+      value: 'vsCode',
+      title: r.i18n.lockedLazyString('Visual Studio Code'),
+      text: r.i18n.lockedLazyString('Visual Studio Code'),
+    },
+  ],
+});
+function d(n) {
+  return () => r.i18n.getLocalizedLanguageRegion(n, r.DevToolsLocale.DevToolsLocale.instance());
+}
+function S(n) {
+  return { value: n, title: d(n), text: d(n) };
+}
+a.Settings.registerSettingExtension({
+  category: 'ACCOUNT',
+  settingName: 'sync-preferences',
+  settingType: 'boolean',
+  title: t(e.saveSettings),
+  defaultValue: !1,
+  reloadRequired: !0,
+});
+a.Settings.registerSettingExtension({
+  category: 'ACCOUNT',
+  settingName: 'receive-gdp-badges',
+  settingType: 'boolean',
+  storageType: 'Synced',
+  title: t(e.earnBadges),
+  defaultValue: !1,
+  reloadRequired: !0,
+});
+a.Settings.registerSettingExtension({
+  storageType: 'Synced',
+  settingName: 'user-shortcuts',
+  settingType: 'array',
+  defaultValue: [],
+});
+a.Settings.registerSettingExtension({
+  category: 'GLOBAL',
+  storageType: 'Local',
+  title: t(e.searchAsYouTypeSetting),
+  settingName: 'search-as-you-type',
+  settingType: 'boolean',
+  order: 3,
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.searchAsYouTypeCommand) },
+    { value: !1, title: t(e.searchOnEnterCommand) },
+  ],
+});
+o.ViewManager.registerLocationResolver({
+  name: 'drawer-view',
+  category: 'DRAWER',
+  async loadResolver() {
+    return o.InspectorView.InspectorView.instance();
+  },
+});
+o.ViewManager.registerLocationResolver({
+  name: 'drawer-sidebar',
+  category: 'DRAWER_SIDEBAR',
+  async loadResolver() {
+    return o.InspectorView.InspectorView.instance();
+  },
+});
+o.ViewManager.registerLocationResolver({
+  name: 'panel',
+  category: 'PANEL',
+  async loadResolver() {
+    return o.InspectorView.InspectorView.instance();
+  },
+});
+o.ContextMenu.registerProvider({
+  contextTypes() {
+    return [p.UISourceCode.UISourceCode, s.Resource.Resource, s.NetworkRequest.NetworkRequest];
+  },
+  async loadProvider() {
+    return new u.Linkifier.ContentProviderContextMenuProvider();
+  },
+});
+o.ContextMenu.registerProvider({
+  contextTypes() {
+    return [Node];
+  },
+  async loadProvider() {
+    return new o.LinkContextMenuProvider.LinkContextMenuProvider();
+  },
+});
+o.ContextMenu.registerProvider({
+  contextTypes() {
+    return [Node];
+  },
+  async loadProvider() {
+    return new u.Linkifier.LinkContextMenuProvider();
+  },
+});
+o.Toolbar.registerToolbarItem({ separator: !0, location: 'main-toolbar-left', order: 100 });
+o.Toolbar.registerToolbarItem({ separator: !0, order: 96, location: 'main-toolbar-right' });
+o.Toolbar.registerToolbarItem({
+  condition(n) {
+    let h = n?.devToolsGlobalAiButton?.enabled,
+      y = n?.aidaAvailability?.blockedByGeo === !0,
+      w = n?.aidaAvailability?.blockedByEnterprisePolicy === !0;
+    return !!(h && !y && !w);
+  },
+  async loadItem() {
+    return (await i()).GlobalAiButton.GlobalAiButtonToolbarProvider.instance();
+  },
+  order: 98,
+  location: 'main-toolbar-right',
+});
+o.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await i()).MainImpl.SettingsButtonProvider.instance();
+  },
+  order: 99,
+  location: 'main-toolbar-right',
+});
+o.Toolbar.registerToolbarItem({
+  condition: () => !g.Runtime.Runtime.isTraceApp(),
+  async loadItem() {
+    return (await i()).MainImpl.MainMenuItem.instance();
+  },
+  order: 100,
+  location: 'main-toolbar-right',
+});
+o.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return o.DockController.CloseButtonProvider.instance();
+  },
+  order: 101,
+  location: 'main-toolbar-right',
+});
+a.AppProvider.registerAppProvider({
+  async loadAppProvider() {
+    return (await i()).SimpleApp.SimpleAppProvider.instance();
+  },
+  order: 10,
+});
+//# sourceMappingURL=main-meta.js.map

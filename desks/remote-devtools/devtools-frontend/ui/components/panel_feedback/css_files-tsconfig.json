@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "."
+  },
+  "files": ["panelFeedback.css.js", "previewToggle.css.js"]
+}

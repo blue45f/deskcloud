@@ -1,0 +1,49 @@
+import * as o from './../../../../core/i18n/i18n.js';
+import * as e from './../../legacy.js';
+var i = { openFile: 'Open file', runCommand: 'Run command' },
+  c = o.i18n.registerUIStrings('ui/legacy/components/quick_open/quick_open-meta.ts', i),
+  a = o.i18n.getLazilyComputedLocalizedString.bind(void 0, c),
+  n;
+async function s() {
+  return (n || (n = await import('./quick_open.js')), n);
+}
+e.ActionRegistration.registerActionExtension({
+  actionId: 'quick-open.show-command-menu',
+  category: 'GLOBAL',
+  title: a(i.runCommand),
+  async loadActionDelegate() {
+    let t = await s();
+    return new t.CommandMenu.ShowActionDelegate();
+  },
+  bindings: [
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+Shift+P',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'mac', shortcut: 'Meta+Shift+P', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { shortcut: 'F1', keybindSets: ['vsCode'] },
+  ],
+});
+e.ActionRegistration.registerActionExtension({
+  actionId: 'quick-open.show',
+  category: 'GLOBAL',
+  title: a(i.openFile),
+  async loadActionDelegate() {
+    let t = await s();
+    return new t.QuickOpen.ShowActionDelegate();
+  },
+  order: 100,
+  bindings: [
+    { platform: 'mac', shortcut: 'Meta+P', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+O', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+P', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+O', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+e.ContextMenu.registerItem({
+  location: 'mainMenu/default',
+  actionId: 'quick-open.show-command-menu',
+});
+e.ContextMenu.registerItem({ location: 'mainMenu/default', actionId: 'quick-open.show' });
+//# sourceMappingURL=quick_open-meta.js.map

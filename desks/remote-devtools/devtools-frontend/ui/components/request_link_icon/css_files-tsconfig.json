@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "."
+  },
+  "files": ["requestLinkIcon.css.js"]
+}

@@ -1,0 +1,201 @@
+import * as g from './../../core/i18n/i18n.js';
+import * as w from './../../ui/legacy/legacy.js';
+var c = { devices: 'Devices', showDevices: 'Show Devices' },
+  S = g.i18n.registerUIStrings('panels/settings/emulation/emulation-meta.ts', c),
+  l = g.i18n.getLazilyComputedLocalizedString.bind(void 0, S),
+  a;
+async function u() {
+  return (a || (a = await import('./emulation/emulation.js')), a);
+}
+w.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  commandPrompt: l(c.showDevices),
+  title: l(c.devices),
+  order: 30,
+  async loadView() {
+    let e = await u();
+    return new e.DevicesSettingsTab.DevicesSettingsTab();
+  },
+  id: 'devices',
+  settings: ['standard-emulated-device-list', 'custom-emulated-device-list'],
+  iconName: 'devices',
+});
+import * as r from './../../core/common/common.js';
+import * as m from './../../core/i18n/i18n.js';
+import * as s from './../../core/root/root.js';
+import * as i from './../../ui/legacy/legacy.js';
+var t = {
+    shortcuts: 'Shortcuts',
+    preferences: 'Preferences',
+    experiments: 'Experiments',
+    greenDevProtoTypes: 'GreenDev',
+    showGreenDev: 'Show GreenDev',
+    ignoreList: 'Ignore list',
+    showShortcuts: 'Show Shortcuts',
+    showPreferences: 'Show Preferences',
+    showExperiments: 'Show Experiments',
+    showIgnoreList: 'Show Ignore list',
+    settings: 'Settings',
+    documentation: 'Documentation',
+    aiInnovations: 'AI innovations',
+    showAiInnovations: 'Show AI innovations',
+    workspace: 'Workspace',
+    showWorkspace: 'Show Workspace settings',
+  },
+  p = m.i18n.registerUIStrings('panels/settings/settings-meta.ts', t),
+  n = m.i18n.getLazilyComputedLocalizedString.bind(void 0, p),
+  d;
+async function o() {
+  return (d || (d = await import('./settings.js')), d);
+}
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'preferences',
+  title: n(t.preferences),
+  commandPrompt: n(t.showPreferences),
+  order: 0,
+  async loadView() {
+    let e = await o();
+    return new e.SettingsScreen.GenericSettingsTab();
+  },
+  iconName: 'gear',
+});
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'workspace',
+  title: n(t.workspace),
+  commandPrompt: n(t.showWorkspace),
+  order: 1,
+  async loadView() {
+    let e = await o();
+    return new e.WorkspaceSettingsTab.WorkspaceSettingsTab();
+  },
+  iconName: 'folder',
+});
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'chrome-ai',
+  title: n(t.aiInnovations),
+  commandPrompt: n(t.showAiInnovations),
+  order: 2,
+  async loadView() {
+    let e = await o();
+    return new e.AISettingsTab.AISettingsTab();
+  },
+  iconName: 'button-magic',
+  settings: ['console-insights-enabled'],
+  condition: (e) =>
+    (e?.aidaAvailability?.enabled &&
+      (e?.devToolsConsoleInsights?.enabled || e?.devToolsFreestyler?.enabled)) ??
+    !1,
+});
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'experiments',
+  title: n(t.experiments),
+  commandPrompt: n(t.showExperiments),
+  order: 3,
+  experiment: s.ExperimentNames.ExperimentName.ALL,
+  async loadView() {
+    let e = await o();
+    return new e.SettingsScreen.ExperimentsSettingsTab();
+  },
+  iconName: 'experiment',
+});
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'blackbox',
+  title: n(t.ignoreList),
+  commandPrompt: n(t.showIgnoreList),
+  order: 4,
+  async loadView() {
+    let e = await o();
+    return new e.FrameworkIgnoreListSettingsTab.FrameworkIgnoreListSettingsTab();
+  },
+  iconName: 'clear-list',
+});
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'greendev-prototypes',
+  title: n(t.greenDevProtoTypes),
+  commandPrompt: n(t.showGreenDev),
+  order: 101,
+  async loadView() {
+    let e = await o();
+    return new e.SettingsScreen.GreenDevSettingsTab();
+  },
+  iconName: 'experiment',
+  condition: (e) => !!e?.devToolsGreenDevUi?.enabled,
+});
+i.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'keybinds',
+  title: n(t.shortcuts),
+  commandPrompt: n(t.showShortcuts),
+  order: 100,
+  async loadView() {
+    let e = await o();
+    return new e.KeybindsSettingsTab.KeybindsSettingsTab();
+  },
+  iconName: 'keyboard',
+});
+i.ActionRegistration.registerActionExtension({
+  category: 'SETTINGS',
+  actionId: 'settings.show',
+  title: n(t.settings),
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.SettingsScreen.ActionDelegate();
+  },
+  iconClass: 'gear',
+  bindings: [
+    { shortcut: 'F1', keybindSets: ['devToolsDefault'] },
+    { shortcut: 'Shift+?' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+,', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+,', keybindSets: ['vsCode'] },
+  ],
+});
+i.ActionRegistration.registerActionExtension({
+  category: 'SETTINGS',
+  actionId: 'settings.documentation',
+  title: n(t.documentation),
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.SettingsScreen.ActionDelegate();
+  },
+});
+i.ActionRegistration.registerActionExtension({
+  category: 'SETTINGS',
+  actionId: 'settings.shortcuts',
+  title: n(t.showShortcuts),
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.SettingsScreen.ActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+K Ctrl+S', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+K Meta+S', keybindSets: ['vsCode'] },
+  ],
+});
+i.ViewManager.registerLocationResolver({
+  name: 'settings-view',
+  category: 'SETTINGS',
+  async loadResolver() {
+    return (await o()).SettingsScreen.SettingsScreen.instance();
+  },
+});
+r.Revealer.registerRevealer({
+  contextTypes() {
+    return [r.Settings.Setting, s.Runtime.Experiment, s.Runtime.HostExperiment];
+  },
+  async loadRevealer() {
+    let e = await o();
+    return new e.SettingsScreen.Revealer();
+  },
+});
+i.ContextMenu.registerItem({ location: 'mainMenu/footer', actionId: 'settings.shortcuts' });
+i.ContextMenu.registerItem({
+  location: 'mainMenuHelp/default',
+  actionId: 'settings.documentation',
+});
+//# sourceMappingURL=settings-meta.js.map

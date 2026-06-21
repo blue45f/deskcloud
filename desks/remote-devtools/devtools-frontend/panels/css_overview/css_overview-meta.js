@@ -1,0 +1,23 @@
+import * as r from './../../core/i18n/i18n.js';
+import * as n from './../../ui/legacy/legacy.js';
+var i = { cssOverview: 'CSS overview', showCssOverview: 'Show CSS overview' },
+  t = r.i18n.registerUIStrings('panels/css_overview/css_overview-meta.ts', i),
+  s = r.i18n.getLazilyComputedLocalizedString.bind(void 0, t),
+  e;
+async function v() {
+  return (e || (e = await import('./css_overview.js')), e);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'cssoverview',
+  commandPrompt: s(i.showCssOverview),
+  title: s(i.cssOverview),
+  order: 95,
+  persistence: 'closeable',
+  async loadView() {
+    let o = await v();
+    return new o.CSSOverviewPanel.CSSOverviewPanel();
+  },
+  isPreviewFeature: !0,
+});
+//# sourceMappingURL=css_overview-meta.js.map

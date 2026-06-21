@@ -1,0 +1,645 @@
+import * as a from './../common/common.js';
+import * as o from './../i18n/i18n.js';
+var e = {
+    preserveLogUponNavigation: 'Preserve log upon navigation',
+    doNotPreserveLogUponNavigation: 'Do not preserve log upon navigation',
+    pauseOnExceptions: 'Pause on exceptions',
+    doNotPauseOnExceptions: 'Do not pause on exceptions',
+    disableJavascript: 'Disable JavaScript',
+    enableJavascript: 'Enable JavaScript',
+    disableAsyncStackTraces: 'Disable async stack traces',
+    doNotCaptureAsyncStackTraces: 'Do not capture async stack traces',
+    captureAsyncStackTraces: 'Capture async stack traces',
+    rulersOnHover: 'Rulers on hover',
+    showRulersOnHover: 'Show rulers on hover',
+    doNotShowRulersOnHover: "Don't show rulers on hover",
+    showAreaNames: 'Show area names',
+    showGridNamedAreas: 'Show grid named areas',
+    doNotShowGridNamedAreas: 'Do not show grid named areas',
+    showTrackSizes: 'Show track sizes',
+    showGridTrackSizes: 'Show grid track sizes',
+    doNotShowGridTrackSizes: 'Do not show grid track sizes',
+    extendGridLines: 'Extend grid lines',
+    doNotExtendGridLines: 'Do not extend grid lines',
+    showLineLabels: 'Show line labels',
+    hideLineLabels: 'Hide line labels',
+    showLineNumbers: 'Show line numbers',
+    showLineNames: 'Show line names',
+    showPaintFlashingRectangles: 'Show paint flashing rectangles',
+    hidePaintFlashingRectangles: 'Hide paint flashing rectangles',
+    showLayoutShiftRegions: 'Show layout shift regions',
+    hideLayoutShiftRegions: 'Hide layout shift regions',
+    highlightAdFrames: 'Highlight ad frames',
+    doNotHighlightAdFrames: 'Do not highlight ad frames',
+    showLayerBorders: 'Show layer borders',
+    hideLayerBorders: 'Hide layer borders',
+    showFramesPerSecondFpsMeter: 'Show frames per second (FPS) meter',
+    hideFramesPerSecondFpsMeter: 'Hide frames per second (FPS) meter',
+    showScrollPerformanceBottlenecks: 'Show scroll performance bottlenecks',
+    hideScrollPerformanceBottlenecks: 'Hide scroll performance bottlenecks',
+    emulateAFocusedPage: 'Emulate a focused page',
+    doNotEmulateAFocusedPage: 'Do not emulate a focused page',
+    doNotEmulateCssMediaType: 'Do not emulate CSS media type',
+    noEmulation: 'No emulation',
+    emulateCssPrintMediaType: 'Emulate CSS print media type',
+    print: 'print',
+    emulateCssScreenMediaType: 'Emulate CSS screen media type',
+    screen: 'screen',
+    query: 'query',
+    emulateCssMediaType: 'Emulate CSS media type',
+    doNotEmulateCss: 'Do not emulate CSS {PH1}',
+    emulateCss: 'Emulate CSS {PH1}',
+    emulateCssMediaFeature: 'Emulate CSS media feature {PH1}',
+    doNotEmulateAnyVisionDeficiency: 'Do not emulate any vision deficiency',
+    emulateBlurredVision: 'Emulate blurred vision',
+    emulateReducedContrast: 'Emulate reduced contrast',
+    blurredVision: 'Blurred vision',
+    reducedContrast: 'Reduced contrast',
+    emulateProtanopia: 'Emulate protanopia (no red)',
+    protanopia: 'Protanopia (no red)',
+    emulateDeuteranopia: 'Emulate deuteranopia (no green)',
+    deuteranopia: 'Deuteranopia (no green)',
+    emulateTritanopia: 'Emulate tritanopia (no blue)',
+    tritanopia: 'Tritanopia (no blue)',
+    emulateAchromatopsia: 'Emulate achromatopsia (no color)',
+    achromatopsia: 'Achromatopsia (no color)',
+    emulateVisionDeficiencies: 'Emulate vision deficiencies',
+    emulateOsTextScale: 'Emulate OS text scale',
+    doNotEmulateOsTextScale: 'Do not emulate OS text scale',
+    osTextScaleEmulationNone: 'No emulation',
+    osTextScaleEmulation85: '85%',
+    osTextScaleEmulation100: '100% (default)',
+    osTextScaleEmulation115: '115%',
+    osTextScaleEmulation130: '130%',
+    osTextScaleEmulation150: '150%',
+    osTextScaleEmulation180: '180%',
+    osTextScaleEmulation200: '200%',
+    disableLocalFonts: 'Disable local fonts',
+    enableLocalFonts: 'Enable local fonts',
+    disableAvifFormat: 'Disable `AVIF` format',
+    enableAvifFormat: 'Enable `AVIF` format',
+    disableJpegXlFormat: 'Disable `JPEG XL` format',
+    enableJpegXlFormat: 'Enable `JPEG XL` format',
+    disableWebpFormat: 'Disable `WebP` format',
+    enableWebpFormat: 'Enable `WebP` format',
+    customFormatters: 'Custom formatters',
+    networkRequestBlocking: 'Network request blocking',
+    enableNetworkRequestBlocking: 'Enable network request blocking',
+    disableNetworkRequestBlocking: 'Disable network request blocking',
+    enableCache: 'Enable cache',
+    disableCache: 'Disable cache while DevTools is open',
+    emulateAutoDarkMode: 'Emulate auto dark mode',
+    enableRemoteFileLoading: 'Allow loading remote file path resources in DevTools',
+    remoteFileLoadingInfo:
+      'Example resource are source maps. Disabled by default for security reasons.',
+    networkCacheExplanation:
+      'Disabling the network cache will simulate a network experience similar to a first time visitor.',
+    javaScriptSourceMaps: 'JavaScript source maps',
+    enableJavaScriptSourceMaps: 'Enable JavaScript source maps',
+    disableJavaScriptSourceMaps: 'Disable JavaScript source maps',
+    cssSourceMaps: 'CSS source maps',
+    enableCssSourceMaps: 'Enable CSS source maps',
+    disableCssSourceMaps: 'Disable CSS source maps',
+    logXmlhttprequests: 'Log XMLHttpRequests',
+  },
+  s = o.i18n.registerUIStrings('core/sdk/sdk-meta.ts', e),
+  t = o.i18n.getLazilyComputedLocalizedString.bind(void 0, s);
+a.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.preserveLogUponNavigation),
+  settingName: 'preserve-console-log',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.preserveLogUponNavigation) },
+    { value: !1, title: t(e.doNotPreserveLogUponNavigation) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'DEBUGGER',
+  settingName: 'pause-on-exception-enabled',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.pauseOnExceptions) },
+    { value: !1, title: t(e.doNotPauseOnExceptions) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  settingName: 'pause-on-caught-exception',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  settingName: 'pause-on-uncaught-exception',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'DEBUGGER',
+  title: t(e.disableJavascript),
+  settingName: 'java-script-disabled',
+  settingType: 'boolean',
+  storageType: 'Session',
+  order: 1,
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.disableJavascript) },
+    { value: !1, title: t(e.enableJavascript) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'DEBUGGER',
+  title: t(e.disableAsyncStackTraces),
+  settingName: 'disable-async-stack-traces',
+  settingType: 'boolean',
+  defaultValue: !1,
+  order: 2,
+  options: [
+    { value: !0, title: t(e.doNotCaptureAsyncStackTraces) },
+    { value: !1, title: t(e.captureAsyncStackTraces) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'DEBUGGER',
+  settingName: 'breakpoints-active',
+  settingType: 'boolean',
+  storageType: 'Session',
+  defaultValue: !0,
+});
+a.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  title: t(e.rulersOnHover),
+  settingName: 'show-metrics-rulers',
+  settingType: 'boolean',
+  options: [
+    { value: !0, title: t(e.showRulersOnHover) },
+    { value: !1, title: t(e.doNotShowRulersOnHover) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'GRID',
+  storageType: 'Synced',
+  title: t(e.showAreaNames),
+  settingName: 'show-grid-areas',
+  settingType: 'boolean',
+  options: [
+    { value: !0, title: t(e.showGridNamedAreas) },
+    { value: !1, title: t(e.doNotShowGridNamedAreas) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'GRID',
+  storageType: 'Synced',
+  title: t(e.showTrackSizes),
+  settingName: 'show-grid-track-sizes',
+  settingType: 'boolean',
+  options: [
+    { value: !0, title: t(e.showGridTrackSizes) },
+    { value: !1, title: t(e.doNotShowGridTrackSizes) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'GRID',
+  storageType: 'Synced',
+  title: t(e.extendGridLines),
+  settingName: 'extend-grid-lines',
+  settingType: 'boolean',
+  options: [
+    { value: !0, title: t(e.extendGridLines) },
+    { value: !1, title: t(e.doNotExtendGridLines) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'GRID',
+  storageType: 'Synced',
+  title: t(e.showLineLabels),
+  settingName: 'show-grid-line-labels',
+  settingType: 'enum',
+  options: [
+    { title: t(e.hideLineLabels), text: t(e.hideLineLabels), value: 'none' },
+    { title: t(e.showLineNumbers), text: t(e.showLineNumbers), value: 'lineNumbers' },
+    { title: t(e.showLineNames), text: t(e.showLineNames), value: 'lineNames' },
+  ],
+  defaultValue: 'lineNumbers',
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'show-paint-rects',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.showPaintFlashingRectangles) },
+    { value: !1, title: t(e.hidePaintFlashingRectangles) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'show-layout-shift-regions',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.showLayoutShiftRegions) },
+    { value: !1, title: t(e.hideLayoutShiftRegions) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'show-ad-highlights',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.highlightAdFrames) },
+    { value: !1, title: t(e.doNotHighlightAdFrames) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'show-debug-borders',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.showLayerBorders) },
+    { value: !1, title: t(e.hideLayerBorders) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'show-fps-counter',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.showFramesPerSecondFpsMeter) },
+    { value: !1, title: t(e.hideFramesPerSecondFpsMeter) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'show-scroll-bottleneck-rects',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.showScrollPerformanceBottlenecks) },
+    { value: !1, title: t(e.hideScrollPerformanceBottlenecks) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  title: t(e.emulateAFocusedPage),
+  settingName: 'emulate-page-focus',
+  settingType: 'boolean',
+  storageType: 'Local',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.emulateAFocusedPage) },
+    { value: !1, title: t(e.doNotEmulateAFocusedPage) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'emulated-css-media',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    { title: t(e.doNotEmulateCssMediaType), text: t(e.noEmulation), value: '' },
+    { title: t(e.emulateCssPrintMediaType), text: t(e.print), value: 'print' },
+    { title: t(e.emulateCssScreenMediaType), text: t(e.screen), value: 'screen' },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateCssMediaType),
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'emulated-css-media-feature-prefers-color-scheme',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    {
+      title: t(e.doNotEmulateCss, { PH1: 'prefers-color-scheme' }),
+      text: t(e.noEmulation),
+      value: '',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-color-scheme: light' }),
+      text: o.i18n.lockedLazyString('prefers-color-scheme: light'),
+      value: 'light',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-color-scheme: dark' }),
+      text: o.i18n.lockedLazyString('prefers-color-scheme: dark'),
+      value: 'dark',
+    },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateCssMediaFeature, { PH1: 'prefers-color-scheme' }),
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'emulated-css-media-feature-forced-colors',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    { title: t(e.doNotEmulateCss, { PH1: 'forced-colors' }), text: t(e.noEmulation), value: '' },
+    {
+      title: t(e.emulateCss, { PH1: 'forced-colors: active' }),
+      text: o.i18n.lockedLazyString('forced-colors: active'),
+      value: 'active',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'forced-colors: none' }),
+      text: o.i18n.lockedLazyString('forced-colors: none'),
+      value: 'none',
+    },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateCssMediaFeature, { PH1: 'forced-colors' }),
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'emulated-css-media-feature-prefers-reduced-motion',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    {
+      title: t(e.doNotEmulateCss, { PH1: 'prefers-reduced-motion' }),
+      text: t(e.noEmulation),
+      value: '',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-reduced-motion: reduce' }),
+      text: o.i18n.lockedLazyString('prefers-reduced-motion: reduce'),
+      value: 'reduce',
+    },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateCssMediaFeature, { PH1: 'prefers-reduced-motion' }),
+});
+a.Settings.registerSettingExtension({
+  settingName: 'emulated-css-media-feature-prefers-contrast',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    { title: t(e.doNotEmulateCss, { PH1: 'prefers-contrast' }), text: t(e.noEmulation), value: '' },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-contrast: more' }),
+      text: o.i18n.lockedLazyString('prefers-contrast: more'),
+      value: 'more',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-contrast: less' }),
+      text: o.i18n.lockedLazyString('prefers-contrast: less'),
+      value: 'less',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-contrast: custom' }),
+      text: o.i18n.lockedLazyString('prefers-contrast: custom'),
+      value: 'custom',
+    },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateCssMediaFeature, { PH1: 'prefers-contrast' }),
+});
+a.Settings.registerSettingExtension({
+  settingName: 'emulated-css-media-feature-prefers-reduced-data',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    {
+      title: t(e.doNotEmulateCss, { PH1: 'prefers-reduced-data' }),
+      text: t(e.noEmulation),
+      value: '',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-reduced-data: reduce' }),
+      text: o.i18n.lockedLazyString('prefers-reduced-data: reduce'),
+      value: 'reduce',
+    },
+  ],
+  title: t(e.emulateCssMediaFeature, { PH1: 'prefers-reduced-data' }),
+});
+a.Settings.registerSettingExtension({
+  settingName: 'emulated-css-media-feature-prefers-reduced-transparency',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    {
+      title: t(e.doNotEmulateCss, { PH1: 'prefers-reduced-transparency' }),
+      text: t(e.noEmulation),
+      value: '',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'prefers-reduced-transparency: reduce' }),
+      text: o.i18n.lockedLazyString('prefers-reduced-transparency: reduce'),
+      value: 'reduce',
+    },
+  ],
+  title: t(e.emulateCssMediaFeature, { PH1: 'prefers-reduced-transparency' }),
+});
+a.Settings.registerSettingExtension({
+  settingName: 'emulated-css-media-feature-color-gamut',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    { title: t(e.doNotEmulateCss, { PH1: 'color-gamut' }), text: t(e.noEmulation), value: '' },
+    {
+      title: t(e.emulateCss, { PH1: 'color-gamut: srgb' }),
+      text: o.i18n.lockedLazyString('color-gamut: srgb'),
+      value: 'srgb',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'color-gamut: p3' }),
+      text: o.i18n.lockedLazyString('color-gamut: p3'),
+      value: 'p3',
+    },
+    {
+      title: t(e.emulateCss, { PH1: 'color-gamut: rec2020' }),
+      text: o.i18n.lockedLazyString('color-gamut: rec2020'),
+      value: 'rec2020',
+    },
+  ],
+  title: t(e.emulateCssMediaFeature, { PH1: 'color-gamut' }),
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'emulated-vision-deficiency',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: 'none',
+  options: [
+    { title: t(e.doNotEmulateAnyVisionDeficiency), text: t(e.noEmulation), value: 'none' },
+    { title: t(e.emulateBlurredVision), text: t(e.blurredVision), value: 'blurredVision' },
+    { title: t(e.emulateReducedContrast), text: t(e.reducedContrast), value: 'reducedContrast' },
+    { title: t(e.emulateProtanopia), text: t(e.protanopia), value: 'protanopia' },
+    { title: t(e.emulateDeuteranopia), text: t(e.deuteranopia), value: 'deuteranopia' },
+    { title: t(e.emulateTritanopia), text: t(e.tritanopia), value: 'tritanopia' },
+    { title: t(e.emulateAchromatopsia), text: t(e.achromatopsia), value: 'achromatopsia' },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateVisionDeficiencies),
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'emulated-os-text-scale',
+  settingType: 'enum',
+  storageType: 'Session',
+  defaultValue: '',
+  options: [
+    { title: t(e.doNotEmulateOsTextScale), text: t(e.osTextScaleEmulationNone), value: '' },
+    { title: t(e.osTextScaleEmulation85), text: t(e.osTextScaleEmulation85), value: '0.85' },
+    { title: t(e.osTextScaleEmulation100), text: t(e.osTextScaleEmulation100), value: '1' },
+    { title: t(e.osTextScaleEmulation115), text: t(e.osTextScaleEmulation115), value: '1.15' },
+    { title: t(e.osTextScaleEmulation130), text: t(e.osTextScaleEmulation130), value: '1.3' },
+    { title: t(e.osTextScaleEmulation150), text: t(e.osTextScaleEmulation150), value: '1.5' },
+    { title: t(e.osTextScaleEmulation180), text: t(e.osTextScaleEmulation180), value: '1.8' },
+    { title: t(e.osTextScaleEmulation200), text: t(e.osTextScaleEmulation200), value: '2' },
+  ],
+  tags: [t(e.query)],
+  title: t(e.emulateOsTextScale),
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'local-fonts-disabled',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.disableLocalFonts) },
+    { value: !1, title: t(e.enableLocalFonts) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'avif-format-disabled',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.disableAvifFormat) },
+    { value: !1, title: t(e.enableAvifFormat) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'jpeg-xl-format-disabled',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.disableJpegXlFormat) },
+    { value: !1, title: t(e.enableJpegXlFormat) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  settingName: 'webp-format-disabled',
+  settingType: 'boolean',
+  storageType: 'Session',
+  options: [
+    { value: !0, title: t(e.disableWebpFormat) },
+    { value: !1, title: t(e.enableWebpFormat) },
+  ],
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  title: t(e.customFormatters),
+  settingName: 'custom-formatters',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  title: t(e.networkRequestBlocking),
+  settingName: 'request-blocking-enabled',
+  settingType: 'boolean',
+  storageType: 'Local',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.enableNetworkRequestBlocking) },
+    { value: !1, title: t(e.disableNetworkRequestBlocking) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  title: t(e.disableCache),
+  settingName: 'cache-disabled',
+  settingType: 'boolean',
+  order: 0,
+  defaultValue: !1,
+  userActionCondition: 'hasOtherClients',
+  options: [
+    { value: !0, title: t(e.disableCache) },
+    { value: !1, title: t(e.enableCache) },
+  ],
+  learnMore: { tooltip: t(e.networkCacheExplanation) },
+});
+a.Settings.registerSettingExtension({
+  category: 'RENDERING',
+  title: t(e.emulateAutoDarkMode),
+  settingName: 'emulate-auto-dark-mode',
+  settingType: 'boolean',
+  storageType: 'Session',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: t(e.enableRemoteFileLoading),
+  settingName: 'network.enable-remote-file-loading',
+  settingType: 'boolean',
+  defaultValue: !1,
+  learnMore: { tooltip: t(e.remoteFileLoadingInfo) },
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: t(e.javaScriptSourceMaps),
+  settingName: 'js-source-maps-enabled',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.enableJavaScriptSourceMaps) },
+    { value: !1, title: t(e.disableJavaScriptSourceMaps) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: t(e.cssSourceMaps),
+  settingName: 'css-source-maps-enabled',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.enableCssSourceMaps) },
+    { value: !1, title: t(e.disableCssSourceMaps) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.logXmlhttprequests),
+  settingName: 'monitoring-xhr-enabled',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+//# sourceMappingURL=sdk-meta.js.map

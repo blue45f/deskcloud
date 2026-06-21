@@ -1,0 +1,70 @@
+import * as e from './../../core/i18n/i18n.js';
+import * as t from './../../ui/legacy/legacy.js';
+var o = {
+    resetView: 'Reset view',
+    switchToPanMode: 'Switch to pan mode',
+    switchToRotateMode: 'Switch to rotate mode',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out',
+    panOrRotateUp: 'Pan or rotate up',
+    panOrRotateDown: 'Pan or rotate down',
+    panOrRotateLeft: 'Pan or rotate left',
+    panOrRotateRight: 'Pan or rotate right',
+  },
+  n = e.i18n.registerUIStrings('panels/layer_viewer/layer_viewer-meta.ts', o),
+  i = e.i18n.getLazilyComputedLocalizedString.bind(void 0, n);
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.reset-view',
+  category: 'LAYERS',
+  title: i(o.resetView),
+  bindings: [{ shortcut: '0' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.pan-mode',
+  category: 'LAYERS',
+  title: i(o.switchToPanMode),
+  bindings: [{ shortcut: 'x' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.rotate-mode',
+  category: 'LAYERS',
+  title: i(o.switchToRotateMode),
+  bindings: [{ shortcut: 'v' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.zoom-in',
+  category: 'LAYERS',
+  title: i(o.zoomIn),
+  bindings: [{ shortcut: 'Shift+Plus' }, { shortcut: 'NumpadPlus' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.zoom-out',
+  category: 'LAYERS',
+  title: i(o.zoomOut),
+  bindings: [{ shortcut: 'Shift+Minus' }, { shortcut: 'NumpadMinus' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.up',
+  category: 'LAYERS',
+  title: i(o.panOrRotateUp),
+  bindings: [{ shortcut: 'Up' }, { shortcut: 'w' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.down',
+  category: 'LAYERS',
+  title: i(o.panOrRotateDown),
+  bindings: [{ shortcut: 'Down' }, { shortcut: 's' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.left',
+  category: 'LAYERS',
+  title: i(o.panOrRotateLeft),
+  bindings: [{ shortcut: 'Left' }, { shortcut: 'a' }],
+});
+t.ActionRegistration.registerActionExtension({
+  actionId: 'layers.right',
+  category: 'LAYERS',
+  title: i(o.panOrRotateRight),
+  bindings: [{ shortcut: 'Right' }, { shortcut: 'd' }],
+});
+//# sourceMappingURL=layer_viewer-meta.js.map

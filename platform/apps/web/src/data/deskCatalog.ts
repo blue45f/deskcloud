@@ -4,6 +4,7 @@ import {
   Bug,
   FileText,
   Fingerprint,
+  Globe2,
   Image,
   LayoutGrid,
   Megaphone,
@@ -93,13 +94,16 @@ export interface DeskEntry {
   /** 플랫폼 코어 자신인지(별도 카드 스타일). */
   isCore?: boolean
   /**
-   * DeskCloud SDK에 네이티브로 포함된 Desk인지, 별도 저장소/배포를 운영 콘솔에 연결한 Desk인지.
+   * DeskCloud SDK에 네이티브로 포함된 Desk인지, 모노레포 workspace에 흡수된 별도 런타임인지,
+   * 별도 저장소/배포를 운영 콘솔에 연결한 Desk인지.
    * 생략하면 native로 간주한다.
    */
-  integrationMode?: 'native' | 'linked'
-  /** linked Desk가 자체 SDK/패키지를 유지할 때 표시할 패키지 이름. */
+  integrationMode?: 'native' | 'workspace' | 'linked'
+  /** workspace/linked Desk가 자체 SDK/패키지를 유지할 때 표시할 패키지 이름. */
   integrationPackage?: string
-  /** linked Desk의 현재 운영 URL. */
+  /** workspace에 흡수된 소스 경로. */
+  workspacePath?: string
+  /** workspace/linked Desk의 현재 운영 URL. */
   liveUrl?: string
   /** linked Desk의 원격 저장소. */
   sourceRepositoryUrl?: string
@@ -273,15 +277,24 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
     operatorTasks: ['파일 삭제/복구', '서명 URL 점검', '스토리지 사용량 관리'],
     recommendedPlan: 'scale',
   }),
+  'seo-gateway': ops('seo-gateway', {
+    gatewayPath: '/seo-gateway',
+    primaryMetric: 'api_calls',
+    billingDriver:
+      '봇 렌더, 캐시 hit/miss, 워밍, Lighthouse/VisualDiff 실행을 렌더 이벤트로 집계합니다.',
+    config: ['origin URL', 'route rules', 'cache TTL/SWR', 'bot detection', 'admin token'],
+    operatorTasks: ['렌더 라우트 관리', '캐시/워밍 점검', 'SEO 품질 게이트 확인'],
+    recommendedPlan: 'scale',
+  }),
   'remote-devtools': ops('remote-devtools', {
-    gatewayPath: 'https://remote-devtools.vercel.app',
+    gatewayPath: '/remote-devtools',
     primaryMetric: 'events',
     billingDriver:
       '라이브 연결, 녹화 세션, 리플레이 조회, Jira/Slack/Sheets 연동 이벤트를 테넌트 사용량으로 합산합니다.',
     config: [
       'SDK script origin',
       'internal admin origin',
-      'external WS gateway',
+      'DeskCloud WS gateway',
       'PostgreSQL',
       'S3 backup',
     ],
@@ -908,9 +921,59 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
     domainIsolation:
       'FileDesk는 bucket namespace와 origin allowlist로 도메인별 파일 접근을 분리합니다. 같은 회사의 고객 포털과 내부 관리자 파일이 같은 테넌트에 있더라도 bucket policy로 공개 범위를 나눕니다.',
   }),
+  'seo-gateway': details({
+    summary:
+      'SEOGatewayDesk는 JavaScript SPA를 검색 봇과 링크 프리뷰 크롤러가 읽을 수 있는 정적 HTML로 렌더링하는 프리렌더링/SEO 게이트웨이 Desk입니다. Fastify 기반 렌더 데이터플레인과 Puppeteer 풀, 캐시, SWR, 라우트 규칙, Lighthouse/VisualDiff 품질 게이트를 유지하면서 DeskCloud 콘솔에서는 가입회사·서비스 도메인·사용량·요금 한도를 통합 관리합니다. 기존 패키지명은 SEO/OSS 자산 보존을 위해 @heejun/spa-seo-gateway-*로 유지하고, 제품 표시명은 패밀리 톤에 맞춰 SEOGatewayDesk로 통일합니다.',
+    bestFor: ['SPA 검색 노출 개선', '봇 전용 프리렌더링', 'Lighthouse/VisualDiff 품질 게이트'],
+    dataModel: [
+      {
+        name: 'Site',
+        description:
+          'origin URL, route rules, 캐시 정책, 활성 상태를 가진 서비스 도메인 단위 설정입니다.',
+      },
+      {
+        name: 'RouteRule',
+        description:
+          '패턴, TTL, waitUntil, waitSelector, ignore 플래그를 가진 렌더 라우팅 규칙입니다.',
+      },
+      {
+        name: 'RenderJob',
+        description: '봇 요청 또는 워밍 작업으로 생성되는 렌더 실행, 소요 시간, 결과 상태입니다.',
+      },
+      {
+        name: 'QualityReport',
+        description:
+          'Lighthouse 점수, VisualDiff 결과, schema.org JSON-LD 추론 결과를 묶은 품질 리포트입니다.',
+      },
+    ],
+    adminGuide: [
+      {
+        title: '서비스 origin 등록',
+        description:
+          '검색 노출이 필요한 SPA 도메인을 등록하고 SSR 대상 경로만 route rule로 제한합니다.',
+      },
+      {
+        title: '캐시/워밍 운영',
+        description:
+          'TTL, SWR, sitemap 워밍, Redis 상태를 확인해 cold render 비용과 지연을 줄입니다.',
+      },
+      {
+        title: 'SEO 품질 게이트 확인',
+        description:
+          'Lighthouse, schema, visual diff 결과를 보고 배포 전 검색 노출 품질을 검증합니다.',
+      },
+    ],
+    integrationGuide: [
+      'DeskCloud 서비스 도메인 allowlist에 원본 SPA origin과 게이트웨이 운영 origin을 등록합니다.',
+      'Fastify gateway는 @heejun/spa-seo-gateway-core와 admin-ui 패키지를 workspace에서 사용합니다.',
+      '봇 트래픽은 CDN/nginx/Caddy에서 게이트웨이로 보내고 일반 사용자는 원본 SPA로 통과시킵니다.',
+    ],
+    domainIsolation:
+      'SEOGatewayDesk는 Site origin과 route rule namespace로 도메인별 렌더 범위를 분리합니다. 같은 가입회사가 여러 SPA를 운영해도 각 origin의 캐시, 워밍, 품질 리포트, admin token 범위를 나눠 관리합니다.',
+  }),
   'remote-devtools': details({
     summary:
-      'RemoteDevTools는 Chrome DevTools Protocol 기반의 원격 디버깅 Desk입니다. 고객 서비스에 SDK를 삽입하면 콘솔, 네트워크, DOM, 런타임 이벤트를 수집하고, rrweb 기반 세션 녹화/재생으로 문제 상황을 운영자가 다시 확인할 수 있습니다. 현재 별도 저장소와 배포 파이프라인을 유지하는 연결형 Desk로 두고, DeskCloud 운영 콘솔에서는 가입회사, 서비스 도메인, 사용량, 연동 상태를 통합 관리하는 형태가 적합합니다.',
+      'RemoteDevTools는 Chrome DevTools Protocol 기반의 원격 디버깅 Desk입니다. 고객 서비스에 SDK를 삽입하면 콘솔, 네트워크, DOM, 런타임 이벤트를 수집하고, rrweb 기반 세션 녹화/재생으로 문제 상황을 운영자가 다시 확인할 수 있습니다. 소스는 deskcloud 모노레포의 desks/remote-devtools로 통합했고, DevTools 벤더 프론트엔드와 TypeORM CDP 데이터플레인은 보존하면서 DeskCloud 운영 콘솔에서는 가입회사, 서비스 도메인, 사용량, 연동 상태를 통합 관리합니다.',
     bestFor: ['원격 웹앱 디버깅', '세션 녹화/리플레이', 'Jira/Slack/Google Sheets 연동'],
     dataModel: [
       {
@@ -950,11 +1013,11 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
     ],
     integrationGuide: [
       'DeskCloud 테넌트의 서비스 도메인 allowlist에 디버깅 대상 서비스를 등록합니다.',
-      '대상 웹앱에 remote-debug-sdk 또는 UMD 스크립트를 삽입하고 외부 WebSocket 게이트웨이를 연결합니다.',
+      '대상 웹앱에 remote-debug-sdk 또는 UMD 스크립트를 삽입하고 DeskCloud 통합 WebSocket 게이트웨이를 연결합니다.',
       '운영자는 RemoteDevTools 콘솔에서 라이브 세션, 녹화 리플레이, 티켓/알림 연동 상태를 확인합니다.',
     ],
     domainIsolation:
-      'RemoteDevTools는 Internal Admin, External SDK/WS gateway, 고객 서비스 origin을 분리해서 운영합니다. DeskCloud에서는 가입회사 테넌트와 서비스 도메인 allowlist를 통합 관리하고, RemoteDevTools 저장소의 PostgreSQL/세션 데이터는 org 또는 origin 네임스페이스로 분리하는 방식이 맞습니다.',
+      'RemoteDevTools는 DeskCloud 통합 라우트 아래에서 Internal Admin, SDK/WS gateway, 고객 서비스 origin의 책임을 나눕니다. DeskCloud에서는 가입회사 테넌트와 서비스 도메인 allowlist를 통합 관리하고, desks/remote-devtools의 PostgreSQL/세션 데이터는 org 또는 origin 네임스페이스로 분리합니다.',
   }),
 }
 
@@ -979,8 +1042,28 @@ export function adminFactory(sdkFactory: string): string {
  * 설치 명령(npm/pnpm/yarn/bun)은 페이지 상단의 공유 InstallTabs 가 담당한다.
  */
 export function sdkSnippet(desk: DeskEntry): string {
-  if (desk.integrationMode === 'linked') {
-    const src = `${desk.liveUrl ?? 'https://remote-devtools.vercel.app'}/sdk/index.umd.js`
+  if (desk.id === 'seo-gateway') {
+    return `import Fastify from 'fastify'
+import { browserPool, render } from '@heejun/spa-seo-gateway-core'
+import { registerAdminUI } from '@heejun/spa-seo-gateway-admin-ui'
+
+const app = Fastify()
+await registerAdminUI(app, { adminToken: process.env.ADMIN_TOKEN! })
+
+app.get('/render', async (req, reply) => {
+  const url = String(req.query.url)
+  const html = await render({ url, pool: browserPool })
+  return reply.type('text/html').send(html)
+})`
+  }
+
+  if (desk.id === 'remote-devtools' || desk.integrationMode === 'linked') {
+    const operations = deskOperations(desk)
+    const base =
+      desk.integrationMode === 'workspace'
+        ? `${apiEndpoint()}${operations.gatewayPath}`
+        : (desk.liveUrl ?? 'https://remote-devtools.vercel.app')
+    const src = `${base}/sdk/index.umd.js`
     return `<script>
   function handleRemoteDebugSdkLoad() {
     window.RemoteDebugSdk?.createDebugger()
@@ -1207,17 +1290,31 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     metrics: ['스토리지', '가시성', '서명 URL'],
   },
   {
+    id: 'seo-gateway',
+    name: 'SEOGatewayDesk',
+    tagline: 'SPA 프리렌더링·SEO 게이트웨이',
+    what: 'JavaScript SPA를 검색 봇과 링크 프리뷰 크롤러가 읽을 수 있는 HTML로 렌더링하고, 라우트·캐시·워밍·Lighthouse·VisualDiff를 운영하는 개발자용 Desk입니다.',
+    icon: Globe2,
+    tone: 'accent',
+    status: 'live',
+    metrics: ['프리렌더', '캐시/SWR', 'Lighthouse', 'VisualDiff'],
+    integrationMode: 'workspace',
+    integrationPackage: '@heejun/spa-seo-gateway-core',
+    workspacePath: 'desks/seo-gateway',
+    sourceRepositoryUrl: 'https://github.com/blue45f/spa-seo-gateway',
+  },
+  {
     id: 'remote-devtools',
     name: 'RemoteDevTools',
     tagline: '원격 디버깅·세션 리플레이',
-    what: 'Chrome DevTools Protocol 기반 원격 콘솔·네트워크·DOM 수집과 rrweb 세션 녹화/재생, Jira·Slack·Google Sheets·S3 연동을 제공하는 연결형 운영 Desk입니다.',
+    what: 'Chrome DevTools Protocol 기반 원격 콘솔·네트워크·DOM 수집과 rrweb 세션 녹화/재생, Jira·Slack·Google Sheets·S3 연동을 제공하는 개발자용 Desk입니다.',
     icon: Bug,
     tone: 'warning',
     status: 'live',
     metrics: ['라이브 세션', '녹화 리플레이', 'CDP 이벤트', '외부 연동'],
-    integrationMode: 'linked',
+    integrationMode: 'workspace',
     integrationPackage: 'remote-debug-sdk',
-    liveUrl: 'https://remote-devtools.vercel.app',
+    workspacePath: 'desks/remote-devtools',
     sourceRepositoryUrl: 'https://github.com/blue45f/remote-devtools',
   },
 ]

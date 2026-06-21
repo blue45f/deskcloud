@@ -1,0 +1,54 @@
+import * as i from './../../../../core/common/common.js';
+import * as n from './../../../../core/i18n/i18n.js';
+import * as a from './../../../../core/root/root.js';
+import * as l from './../../legacy.js';
+var e = {
+    flamechartSelectedNavigation: 'Flamechart navigation:',
+    modern: 'Modern',
+    classic: 'Classic',
+    liveMemoryAllocationAnnotations: 'Live memory allocation annotations',
+    showLiveMemoryAllocation: 'Show live memory allocation annotations',
+    hideLiveMemoryAllocation: 'Hide live memory allocation annotations',
+    collectGarbage: 'Collect garbage',
+  },
+  s = n.i18n.registerUIStrings('ui/legacy/components/perf_ui/perf_ui-meta.ts', e),
+  t = n.i18n.getLazilyComputedLocalizedString.bind(void 0, s),
+  o;
+async function c() {
+  return (o || (o = await import('./perf_ui.js')), o);
+}
+l.ActionRegistration.registerActionExtension({
+  actionId: 'components.collect-garbage',
+  category: 'PERFORMANCE',
+  title: t(e.collectGarbage),
+  iconClass: 'mop',
+  async loadActionDelegate() {
+    let r = await c();
+    return new r.GCActionDelegate.GCActionDelegate();
+  },
+});
+i.Settings.registerSettingExtension({
+  category: 'PERFORMANCE',
+  storageType: 'Synced',
+  title: t(e.flamechartSelectedNavigation),
+  settingName: 'flamechart-selected-navigation',
+  settingType: 'enum',
+  defaultValue: 'classic',
+  options: [
+    { title: t(e.modern), text: t(e.modern), value: 'modern' },
+    { title: t(e.classic), text: t(e.classic), value: 'classic' },
+  ],
+});
+i.Settings.registerSettingExtension({
+  category: 'MEMORY',
+  experiment: a.ExperimentNames.ExperimentName.LIVE_HEAP_PROFILE,
+  title: t(e.liveMemoryAllocationAnnotations),
+  settingName: 'memory-live-heap-profile',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.showLiveMemoryAllocation) },
+    { value: !1, title: t(e.hideLiveMemoryAllocation) },
+  ],
+});
+//# sourceMappingURL=perf_ui-meta.js.map

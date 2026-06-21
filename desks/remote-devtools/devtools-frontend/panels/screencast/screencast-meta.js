@@ -1,0 +1,25 @@
+import * as o from './../../core/common/common.js';
+import * as e from './../../ui/legacy/legacy.js';
+var r;
+async function t() {
+  return (r || (r = await import('./screencast.js')), r);
+}
+e.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await t()).ScreencastApp.ToolbarButtonProvider.instance();
+  },
+  order: 1,
+  location: 'main-toolbar-left',
+});
+o.AppProvider.registerAppProvider({
+  async loadAppProvider() {
+    return (await t()).ScreencastApp.ScreencastAppProvider.instance();
+  },
+  order: 1,
+});
+e.ContextMenu.registerItem({
+  location: 'mainMenu',
+  order: 10,
+  actionId: 'components.request-app-banner',
+});
+//# sourceMappingURL=screencast-meta.js.map

@@ -1,0 +1,185 @@
+import * as d from './../../core/i18n/i18n.js';
+import * as a from './../../core/root/root.js';
+import * as s from './../../core/sdk/sdk.js';
+import * as n from './../../ui/legacy/legacy.js';
+var r = {
+    showEventListenerBreakpoints: 'Show Event Listener Breakpoints',
+    eventListenerBreakpoints: 'Event Listener Breakpoints',
+    showCspViolationBreakpoints: 'Show CSP Violation Breakpoints',
+    cspViolationBreakpoints: 'CSP Violation Breakpoints',
+    showXhrfetchBreakpoints: 'Show XHR/fetch Breakpoints',
+    xhrfetchBreakpoints: 'XHR/fetch Breakpoints',
+    showDomBreakpoints: 'Show DOM Breakpoints',
+    domBreakpoints: 'DOM Breakpoints',
+    showGlobalListeners: 'Show Global Listeners',
+    globalListeners: 'Global Listeners',
+    page: 'Page',
+    showPage: 'Show Page',
+    overrides: 'Overrides',
+    showOverrides: 'Show Overrides',
+    contentScripts: 'Content scripts',
+    showContentScripts: 'Show Content scripts',
+    refreshGlobalListeners: 'Refresh global listeners',
+  },
+  g = d.i18n.registerUIStrings('panels/browser_debugger/browser_debugger-meta.ts', r),
+  t = d.i18n.getLazilyComputedLocalizedString.bind(void 0, g),
+  i;
+async function o() {
+  return (i || (i = await import('./browser_debugger.js')), i);
+}
+function w(e) {
+  return i === void 0 ? [] : e(i);
+}
+var c;
+async function p() {
+  return (c || (c = await import('./../sources/sources.js')), c);
+}
+n.ViewManager.registerViewExtension({
+  async loadView() {
+    return (
+      await o()
+    ).EventListenerBreakpointsSidebarPane.EventListenerBreakpointsSidebarPane.instance();
+  },
+  id: 'sources.event-listener-breakpoints',
+  location: 'sources.sidebar-bottom',
+  commandPrompt: t(r.showEventListenerBreakpoints),
+  title: t(r.eventListenerBreakpoints),
+  order: 9,
+  persistence: 'permanent',
+});
+n.ViewManager.registerViewExtension({
+  async loadView() {
+    let e = await o();
+    return new e.CSPViolationBreakpointsSidebarPane.CSPViolationBreakpointsSidebarPane();
+  },
+  id: 'sources.csp-violation-breakpoints',
+  location: 'sources.sidebar-bottom',
+  commandPrompt: t(r.showCspViolationBreakpoints),
+  title: t(r.cspViolationBreakpoints),
+  order: 10,
+  persistence: 'permanent',
+});
+n.ViewManager.registerViewExtension({
+  async loadView() {
+    return (await o()).XHRBreakpointsSidebarPane.XHRBreakpointsSidebarPane.instance();
+  },
+  id: 'sources.xhr-breakpoints',
+  location: 'sources.sidebar-bottom',
+  commandPrompt: t(r.showXhrfetchBreakpoints),
+  title: t(r.xhrfetchBreakpoints),
+  order: 5,
+  persistence: 'permanent',
+  hasToolbar: !0,
+});
+n.ViewManager.registerViewExtension({
+  async loadView() {
+    return (await o()).DOMBreakpointsSidebarPane.DOMBreakpointsSidebarPane.instance();
+  },
+  id: 'sources.dom-breakpoints',
+  location: 'sources.sidebar-bottom',
+  commandPrompt: t(r.showDomBreakpoints),
+  title: t(r.domBreakpoints),
+  order: 7,
+  persistence: 'permanent',
+});
+n.ViewManager.registerViewExtension({
+  async loadView() {
+    let e = await o();
+    return new e.ObjectEventListenersSidebarPane.ObjectEventListenersSidebarPane();
+  },
+  id: 'sources.global-listeners',
+  location: 'sources.sidebar-bottom',
+  commandPrompt: t(r.showGlobalListeners),
+  title: t(r.globalListeners),
+  order: 8,
+  persistence: 'permanent',
+  hasToolbar: !0,
+});
+n.ViewManager.registerViewExtension({
+  async loadView() {
+    return (await o()).DOMBreakpointsSidebarPane.DOMBreakpointsSidebarPane.instance();
+  },
+  id: 'elements.dom-breakpoints',
+  location: 'elements-sidebar',
+  commandPrompt: t(r.showDomBreakpoints),
+  title: t(r.domBreakpoints),
+  order: 6,
+  persistence: 'permanent',
+});
+n.ViewManager.registerViewExtension({
+  location: 'navigator-view',
+  id: 'navigator-network',
+  title: t(r.page),
+  commandPrompt: t(r.showPage),
+  order: 2,
+  persistence: 'permanent',
+  async loadView() {
+    return (await p()).SourcesNavigator.NetworkNavigatorView.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'navigator-view',
+  id: 'navigator-overrides',
+  title: t(r.overrides),
+  commandPrompt: t(r.showOverrides),
+  order: 4,
+  persistence: 'permanent',
+  condition: () => !a.Runtime.Runtime.isTraceApp(),
+  async loadView() {
+    return (await p()).SourcesNavigator.OverridesNavigatorView.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'navigator-view',
+  id: 'navigator-content-scripts',
+  title: t(r.contentScripts),
+  commandPrompt: t(r.showContentScripts),
+  order: 5,
+  persistence: 'permanent',
+  condition: () =>
+    a.Runtime.getPathName() !== '/bundled/worker_app.html' && !a.Runtime.Runtime.isTraceApp(),
+  async loadView() {
+    let e = await p();
+    return new e.SourcesNavigator.ContentScriptsNavigatorView();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'browser-debugger.refresh-global-event-listeners',
+  async loadActionDelegate() {
+    let e = await o();
+    return new e.ObjectEventListenersSidebarPane.ActionDelegate();
+  },
+  title: t(r.refreshGlobalListeners),
+  iconClass: 'refresh',
+  contextTypes() {
+    return w((e) => [e.ObjectEventListenersSidebarPane.ObjectEventListenersSidebarPane]);
+  },
+});
+n.ContextMenu.registerProvider({
+  contextTypes() {
+    return [s.DOMModel.DOMNode];
+  },
+  async loadProvider() {
+    let e = await o();
+    return new e.DOMBreakpointsSidebarPane.ContextMenuProvider();
+  },
+  experiment: void 0,
+});
+n.Context.registerListener({
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  async loadListener() {
+    return (await o()).XHRBreakpointsSidebarPane.XHRBreakpointsSidebarPane.instance();
+  },
+});
+n.Context.registerListener({
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  async loadListener() {
+    return (await o()).DOMBreakpointsSidebarPane.DOMBreakpointsSidebarPane.instance();
+  },
+});
+//# sourceMappingURL=browser_debugger-meta.js.map

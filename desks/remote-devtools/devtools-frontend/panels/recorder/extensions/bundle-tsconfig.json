@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": ".",
+    "baseUrl": ".",
+    "rootDir": "../../../../../../../front_end/panels/recorder/extensions"
+  },
+  "files": ["../../../../../../../front_end/panels/recorder/extensions/extensions.ts"],
+  "references": [{ "path": "./extensions-tsconfig.json" }]
+}

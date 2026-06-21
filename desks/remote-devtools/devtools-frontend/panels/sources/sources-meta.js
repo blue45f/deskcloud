@@ -1,0 +1,1144 @@
+import * as a from './../../core/common/common.js';
+import * as S from './../../core/host/host.js';
+import * as g from './../../core/i18n/i18n.js';
+import * as d from './../../core/root/root.js';
+import * as s from './../../core/sdk/sdk.js';
+import * as p from './../../models/breakpoints/breakpoints.js';
+import * as w from './../../models/stack_trace/stack_trace.js';
+import * as c from './../../models/workspace/workspace.js';
+import * as m from './../../ui/legacy/components/object_ui/object_ui.js';
+import * as u from './../../ui/legacy/components/quick_open/quick_open.js';
+import * as n from './../../ui/legacy/legacy.js';
+var t = {
+    showSources: 'Show Sources',
+    sources: 'Sources',
+    showWorkspace: 'Show Workspace',
+    workspace: 'Workspace',
+    showSnippets: 'Show Snippets',
+    snippets: 'Snippets',
+    showSearch: 'Show Search',
+    search: 'Search',
+    showQuickSource: 'Show Quick source',
+    quickSource: 'Quick source',
+    showThreads: 'Show Threads',
+    threads: 'Threads',
+    showScope: 'Show Scope',
+    scope: 'Scope',
+    showWatch: 'Show Watch',
+    watch: 'Watch',
+    showBreakpoints: 'Show Breakpoints',
+    breakpoints: 'Breakpoints',
+    pauseScriptExecution: 'Pause script execution',
+    resumeScriptExecution: 'Resume script execution',
+    stepOverNextFunctionCall: 'Step over next function call',
+    stepIntoNextFunctionCall: 'Step into next function call',
+    step: 'Step',
+    stepOutOfCurrentFunction: 'Step out of current function',
+    runSnippet: 'Run snippet',
+    deactivateBreakpoints: 'Deactivate breakpoints',
+    activateBreakpoints: 'Activate breakpoints',
+    addSelectedTextToWatches: 'Add selected text to watches',
+    evaluateSelectedTextInConsole: 'Evaluate selected text in console',
+    switchFile: 'Switch file',
+    rename: 'Rename',
+    closeAll: 'Close all',
+    jumpToPreviousEditingLocation: 'Jump to previous editing location',
+    jumpToNextEditingLocation: 'Jump to next editing location',
+    closeTheActiveTab: 'Close the active tab',
+    goToLine: 'Go to line',
+    goToAFunctionDeclarationruleSet: 'Go to a function declaration/rule set',
+    toggleBreakpoint: 'Toggle breakpoint',
+    toggleBreakpointEnabled: 'Toggle breakpoint enabled',
+    toggleBreakpointInputWindow: 'Toggle breakpoint input window',
+    save: 'Save',
+    saveAll: 'Save all',
+    createNewSnippet: 'Create new snippet',
+    addFolderManually: 'Add folder manually',
+    addFolderToWorkspace: 'Add folder to workspace',
+    previousCallFrame: 'Previous call frame',
+    nextCallFrame: 'Next call frame',
+    incrementCssUnitBy: 'Increment CSS unit by {PH1}',
+    decrementCssUnitBy: 'Decrement CSS unit by {PH1}',
+    searchInAnonymousAndContent: 'Search in anonymous and content scripts',
+    doNotSearchInAnonymousAndContent: 'Do not search in anonymous and content scripts',
+    automaticallyRevealFilesIn: 'Automatically reveal files in sidebar',
+    doNotAutomaticallyRevealFilesIn: 'Do not automatically reveal files in sidebar',
+    tabMovesFocus: 'Tab moves focus',
+    enableTabMovesFocus: 'Enable tab moves focus',
+    disableTabMovesFocus: 'Disable tab moves focus',
+    detectIndentation: 'Detect indentation',
+    doNotDetectIndentation: 'Do not detect indentation',
+    automaticallyPrettyPrintMinifiedSources: 'Automatically pretty print minified sources',
+    doNotAutomaticallyPrettyPrintMinifiedSources:
+      'Do not automatically pretty print minified sources',
+    autocompletion: 'Autocompletion',
+    enableAutocompletion: 'Enable autocompletion',
+    disableAutocompletion: 'Disable autocompletion',
+    bracketClosing: 'Auto closing brackets',
+    enableBracketClosing: 'Enable auto closing brackets',
+    disableBracketClosing: 'Disable auto closing brackets',
+    bracketMatching: 'Bracket matching',
+    enableBracketMatching: 'Enable bracket matching',
+    disableBracketMatching: 'Disable bracket matching',
+    codeFolding: 'Code folding',
+    enableCodeFolding: 'Enable code folding',
+    disableCodeFolding: 'Disable code folding',
+    showWhitespaceCharacters: 'Show whitespace characters:',
+    doNotShowWhitespaceCharacters: 'Do not show whitespace characters',
+    none: 'None',
+    showAllWhitespaceCharacters: 'Show all whitespace characters',
+    all: 'All',
+    showTrailingWhitespaceCharacters: 'Show trailing whitespace characters',
+    trailing: 'Trailing',
+    variableValuesInlineWhile: 'Variable values inline',
+    displayVariableValuesInlineWhile: 'Display variable values inline while debugging',
+    doNotDisplayVariableValuesInline: "Don't show variable values inline",
+    allowScrollingPastEndOfFile: 'Allow scrolling past end of file',
+    disallowScrollingPastEndOfFile: 'Disallow scrolling past end of file',
+    wasmAutoStepping: 'Wasm auto-stepping bytecode',
+    wasmAutoSteppingInfo: 'When debugging Wasm with debug information, try to skip wasm bytecode',
+    enableWasmAutoStepping: 'Enable Wasm auto-stepping',
+    disableWasmAutoStepping: 'Disable Wasm auto-stepping',
+    goTo: 'Go to',
+    line: 'Line',
+    symbol: 'Symbol',
+    goToSymbol: 'Go to symbol',
+    open: 'Open',
+    file: 'File',
+    openFile: 'Open file',
+    disableAutoFocusOnDebuggerPaused: 'Do not focus Sources panel when triggering a breakpoint',
+    enableAutoFocusOnDebuggerPaused: 'Focus Sources panel when triggering a breakpoint',
+    revealActiveFileInSidebar: 'Reveal active file in navigator sidebar',
+    toggleNavigatorSidebar: 'Toggle navigator sidebar',
+    toggleDebuggerSidebar: 'Toggle debugger sidebar',
+    nextEditorTab: 'Next editor',
+    previousEditorTab: 'Previous editor',
+    wordWrap: 'Word wrap',
+    toggleWordWrap: 'Toggle word wrap',
+  },
+  b = g.i18n.registerUIStrings('panels/sources/sources-meta.ts', t),
+  o = g.i18n.getLazilyComputedLocalizedString.bind(void 0, b),
+  l;
+async function i() {
+  return (l || (l = await import('./sources.js')), l);
+}
+function r(e) {
+  return l === void 0 ? [] : e(l);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'sources',
+  commandPrompt: o(t.showSources),
+  title: o(t.sources),
+  order: 30,
+  async loadView() {
+    return (await i()).SourcesPanel.SourcesPanel.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'navigator-view',
+  id: 'navigator-files',
+  commandPrompt: o(t.showWorkspace),
+  title: o(t.workspace),
+  order: 3,
+  persistence: 'permanent',
+  condition: () => !d.Runtime.Runtime.isTraceApp(),
+  async loadView() {
+    let e = await i();
+    return new e.SourcesNavigator.FilesNavigatorView();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'navigator-view',
+  id: 'navigator-snippets',
+  commandPrompt: o(t.showSnippets),
+  title: o(t.snippets),
+  order: 6,
+  persistence: 'permanent',
+  condition: () => !d.Runtime.Runtime.isTraceApp(),
+  async loadView() {
+    let e = await i();
+    return new e.SourcesNavigator.SnippetsNavigatorView();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'sources.search-sources-tab',
+  commandPrompt: o(t.showSearch),
+  title: o(t.search),
+  order: 7,
+  persistence: 'closeable',
+  async loadView() {
+    let e = await i();
+    return new e.SearchSourcesView.SearchSourcesView();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'sources.quick',
+  commandPrompt: o(t.showQuickSource),
+  title: o(t.quickSource),
+  persistence: 'closeable',
+  order: 1e3,
+  async loadView() {
+    let e = await i();
+    return new e.SourcesPanel.QuickSourceView();
+  },
+});
+n.ViewManager.registerViewExtension({
+  id: 'sources.threads',
+  commandPrompt: o(t.showThreads),
+  title: o(t.threads),
+  persistence: 'permanent',
+  async loadView() {
+    let e = await i();
+    return new e.ThreadsSidebarPane.ThreadsSidebarPane();
+  },
+});
+n.ViewManager.registerViewExtension({
+  id: 'sources.scope-chain',
+  commandPrompt: o(t.showScope),
+  title: o(t.scope),
+  persistence: 'permanent',
+  async loadView() {
+    return (await i()).ScopeChainSidebarPane.ScopeChainSidebarPane.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  id: 'sources.watch',
+  commandPrompt: o(t.showWatch),
+  title: o(t.watch),
+  persistence: 'permanent',
+  async loadView() {
+    return (await i()).WatchExpressionsSidebarPane.WatchExpressionsSidebarPane.instance();
+  },
+  hasToolbar: !0,
+});
+n.ViewManager.registerViewExtension({
+  id: 'sources.js-breakpoints',
+  commandPrompt: o(t.showBreakpoints),
+  title: o(t.breakpoints),
+  persistence: 'permanent',
+  async loadView() {
+    return (await i()).BreakpointsView.BreakpointsView.instance();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.toggle-pause',
+  iconClass: 'pause',
+  toggleable: !0,
+  toggledIconClass: 'resume',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.RevealingActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView, n.ShortcutRegistry.ForwardedShortcut]);
+  },
+  options: [
+    { value: !0, title: o(t.pauseScriptExecution) },
+    { value: !1, title: o(t.resumeScriptExecution) },
+  ],
+  bindings: [
+    { shortcut: 'F8', keybindSets: ['devToolsDefault'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+\\' },
+    { shortcut: 'F5', keybindSets: ['vsCode'] },
+    { shortcut: 'Shift+F5', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+\\' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.step-over',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.stepOverNextFunctionCall),
+  iconClass: 'step-over',
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  bindings: [
+    { shortcut: 'F10', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: "Ctrl+'" },
+    { platform: 'mac', shortcut: "Meta+'" },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.step-into',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.stepIntoNextFunctionCall),
+  iconClass: 'step-into',
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  bindings: [
+    { shortcut: 'F11', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+;' },
+    { platform: 'mac', shortcut: 'Meta+;' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.step',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.step),
+  iconClass: 'step',
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  bindings: [{ shortcut: 'F9', keybindSets: ['devToolsDefault'] }],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.step-out',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.stepOutOfCurrentFunction),
+  iconClass: 'step-out',
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  bindings: [
+    { shortcut: 'Shift+F11', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Shift+Ctrl+;' },
+    { platform: 'mac', shortcut: 'Shift+Meta+;' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'debugger.run-snippet',
+  category: 'DEBUGGER',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.runSnippet),
+  iconClass: 'play',
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Enter' },
+    { platform: 'mac', shortcut: 'Meta+Enter' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.toggle-breakpoints-active',
+  iconClass: 'breakpoint-crossed',
+  toggledIconClass: 'breakpoint-crossed-filled',
+  toggleable: !0,
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  options: [
+    { value: !0, title: o(t.deactivateBreakpoints) },
+    { value: !1, title: o(t.activateBreakpoints) },
+  ],
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+F8' },
+    { platform: 'mac', shortcut: 'Meta+F8' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.add-to-watch',
+  async loadActionDelegate() {
+    return (await i()).WatchExpressionsSidebarPane.WatchExpressionsSidebarPane.instance();
+  },
+  category: 'DEBUGGER',
+  title: o(t.addSelectedTextToWatches),
+  contextTypes() {
+    return r((e) => [e.UISourceCodeFrame.UISourceCodeFrame]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+A' },
+    { platform: 'mac', shortcut: 'Meta+Shift+A' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'debugger.evaluate-selection',
+  category: 'DEBUGGER',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.evaluateSelectedTextInConsole),
+  contextTypes() {
+    return r((e) => [e.UISourceCodeFrame.UISourceCodeFrame]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+E' },
+    { platform: 'mac', shortcut: 'Meta+Shift+E' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.switch-file',
+  category: 'SOURCES',
+  title: o(t.switchFile),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.SwitchFileActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [{ shortcut: 'Alt+O' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.rename',
+  category: 'SOURCES',
+  title: o(t.rename),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'F2' },
+    { platform: 'mac', shortcut: 'Enter' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'SOURCES',
+  actionId: 'sources.close-all',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  title: o(t.closeAll),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+K W', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+K W', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.jump-to-previous-location',
+  category: 'SOURCES',
+  title: o(t.jumpToPreviousEditingLocation),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [{ shortcut: 'Alt+Minus' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.jump-to-next-location',
+  category: 'SOURCES',
+  title: o(t.jumpToNextEditingLocation),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [{ shortcut: 'Alt+Plus' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.close-editor-tab',
+  category: 'SOURCES',
+  title: o(t.closeTheActiveTab),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    { shortcut: 'Alt+w' },
+    { shortcut: 'Ctrl+W', keybindSets: ['vsCode'] },
+    { platform: 'windows', shortcut: 'Ctrl+F4', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.next-editor-tab',
+  category: 'SOURCES',
+  title: o(t.nextEditorTab),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+PageDown',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'mac', shortcut: 'Meta+PageDown', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.previous-editor-tab',
+  category: 'SOURCES',
+  title: o(t.previousEditorTab),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+PageUp',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'mac', shortcut: 'Meta+PageUp', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.go-to-line',
+  category: 'SOURCES',
+  title: o(t.goToLine),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [{ shortcut: 'Ctrl+g', keybindSets: ['devToolsDefault', 'vsCode'] }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.go-to-member',
+  category: 'SOURCES',
+  title: o(t.goToAFunctionDeclarationruleSet),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+Shift+o',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'mac', shortcut: 'Meta+Shift+o', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+T', keybindSets: ['vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+T', keybindSets: ['vsCode'] },
+    { shortcut: 'F12', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'debugger.toggle-breakpoint',
+  category: 'DEBUGGER',
+  title: o(t.toggleBreakpoint),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+b', keybindSets: ['devToolsDefault'] },
+    { platform: 'mac', shortcut: 'Meta+b', keybindSets: ['devToolsDefault'] },
+    { shortcut: 'F9', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'debugger.toggle-breakpoint-enabled',
+  category: 'DEBUGGER',
+  title: o(t.toggleBreakpointEnabled),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+b' },
+    { platform: 'mac', shortcut: 'Meta+Shift+b' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'debugger.breakpoint-input-window',
+  category: 'DEBUGGER',
+  title: o(t.toggleBreakpointInputWindow),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Alt+b' },
+    { platform: 'mac', shortcut: 'Meta+Alt+b' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.save',
+  category: 'SOURCES',
+  title: o(t.save),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+s', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+s', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.save-all',
+  category: 'SOURCES',
+  title: o(t.saveAll),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesView.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+s' },
+    { platform: 'mac', shortcut: 'Meta+Alt+s' },
+    { platform: 'windows,linux', shortcut: 'Ctrl+K S', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+Alt+S', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'SOURCES',
+  actionId: 'sources.create-snippet',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesNavigator.ActionDelegate();
+  },
+  title: o(t.createNewSnippet),
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'SOURCES',
+  actionId: 'sources.add-folder-to-workspace',
+  condition: () => !S.InspectorFrontendHost.InspectorFrontendHostInstance.isHostedMode(),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesNavigator.ActionDelegate();
+  },
+  iconClass: 'plus',
+  title: o(t.addFolderToWorkspace),
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.previous-call-frame',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.CallStackSidebarPane.ActionDelegate();
+  },
+  title: o(t.previousCallFrame),
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  bindings: [{ shortcut: 'Ctrl+,' }],
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'DEBUGGER',
+  actionId: 'debugger.next-call-frame',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.CallStackSidebarPane.ActionDelegate();
+  },
+  title: o(t.nextCallFrame),
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  bindings: [{ shortcut: 'Ctrl+.' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.search',
+  title: o(t.search),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SearchSourcesView.ActionDelegate();
+  },
+  category: 'SOURCES',
+  bindings: [
+    { platform: 'mac', shortcut: 'Meta+Alt+F', keybindSets: ['devToolsDefault'] },
+    {
+      platform: 'windows,linux',
+      shortcut: 'Ctrl+Shift+F',
+      keybindSets: ['devToolsDefault', 'vsCode'],
+    },
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+J', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+Shift+F', keybindSets: ['vsCode'] },
+    { platform: 'mac', shortcut: 'Meta+Shift+J', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.increment-css',
+  category: 'SOURCES',
+  title: o(t.incrementCssUnitBy, { PH1: 1 }),
+  bindings: [{ shortcut: 'Alt+Up' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.increment-css-by-ten',
+  title: o(t.incrementCssUnitBy, { PH1: 10 }),
+  category: 'SOURCES',
+  bindings: [{ shortcut: 'Alt+PageUp' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.decrement-css',
+  category: 'SOURCES',
+  title: o(t.decrementCssUnitBy, { PH1: 1 }),
+  bindings: [{ shortcut: 'Alt+Down' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.decrement-css-by-ten',
+  category: 'SOURCES',
+  title: o(t.decrementCssUnitBy, { PH1: 10 }),
+  bindings: [{ shortcut: 'Alt+PageDown' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.reveal-in-navigator-sidebar',
+  category: 'SOURCES',
+  title: o(t.revealActiveFileInSidebar),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.toggle-navigator-sidebar',
+  category: 'SOURCES',
+  title: o(t.toggleNavigatorSidebar),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+y', keybindSets: ['devToolsDefault'] },
+    { platform: 'mac', shortcut: 'Meta+Shift+y', keybindSets: ['devToolsDefault'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+b', keybindSets: ['vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Meta+b', keybindSets: ['vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'sources.toggle-debugger-sidebar',
+  category: 'SOURCES',
+  title: o(t.toggleDebuggerSidebar),
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+h' },
+    { platform: 'mac', shortcut: 'Meta+Shift+h' },
+  ],
+});
+a.Settings.registerSettingExtension({
+  settingName: 'navigator-group-by-folder',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+a.Settings.registerSettingExtension({
+  settingName: 'navigator-group-by-authored',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  settingName: 'navigator-just-my-code',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.searchInAnonymousAndContent),
+  settingName: 'search-in-anonymous-and-content-scripts',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: o(t.searchInAnonymousAndContent) },
+    { value: !1, title: o(t.doNotSearchInAnonymousAndContent) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.automaticallyRevealFilesIn),
+  settingName: 'auto-reveal-in-navigator',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.automaticallyRevealFilesIn) },
+    { value: !1, title: o(t.doNotAutomaticallyRevealFilesIn) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.tabMovesFocus),
+  settingName: 'text-editor-tab-moves-focus',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: o(t.enableTabMovesFocus) },
+    { value: !1, title: o(t.disableTabMovesFocus) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.detectIndentation),
+  settingName: 'text-editor-auto-detect-indent',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.detectIndentation) },
+    { value: !1, title: o(t.doNotDetectIndentation) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.autocompletion),
+  settingName: 'text-editor-autocompletion',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.enableAutocompletion) },
+    { value: !1, title: o(t.disableAutocompletion) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.bracketClosing),
+  settingName: 'text-editor-bracket-closing',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.enableBracketClosing) },
+    { value: !1, title: o(t.disableBracketClosing) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  title: o(t.bracketMatching),
+  settingName: 'text-editor-bracket-matching',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.enableBracketMatching) },
+    { value: !1, title: o(t.disableBracketMatching) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.codeFolding),
+  settingName: 'text-editor-code-folding',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.enableCodeFolding) },
+    { value: !1, title: o(t.disableCodeFolding) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.showWhitespaceCharacters),
+  settingName: 'show-whitespaces-in-editor',
+  settingType: 'enum',
+  defaultValue: 'original',
+  options: [
+    { title: o(t.doNotShowWhitespaceCharacters), text: o(t.none), value: 'none' },
+    { title: o(t.showAllWhitespaceCharacters), text: o(t.all), value: 'all' },
+    { title: o(t.showTrailingWhitespaceCharacters), text: o(t.trailing), value: 'trailing' },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.wordWrap),
+  settingName: 'sources.word-wrap',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+n.ActionRegistration.registerActionExtension({
+  category: 'SOURCES',
+  actionId: 'sources.toggle-word-wrap',
+  async loadActionDelegate() {
+    let e = await i();
+    return new e.SourcesPanel.ActionDelegate();
+  },
+  title: o(t.toggleWordWrap),
+  contextTypes() {
+    return r((e) => [e.SourcesView.SourcesView]);
+  },
+  bindings: [{ shortcut: 'Alt+Z', keybindSets: ['vsCode'] }],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.variableValuesInlineWhile),
+  settingName: 'inline-variable-values',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.displayVariableValuesInlineWhile) },
+    { value: !1, title: o(t.doNotDisplayVariableValuesInline) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.enableAutoFocusOnDebuggerPaused),
+  settingName: 'auto-focus-on-debugger-paused-enabled',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.enableAutoFocusOnDebuggerPaused) },
+    { value: !1, title: o(t.disableAutoFocusOnDebuggerPaused) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.automaticallyPrettyPrintMinifiedSources),
+  settingName: 'auto-pretty-print-minified',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.automaticallyPrettyPrintMinifiedSources) },
+    { value: !1, title: o(t.doNotAutomaticallyPrettyPrintMinifiedSources) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Synced',
+  title: o(t.allowScrollingPastEndOfFile),
+  settingName: 'allow-scroll-past-eof',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.allowScrollingPastEndOfFile) },
+    { value: !1, title: o(t.disallowScrollingPastEndOfFile) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'SOURCES',
+  storageType: 'Local',
+  title: o(t.wasmAutoStepping),
+  settingName: 'wasm-auto-stepping',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: o(t.enableWasmAutoStepping) },
+    { value: !1, title: o(t.disableWasmAutoStepping) },
+  ],
+  learnMore: { tooltip: o(t.wasmAutoSteppingInfo) },
+});
+n.ViewManager.registerLocationResolver({
+  name: 'navigator-view',
+  category: 'SOURCES',
+  async loadResolver() {
+    return (await i()).SourcesPanel.SourcesPanel.instance();
+  },
+});
+n.ViewManager.registerLocationResolver({
+  name: 'sources.sidebar-top',
+  category: 'SOURCES',
+  async loadResolver() {
+    return (await i()).SourcesPanel.SourcesPanel.instance();
+  },
+});
+n.ViewManager.registerLocationResolver({
+  name: 'sources.sidebar-bottom',
+  category: 'SOURCES',
+  async loadResolver() {
+    return (await i()).SourcesPanel.SourcesPanel.instance();
+  },
+});
+n.ViewManager.registerLocationResolver({
+  name: 'sources.sidebar-tabs',
+  category: 'SOURCES',
+  async loadResolver() {
+    return (await i()).SourcesPanel.SourcesPanel.instance();
+  },
+});
+n.ContextMenu.registerProvider({
+  contextTypes() {
+    return [
+      c.UISourceCode.UISourceCode,
+      c.UISourceCode.UILocation,
+      s.RemoteObject.RemoteObject,
+      s.NetworkRequest.NetworkRequest,
+      ...r((e) => [e.UISourceCodeFrame.UISourceCodeFrame]),
+    ];
+  },
+  async loadProvider() {
+    return (await i()).SourcesPanel.SourcesPanel.instance();
+  },
+});
+n.ContextMenu.registerProvider({
+  async loadProvider() {
+    return (await i()).WatchExpressionsSidebarPane.WatchExpressionsSidebarPane.instance();
+  },
+  contextTypes() {
+    return [
+      m.ObjectPropertiesSection.ObjectPropertyTreeElement,
+      ...r((e) => [e.UISourceCodeFrame.UISourceCodeFrame]),
+    ];
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [c.UISourceCode.UILocation];
+  },
+  destination: a.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let e = await i();
+    return new e.SourcesPanel.UILocationRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [c.UISourceCode.UILocationRange];
+  },
+  destination: a.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let e = await i();
+    return new e.SourcesPanel.UILocationRangeRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [s.DebuggerModel.Location];
+  },
+  destination: a.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let e = await i();
+    return new e.SourcesPanel.DebuggerLocationRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [c.UISourceCode.UISourceCode];
+  },
+  destination: a.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let e = await i();
+    return new e.SourcesPanel.UISourceCodeRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  destination: a.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let e = await i();
+    return new e.SourcesPanel.DebuggerPausedDetailsRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [p.BreakpointManager.BreakpointLocation];
+  },
+  destination: a.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let e = await i();
+    return new e.DebuggerPlugin.BreakpointLocationRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return r((e) => [e.SearchSourcesView.SearchSources]);
+  },
+  async loadRevealer() {
+    let e = await i();
+    return new e.SearchSourcesView.Revealer();
+  },
+});
+n.Toolbar.registerToolbarItem({
+  actionId: 'sources.add-folder-to-workspace',
+  location: 'files-navigator-toolbar',
+  label: o(t.addFolderManually),
+});
+n.Context.registerListener({
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  async loadListener() {
+    return (await i()).BreakpointsView.BreakpointsSidebarController.instance();
+  },
+});
+n.Context.registerListener({
+  contextTypes() {
+    return [s.DebuggerModel.DebuggerPausedDetails];
+  },
+  async loadListener() {
+    return (await i()).CallStackSidebarPane.CallStackSidebarPane.instance();
+  },
+});
+n.Context.registerListener({
+  contextTypes() {
+    return [w.StackTrace.DebuggableFrameFlavor];
+  },
+  async loadListener() {
+    return (await i()).ScopeChainSidebarPane.ScopeChainSidebarPane.instance();
+  },
+});
+n.ContextMenu.registerItem({ location: 'navigatorMenu/default', actionId: 'quick-open.show' });
+n.ContextMenu.registerItem({ location: 'mainMenu/default', actionId: 'sources.search' });
+u.FilteredListWidget.registerProvider({
+  prefix: '@',
+  iconName: 'symbol',
+  async provider() {
+    let e = await i();
+    return new e.OutlineQuickOpen.OutlineQuickOpen();
+  },
+  helpTitle: o(t.goToSymbol),
+  titlePrefix: o(t.goTo),
+  titleSuggestion: o(t.symbol),
+  jslogContext: 'source-symbol',
+});
+u.FilteredListWidget.registerProvider({
+  prefix: ':',
+  iconName: 'colon',
+  async provider() {
+    let e = await i();
+    return new e.GoToLineQuickOpen.GoToLineQuickOpen();
+  },
+  helpTitle: o(t.goToLine),
+  titlePrefix: o(t.goTo),
+  titleSuggestion: o(t.line),
+  jslogContext: 'source-line',
+});
+u.FilteredListWidget.registerProvider({
+  prefix: '',
+  iconName: 'document',
+  async provider() {
+    let e = await i();
+    return new e.OpenFileQuickOpen.OpenFileQuickOpen();
+  },
+  helpTitle: o(t.openFile),
+  titlePrefix: o(t.open),
+  titleSuggestion: o(t.file),
+  jslogContext: 'source-file',
+});
+n.ContextMenu.registerProvider({
+  contextTypes() {
+    return [c.UISourceCode.UISourceCode, s.Resource.Resource, s.NetworkRequest.NetworkRequest];
+  },
+  async loadProvider() {
+    let e = await i();
+    return new e.PersistenceActions.ContextMenuProvider();
+  },
+});
+//# sourceMappingURL=sources-meta.js.map

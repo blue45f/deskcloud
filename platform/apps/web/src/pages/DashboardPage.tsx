@@ -180,9 +180,9 @@ function AdminCommandCenter({ tenant }: { tenant?: TenantDto }) {
 
         <div className="rounded-md border border-dashed border-border px-4 py-3">
           <p className="text-sm text-text-muted">
-            RemoteDevTools처럼 물리적으로 분리된 저장소 서비스도 같은 방식으로 연결할 수 있습니다.
-            먼저 서비스 도메인, 운영 URL, 사용량 메트릭을 콘솔에 묶고, 소스 모노레포 흡수는 별도
-            단계로 검증합니다.
+            SEOGatewayDesk와 RemoteDevTools처럼 자체 런타임을 가진 Desk도 같은 운영 콘솔에서
+            관리합니다. 서비스 도메인, gateway path, 사용량 메트릭을 가입회사 테넌트에 묶고 소스는
+            deskcloud workspace에서 함께 검증합니다.
           </p>
         </div>
       </CardContent>

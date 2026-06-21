@@ -1,0 +1,291 @@
+import * as t from './../../core/common/common.js';
+import * as c from './../../core/i18n/i18n.js';
+import * as s from './../../core/sdk/sdk.js';
+import * as o from './../../ui/legacy/legacy.js';
+var i = {
+    performance: 'Performance',
+    showPerformance: 'Show Performance',
+    record: 'Record',
+    stop: 'Stop',
+    recordAndReload: 'Record and reload',
+    saveProfile: 'Save profile\u2026',
+    loadProfile: 'Load profile\u2026',
+    previousFrame: 'Previous frame',
+    nextFrame: 'Next frame',
+    showRecentTimelineSessions: 'Show recent timeline sessions',
+    previousRecording: 'Previous recording',
+    nextRecording: 'Next recording',
+    chromeFrameInLayersView: 'Chrome frame in Layers view',
+    timelineShowAllEvents: 'Show all events',
+  },
+  d = c.i18n.registerUIStrings('panels/timeline/timeline-meta.ts', i),
+  r = c.i18n.getLazilyComputedLocalizedString.bind(void 0, d),
+  l;
+async function n() {
+  return (l || (l = await import('./timeline.js')), l);
+}
+function a(e) {
+  return l === void 0 ? [] : e(l);
+}
+o.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'timeline',
+  title: r(i.performance),
+  commandPrompt: r(i.showPerformance),
+  order: 50,
+  async loadView(e) {
+    let m = await n(),
+      g = e.context.get(s.PageResourceLoader.PageResourceLoader);
+    return m.TimelinePanel.TimelinePanel.instance({ forceNew: !0, resourceLoader: g });
+  },
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.toggle-recording',
+  category: 'PERFORMANCE',
+  iconClass: 'record-start',
+  toggleable: !0,
+  toggledIconClass: 'record-stop',
+  toggleWithRedColor: !0,
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  options: [
+    { value: !0, title: r(i.record) },
+    { value: !1, title: r(i.stop) },
+  ],
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+E' },
+    { platform: 'mac', shortcut: 'Meta+E' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.record-reload',
+  iconClass: 'refresh',
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  category: 'PERFORMANCE',
+  title: r(i.recordAndReload),
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+Shift+E' },
+    { platform: 'mac', shortcut: 'Meta+Shift+E' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'PERFORMANCE',
+  actionId: 'timeline.save-to-file',
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  title: r(i.saveProfile),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+S' },
+    { platform: 'mac', shortcut: 'Meta+S' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'PERFORMANCE',
+  actionId: 'timeline.load-from-file',
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  title: r(i.loadProfile),
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+O' },
+    { platform: 'mac', shortcut: 'Meta+O' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.jump-to-previous-frame',
+  category: 'PERFORMANCE',
+  title: r(i.previousFrame),
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  bindings: [{ shortcut: '[' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.jump-to-next-frame',
+  category: 'PERFORMANCE',
+  title: r(i.nextFrame),
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  bindings: [{ shortcut: ']' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.show-history',
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  category: 'PERFORMANCE',
+  title: r(i.showRecentTimelineSessions),
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Ctrl+H' },
+    { platform: 'mac', shortcut: 'Meta+Y' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.previous-recording',
+  category: 'PERFORMANCE',
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  title: r(i.previousRecording),
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Alt+Left' },
+    { platform: 'mac', shortcut: 'Meta+Left' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'timeline.next-recording',
+  category: 'PERFORMANCE',
+  async loadActionDelegate() {
+    let e = await n();
+    return new e.TimelinePanel.ActionDelegate();
+  },
+  title: r(i.nextRecording),
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.TimelinePanel]);
+  },
+  bindings: [
+    { platform: 'windows,linux', shortcut: 'Alt+Right' },
+    { platform: 'mac', shortcut: 'Meta+Right' },
+  ],
+});
+t.Settings.registerSettingExtension({
+  category: 'PERFORMANCE',
+  storageType: 'Synced',
+  title: r(i.chromeFrameInLayersView),
+  settingName: 'frame-viewer-chrome-window',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+t.Settings.registerSettingExtension({
+  category: 'PERFORMANCE',
+  storageType: 'Synced',
+  title: r(i.timelineShowAllEvents),
+  settingName: 'timeline-show-all-events',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+t.Settings.registerSettingExtension({
+  category: 'PERFORMANCE',
+  storageType: 'Synced',
+  settingName: 'annotations-hidden',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+o.ContextMenu.registerItem({
+  location: 'timelineMenu/open',
+  actionId: 'timeline.load-from-file',
+  order: 10,
+});
+o.ContextMenu.registerItem({
+  location: 'timelineMenu/open',
+  actionId: 'timeline.save-to-file',
+  order: 15,
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return [s.TraceObject.TraceObject];
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.TraceRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return a((e) => [e.TimelinePanel.ParsedTraceRevealable]);
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.ParsedTraceRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return [s.TraceObject.RevealableEvent];
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.EventRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return a((e) => [e.Utils.Helpers.RevealableInsight]);
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.InsightRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return a((e) => [e.Utils.Helpers.RevealableCoreVitals]);
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.CoreVitalsRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return a((e) => [e.Utils.Helpers.RevealableTimeRange]);
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.TimeRangeRevealer();
+  },
+});
+t.Revealer.registerRevealer({
+  contextTypes() {
+    return a((e) => [e.Utils.Helpers.RevealableBottomUpProfile]);
+  },
+  destination: t.Revealer.RevealerDestination.TIMELINE_PANEL,
+  async loadRevealer() {
+    let e = await n();
+    return new e.TimelinePanel.BottomUpProfileRevealer();
+  },
+});
+//# sourceMappingURL=timeline-meta.js.map

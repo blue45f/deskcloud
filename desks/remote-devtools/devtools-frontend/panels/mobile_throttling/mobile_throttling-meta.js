@@ -1,0 +1,79 @@
+import * as l from './../../core/common/common.js';
+import * as a from './../../core/i18n/i18n.js';
+import * as o from './../../ui/legacy/legacy.js';
+var t = {
+    throttling: 'Throttling',
+    showThrottling: 'Show Throttling',
+    goOffline: 'Go offline',
+    device: 'device',
+    throttlingTag: 'throttling',
+    enableSlowGThrottling: 'Enable slow `3G` throttling',
+    enableFastGThrottling: 'Enable fast `3G` throttling',
+    goOnline: 'Go online',
+  },
+  g = a.i18n.registerUIStrings('panels/mobile_throttling/mobile_throttling-meta.ts', t),
+  n = a.i18n.getLazilyComputedLocalizedString.bind(void 0, g),
+  r;
+async function e() {
+  return (r || (r = await import('./mobile_throttling.js')), r);
+}
+o.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  id: 'throttling-conditions',
+  title: n(t.throttling),
+  commandPrompt: n(t.showThrottling),
+  order: 35,
+  async loadView() {
+    let i = await e();
+    return new i.ThrottlingSettingsTab.ThrottlingSettingsTab();
+  },
+  settings: ['custom-network-conditions', 'calibrated-cpu-throttling'],
+  iconName: 'performance',
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'network-conditions.network-offline',
+  category: 'NETWORK',
+  title: n(t.goOffline),
+  async loadActionDelegate() {
+    let i = await e();
+    return new i.ThrottlingManager.ActionDelegate();
+  },
+  tags: [n(t.device), n(t.throttlingTag)],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'network-conditions.network-low-end-mobile',
+  category: 'NETWORK',
+  title: n(t.enableSlowGThrottling),
+  async loadActionDelegate() {
+    let i = await e();
+    return new i.ThrottlingManager.ActionDelegate();
+  },
+  tags: [n(t.device), n(t.throttlingTag)],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'network-conditions.network-mid-tier-mobile',
+  category: 'NETWORK',
+  title: n(t.enableFastGThrottling),
+  async loadActionDelegate() {
+    let i = await e();
+    return new i.ThrottlingManager.ActionDelegate();
+  },
+  tags: [n(t.device), n(t.throttlingTag)],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'network-conditions.network-online',
+  category: 'NETWORK',
+  title: n(t.goOnline),
+  async loadActionDelegate() {
+    let i = await e();
+    return new i.ThrottlingManager.ActionDelegate();
+  },
+  tags: [n(t.device), n(t.throttlingTag)],
+});
+l.Settings.registerSettingExtension({
+  storageType: 'Synced',
+  settingName: 'custom-network-conditions',
+  settingType: 'array',
+  defaultValue: [],
+});
+//# sourceMappingURL=mobile_throttling-meta.js.map

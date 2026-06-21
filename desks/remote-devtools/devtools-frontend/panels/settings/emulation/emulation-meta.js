@@ -1,0 +1,23 @@
+import * as t from './../../../core/i18n/i18n.js';
+import * as s from './../../../ui/legacy/legacy.js';
+var i = { devices: 'Devices', showDevices: 'Show Devices' },
+  a = t.i18n.registerUIStrings('panels/settings/emulation/emulation-meta.ts', i),
+  n = t.i18n.getLazilyComputedLocalizedString.bind(void 0, a),
+  e;
+async function c() {
+  return (e || (e = await import('./emulation.js')), e);
+}
+s.ViewManager.registerViewExtension({
+  location: 'settings-view',
+  commandPrompt: n(i.showDevices),
+  title: n(i.devices),
+  order: 30,
+  async loadView() {
+    let o = await c();
+    return new o.DevicesSettingsTab.DevicesSettingsTab();
+  },
+  id: 'devices',
+  settings: ['standard-emulated-device-list', 'custom-emulated-device-list'],
+  iconName: 'devices',
+});
+//# sourceMappingURL=emulation-meta.js.map

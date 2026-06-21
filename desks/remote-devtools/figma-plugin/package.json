@@ -1,0 +1,30 @@
+{
+  "name": "@desk/remote-devtools-figma-plugin",
+  "version": "1.0.0",
+  "description": "Remote Debug Tools Figma Plugin",
+  "main": "dist/code.js",
+  "scripts": {
+    "dev": "vite build --watch & BUILD_TARGET=ui vite build --watch",
+    "build": "npm run build:dev",
+    "build:dev": "npm run clean && VITE_API_URL=http://localhost:3001 npm run build:all",
+    "build:prod": "npm run clean && npm run build:all",
+    "build:all": "VITE_API_URL=${VITE_API_URL:-http://localhost:3001} vite build && VITE_API_URL=${VITE_API_URL:-http://localhost:3001} BUILD_TARGET=ui vite build",
+    "clean": "rm -rf dist",
+    "verify": "node -e \"const fs = require('fs'); const content = fs.readFileSync('dist/ui.html', 'utf8'); console.log('Built with URL:', content.match(/API_BASE_URL = \\\"([^\\\"]+)\\\"/)?.[1] || 'NOT FOUND')\"",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "axios": "^1.16.1"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.127.0",
+    "@types/node": "^25.9.1",
+    "@typescript-eslint/eslint-plugin": "^8.61.0",
+    "@typescript-eslint/parser": "^8.60.1",
+    "eslint": "^10.5.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.14",
+    "vite-plugin-singlefile": "^2.3.3"
+  }
+}

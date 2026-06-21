@@ -1,0 +1,23 @@
+import * as a from './../../core/i18n/i18n.js';
+import * as d from './../../ui/legacy/legacy.js';
+var i = { webaudio: 'WebAudio', audio: 'audio', showWebaudio: 'Show WebAudio' },
+  t = a.i18n.registerUIStrings('panels/web_audio/web_audio-meta.ts', i),
+  e = a.i18n.getLazilyComputedLocalizedString.bind(void 0, t),
+  o;
+async function r() {
+  return (o || (o = await import('./web_audio.js')), o);
+}
+d.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'web-audio',
+  title: e(i.webaudio),
+  commandPrompt: e(i.showWebaudio),
+  persistence: 'closeable',
+  order: 100,
+  async loadView() {
+    let n = await r();
+    return new n.WebAudioView.WebAudioView();
+  },
+  tags: [e(i.audio)],
+});
+//# sourceMappingURL=web_audio-meta.js.map

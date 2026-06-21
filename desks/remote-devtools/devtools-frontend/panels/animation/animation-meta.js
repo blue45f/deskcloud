@@ -1,0 +1,33 @@
+import * as i from './../../core/common/common.js';
+import * as o from './../../core/i18n/i18n.js';
+import * as m from './../../core/sdk/sdk.js';
+import * as r from './../../ui/legacy/legacy.js';
+var n,
+  e = { animations: 'Animations', showAnimations: 'Show Animations' },
+  l = o.i18n.registerUIStrings('panels/animation/animation-meta.ts', e),
+  a = o.i18n.getLazilyComputedLocalizedString.bind(void 0, l);
+async function s() {
+  return (n || (n = await import('./animation.js')), n);
+}
+r.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'animations',
+  title: a(e.animations),
+  commandPrompt: a(e.showAnimations),
+  persistence: 'closeable',
+  order: 0,
+  async loadView() {
+    return (await s()).AnimationTimeline.AnimationTimeline.instance();
+  },
+});
+i.Revealer.registerRevealer({
+  contextTypes() {
+    return [m.AnimationModel.AnimationGroup];
+  },
+  destination: i.Revealer.RevealerDestination.SOURCES_PANEL,
+  async loadRevealer() {
+    let t = await s();
+    return new t.AnimationTimeline.AnimationGroupRevealer();
+  },
+});
+//# sourceMappingURL=animation-meta.js.map

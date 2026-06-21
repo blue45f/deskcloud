@@ -1,0 +1,34 @@
+import * as r from './../../core/common/common.js';
+import * as t from './../../core/i18n/i18n.js';
+var e = {
+    preserveLog: 'Preserve log',
+    preserve: 'preserve',
+    clear: 'clear',
+    reset: 'reset',
+    preserveLogOnPageReload: 'Preserve log on page reload / navigation',
+    doNotPreserveLogOnPageReload: 'Do not preserve log on page reload / navigation',
+    recordNetworkLog: 'Record network log',
+  },
+  n = t.i18n.registerUIStrings('models/logs/logs-meta.ts', e),
+  o = t.i18n.getLazilyComputedLocalizedString.bind(void 0, n);
+r.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  title: o(e.preserveLog),
+  settingName: 'network-log.preserve-log',
+  settingType: 'boolean',
+  defaultValue: !1,
+  tags: [o(e.preserve), o(e.clear), o(e.reset)],
+  options: [
+    { value: !0, title: o(e.preserveLogOnPageReload) },
+    { value: !1, title: o(e.doNotPreserveLogOnPageReload) },
+  ],
+});
+r.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  title: o(e.recordNetworkLog),
+  settingName: 'network-log.record-log',
+  settingType: 'boolean',
+  defaultValue: !0,
+  storageType: 'Session',
+});
+//# sourceMappingURL=logs-meta.js.map

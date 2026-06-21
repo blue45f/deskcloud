@@ -79,10 +79,24 @@ export default function DeskMicrositePage() {
   const operations = deskOperations(desk)
   const detail = deskDetails(desk)
   const integrationPackage = desk.integrationPackage ?? SDK_PACKAGE
-  const serviceEndpoint = desk.liveUrl ?? endpoint
-  const isLinkedDesk = desk.integrationMode === 'linked'
-  const apiShapeCode = isLinkedDesk
-    ? `# Internal dashboard API
+  const integrationMode = desk.integrationMode ?? 'native'
+  const isNativeDesk = integrationMode === 'native'
+  const isWorkspaceDesk = integrationMode === 'workspace'
+  const isLinkedDesk = integrationMode === 'linked'
+  const isPackagedDesk = isWorkspaceDesk || isLinkedDesk
+  const serviceEndpoint = isWorkspaceDesk ? operations.gatewayPath : (desk.liveUrl ?? endpoint)
+  const apiShapeCode =
+    desk.id === 'seo-gateway'
+      ? `# Admin API
+curl '${serviceEndpoint}/admin/api/site'
+
+# Prometheus metrics
+curl '${serviceEndpoint}/metrics'
+
+# Bot render smoke test
+curl -A 'Googlebot' '${serviceEndpoint}/?_render_target=https://example.com'`
+      : desk.id === 'remote-devtools' || isLinkedDesk
+        ? `# Internal dashboard API
 curl '${serviceEndpoint}/api/dashboard/stats'
 
 # Recorded sessions
@@ -90,7 +104,7 @@ curl '${serviceEndpoint}/sessions/record'
 
 # External SDK bundle
 curl '${serviceEndpoint}/sdk/index.umd.js'`
-    : restSnippet('/api/tenants')
+        : restSnippet('/api/tenants')
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -156,7 +170,9 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
               <div>
                 <dt className="font-medium text-text">Auth</dt>
                 <dd className="mt-0.5 text-[0.8125rem] text-text-muted">
-                  {isLinkedDesk ? 'SDK origin + tenant allowlist' : 'publishable key + tenant CORS'}
+                  {isPackagedDesk
+                    ? 'workspace package + tenant allowlist'
+                    : 'publishable key + tenant CORS'}
                 </dd>
               </div>
             </div>
@@ -337,26 +353,34 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold tracking-tight text-text">
-                {isLinkedDesk ? '연결형 SDK quickstart' : 'SDK quickstart'}
+                {isWorkspaceDesk
+                  ? '워크스페이스 quickstart'
+                  : isLinkedDesk
+                    ? '연결형 SDK quickstart'
+                    : 'SDK quickstart'}
               </h2>
               <p className="mt-1 text-sm text-text-muted">
-                {isLinkedDesk
-                  ? '별도 저장소와 배포를 유지하면서 DeskCloud 운영 콘솔에 연결해 관리합니다.'
-                  : '같은 패키지, 같은 클라이언트 패턴으로 앱 안에 붙입니다.'}
+                {isWorkspaceDesk
+                  ? 'DeskCloud 모노레포 안의 workspace 패키지를 사용하고 운영 콘솔에서 같은 테넌트로 관리합니다.'
+                  : isLinkedDesk
+                    ? '별도 저장소와 배포를 유지하면서 DeskCloud 운영 콘솔에 연결해 관리합니다.'
+                    : '같은 패키지, 같은 클라이언트 패턴으로 앱 안에 붙입니다.'}
               </p>
             </div>
             <Badge tone="outline" size="sm">
               {desk.sdkFactory ?? desk.integrationPackage ?? 'REST'}
             </Badge>
           </div>
-          {isLinkedDesk ? (
+          {isPackagedDesk ? (
             <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-border bg-surface-2 p-3 text-[0.8125rem] text-text-muted">
               <p>
-                운영 URL은{' '}
+                {isWorkspaceDesk ? 'workspace 경로는' : '운영 URL은'}{' '}
                 <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-text">
-                  {serviceEndpoint}
+                  {isWorkspaceDesk ? desk.workspacePath : serviceEndpoint}
                 </code>
-                이고, 소스 저장소는 별도 릴리스 주기를 유지합니다.
+                {isWorkspaceDesk
+                  ? '이고, 소스와 문서는 deskcloud 안에서 함께 검증합니다.'
+                  : '이고, 소스 저장소는 별도 릴리스 주기를 유지합니다.'}
               </p>
               {desk.sourceRepositoryUrl ? (
                 <a
@@ -375,7 +399,10 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
             </div>
           )}
           <div className="mt-5">
-            <CodeBlock code={sdkSnippet(desk)} language={isLinkedDesk ? 'html' : 'ts'} />
+            <CodeBlock
+              code={sdkSnippet(desk)}
+              language={desk.id === 'remote-devtools' ? 'html' : 'ts'}
+            />
           </div>
         </div>
 
@@ -385,12 +412,14 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
             <h2 className="text-lg font-semibold tracking-tight text-text">API shape</h2>
           </div>
           <p className="mt-1 text-sm text-text-muted">
-            {isLinkedDesk
-              ? '자체 Internal API, External SDK 번들, WebSocket gateway를 분리해 운영합니다.'
-              : 'SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.'}
+            {desk.id === 'seo-gateway'
+              ? 'DeskCloud 통합 라우트 아래에서 Fastify 렌더 gateway, admin API, metrics endpoint를 운영합니다.'
+              : desk.id === 'remote-devtools' || isLinkedDesk
+                ? 'DeskCloud 통합 라우트 아래에서 Internal API, SDK 번들, WebSocket gateway를 운영합니다.'
+                : 'SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.'}
           </p>
           <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] text-text-muted">
-            {isLinkedDesk ? serviceEndpoint : `${operations.gatewayPath}/api`}
+            {isNativeDesk ? `${operations.gatewayPath}/api` : serviceEndpoint}
           </p>
           <div className="mt-4">
             <CodeBlock code={apiShapeCode} language="bash" />

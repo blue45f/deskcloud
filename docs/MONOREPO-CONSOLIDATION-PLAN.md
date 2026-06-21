@@ -6,18 +6,19 @@
 >
 > **Verified live (2026-06-20):** `.git` = 241M, worktree = 554M, **`devtools-frontend/` = 299M / 4,709 files / NO `package.json`** (52% of the worktree, the largest 15 history blobs are all `*.json.gz` trace fixtures _inside_ it), no git remote, single local `main`, `node_modules` never materialized, **10 nested config files survive** (4 `pnpm-workspace.yaml` + 6 `pnpm-lock.yaml`), one inner `turbo.json`.
 
-> **Implementation boundary note (2026-06-21):** the current owner directive is stricter than this plan's
-> earlier "SDK/deploy stay OUT" boundary. The implementation absorbs `deskcloud-sdk` as
-> `packages/deskcloud-sdk` while preserving its public package identity `@heejun/deskcloud`, and absorbs
-> `deskcloud-deploy` as `deploy/stack` while keeping `.env` untracked. The platform visit-counter DB/API
-> change from `desk-platform` is merged into `platform/`. `remote-devtools` and
-> `@heejun/web-config-preset` remain outside the DeskCloud monorepo.
+> **Implementation boundary override (2026-06-21):** the owner directive now favors integrated
+> operation over separate repos even when the work is large. The implementation absorbs
+> `deskcloud-sdk` as `packages/deskcloud-sdk`, `deskcloud-deploy` as `deploy/stack`, `seo-gateway`
+> as `desks/seo-gateway` / product name `SEOGatewayDesk`, and `remote-devtools` as
+> `desks/remote-devtools` / workspace package `@desk/remote-devtools`. Older sections below that
+> recommend quarantining `remote-devtools` are retained as historical decision record and are
+> superseded by this override. `@heejun/web-config-preset` remains outside the DeskCloud monorepo.
 
 ---
 
 ## 1. TL;DR — Recommended Consolidation Boundary
 
-**Build a PARTIAL monorepo, not the full 18-repo absorption — but a _wide_ partial, honoring the owner's "one consolidated monorepo / deep operational consolidation" directive for the part of the family where it actually pays.** The owner's directive holds for the product family that shares one architecture; it does **not** justify dragging a 299MB vendored Chromium fork and a published-SemVer SDK into the same `.git` everyone clones forever. The critiques proved two structural outliers that should sit _outside_ the absorption line on **cost-homogeneity** grounds, not just publishing identity.
+**Current implementation: build one integrated DeskCloud monorepo and operate the developer-tool Desks from the same console.** The earlier cost critique recommended quarantining `remote-devtools`, but the owner directive now explicitly prefers integrated operation over keeping `seo-gateway` and `remote-devtools` separate. The 299MB vendored DevTools frontend remains a known clone/CI cost, so it is treated as a documented heavy asset under `desks/remote-devtools/devtools-frontend` rather than as a reason to run a separate repo.
 
 The decisive cut:
 
@@ -25,21 +26,19 @@ The decisive cut:
 
 - `platform/` — the `@desk/*` provider (the _only_ true tight-coupling anchor). **[done, reconcile]**
 - `desks/seo-gateway/` — deep platform wiring, already absorbed. **[done]**
+- `desks/remote-devtools/` — CDP/rrweb developer-tool Desk, absorbed as workspace package `@desk/remote-devtools`. **[done, heavy asset documented]**
 - The **14 homogeneous backend Desks** + `aidigestdesk` — same `apps/{api,web}` + Nest + Drizzle + PGlite shape; cheap to absorb, and they are where "one billing / one admin / one design" delivers value.
 
 **OUT (stay sibling repos, consume `@desk/*` / `@heejun/*` via published packages):**
 
-- **`remote-devtools`** — **[CHANGED BY CRITIQUE: scale + monorepo-vs-polyrepo]** despite being already subtree-imported, it carries a **299MB / 4,709-file vendored Chromium DevTools fork with no `package.json`** (not a workspace project; referenced by 3 string mentions). That single directory is the "teleport killer," not historical blob churn. It sets the clone/CI/IDE-index cost floor for every _other_ Desk. **Quarantine it back out** (un-absorb) — see §4.3.
-- **`deskcloud-sdk` (`@heejun/deskcloud`)** — published npm artifact, external consumer (pettography). Identity = published package.
-- **`deskcloud-deploy`** — no `package.json`; it is the _outside_ deployer of all services; absorbing it couples deploy infra + secrets to app CI.
 - **`@heejun/web-config-preset`** — cross-fleet standard with a consumer set strictly larger than DeskCloud.
 
-**Why partial-but-wide beats both extremes:** Full absorption hits the Vercel 100-deploy/24h team-wide cap, a single-CI SPOF on a private repo with broken Actions billing, and the 299MB clone tax — for 15 "near-clone" Desks that _never co-edit each other_. Pure polyrepo loses the atomic `platform ↔ Desk` edit that is the real coupling. The wide-partial keeps every homogeneous Desk that benefits from one architecture/billing/admin **in**, and pushes only the two cost-divergent outliers **out**.
+**Why this integrated boundary is accepted:** unified console, billing, service-domain isolation, and cross-Desk contract changes are more valuable than keeping the developer-tool Desks on a separate cadence. The cost tradeoff is acknowledged explicitly: `remote-devtools` raises clone/IDE/CI cost, so CI filters and heavy-asset hygiene matter more than they did in the lighter partial-monorepo plan.
 
 **The one gating spike (decide first):** the boundary's "publish `@desk/*`" option depends on a working registry. npm publish currently 401s (per heejun-platform memory). **Resolve publish-auth before committing the boundary:**
 
-- If publish-auth works → `@desk/*` published; OUT repos consume by caret. Cleanest.
-- If publish-auth is unfixable → keep the 14 Desks consuming `@desk/*` via `workspace:*` inside the monorepo (Plan B, the original full-minus-outliers shape). Either way **remote-devtools and the SDK stay out.** Publish-auth only decides whether the 14 backend Desks are `workspace:*` (Plan B) or published-caret (Plan A); it does **not** reopen the outlier exclusion.
+- If publish-auth works → published artifacts can serve external consumers, but the source of truth for DeskCloud products remains this monorepo.
+- If publish-auth is unfixable → all DeskCloud-owned packages continue to consume `@desk/*` and `@heejun/deskcloud` via `workspace:*` inside the monorepo. `remote-devtools`, `seo-gateway`, SDK, and deploy stack stay integrated.
 
 ---
 
@@ -139,7 +138,7 @@ The original plan diagnosed "600M of historical blob churn" curable by `git filt
 - The bloat is a **299MB live working-tree directory** (`devtools-frontend/`, 4,709 tracked files), a vendored Chromium DevTools fork with **no `package.json`** — not a build dependency.
 - `--strip-blobs-bigger-than 5M` would delete ~20 `*.json.gz` trace fixtures **that HEAD references** → corrupt checkout, _and still leave ~140MB of sub-5MB devtools-frontend files_. The teleport fails again.
 
-**The real fix = quarantine remote-devtools out entirely (§4.3).** Removing it drops the worktree from 554M → ~255M and, after history purge of its path, `.git` from 241M toward <30M. This is the genuine teleport fix.
+**Superseded cost critique:** the earlier recommendation was to quarantine `remote-devtools` out entirely (§4.3). That would have dropped the worktree from 554M → ~255M and, after history purge of its path, `.git` from 241M toward <30M. The current implementation keeps `remote-devtools` integrated and accepts the heavier worktree cost.
 
 ### 4.2 Subtree strategy going forward: `--squash`
 
@@ -150,7 +149,7 @@ The 3 already-imported subtrees are **full-history** (commits `b8fc00..`, `44a1f
 - Tag each origin at import: `pre-monorepo/<name>`.
 - Record `{name, originSHA, importDate}` in a root **`MIGRATION.lock`** so you can `git diff` monorepo-copy vs origin-tag at any time to detect drift.
 
-### 4.3 Quarantine remote-devtools (un-absorb) — irreversible op, do it as **commit zero before any remote** **[CHANGED BY CRITIQUE: migration-safety reorders this]**
+### 4.3 [SUPERSEDED] Quarantine remote-devtools (un-absorb)
 
 There is no remote yet, so "before pushing a remote" is trivially satisfiable — which means history surgery is the genuinely-first irreversible op, not a mid-sequence Stage 0.5.
 
@@ -286,24 +285,24 @@ Single root husky: `commit-msg` (commitlint, **body ≤100** — hard fleet gate
 
 The wiring plan's P0–P5 cannot start billing/admin/design work on a Desk until that Desk is **absorbed, green, and deploy-parity-proven** here. Each wiring phase is preceded by the matching substrate batch.
 
-| Substrate step                                                  | Slots at            | Why before wiring                                                                     |
-| --------------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------- |
-| §4.3 quarantine remote-devtools (history purge)                 | **P0, commit zero** | The genuine teleport fix + irreversible op; must precede remote & all absorption      |
-| §2 workspace unification (now 2-repo: platform + seo-gateway)   | **P0**              | Nothing builds reliably until green; only honest "works" proof                        |
-| §3 turbo + catalog + husky scaffolding                          | **P0→P1**           | dedupe + graph-integrity check before more code lands                                 |
-| §6.1 Actions-billing decision + §4.5 remote + branch protection | **P1**              | Enforced gates must exist before family scaling                                       |
-| §5 Batch 0 (platform drift reconcile)                           | **P1**              | `@desk/*` provider correct = floor under wiring's "single architecture/billing/admin" |
-| §5 Batches 1–2 (mirror-import Desks)                            | **P1→P2**           | Bulk absorption; wiring layers per-Desk after                                         |
-| §5.4 deploy-parity + cutover                                    | **P2**              | Per-Desk, as wiring cuts each Desk over                                               |
-| §5 Batch 3 (aidigest, termsdesk)                                | **P2→P3**           | Highest blast radius; termsdesk last                                                  |
-| §6.2 phase-B turbo-affected switch + Batch 4 routing            | **P3+**             | Affected CI only after `@desk/*` routed; overlaps wiring standardization              |
+| Substrate step                                                  | Slots at       | Why before wiring                                                                       |
+| --------------------------------------------------------------- | -------------- | --------------------------------------------------------------------------------------- |
+| §4.3 remote-devtools quarantine                                 | **superseded** | Owner directive now keeps it integrated; manage heavy asset cost with workspace filters |
+| §2 workspace unification (now 2-repo: platform + seo-gateway)   | **P0**         | Nothing builds reliably until green; only honest "works" proof                          |
+| §3 turbo + catalog + husky scaffolding                          | **P0→P1**      | dedupe + graph-integrity check before more code lands                                   |
+| §6.1 Actions-billing decision + §4.5 remote + branch protection | **P1**         | Enforced gates must exist before family scaling                                         |
+| §5 Batch 0 (platform drift reconcile)                           | **P1**         | `@desk/*` provider correct = floor under wiring's "single architecture/billing/admin"   |
+| §5 Batches 1–2 (mirror-import Desks)                            | **P1→P2**      | Bulk absorption; wiring layers per-Desk after                                           |
+| §5.4 deploy-parity + cutover                                    | **P2**         | Per-Desk, as wiring cuts each Desk over                                                 |
+| §5 Batch 3 (aidigest, termsdesk)                                | **P2→P3**      | Highest blast radius; termsdesk last                                                    |
+| §6.2 phase-B turbo-affected switch + Batch 4 routing            | **P3+**        | Affected CI only after `@desk/*` routed; overlaps wiring standardization                |
 
 ---
 
 ## 8. Open Decisions for the Owner
 
-1. **Publish-auth spike (gates the boundary):** is npm/GitHub-Packages publish for `@desk/*` fixable? **Yes → Plan A** (`@desk/*` published, OUT repos consume caret). **No → Plan B** (14 backend Desks consume `@desk/*` via `workspace:*` inside the monorepo). Either way remote-devtools + SDK stay OUT.
-2. **Confirm the boundary:** accept partial-but-wide (14 Desks + platform + seo-gateway IN; remote-devtools + SDK + deploy + preset OUT)? Or override to keep remote-devtools IN — which then _requires_ replacing the 299MB vendored `devtools-frontend` with a build-time fetch/submodule (not negotiable if it's in).
+1. **Publish-auth spike (no longer a boundary gate):** npm/GitHub-Packages publish for `@desk/*` still matters for external consumers, but it no longer decides whether DeskCloud products stay in the monorepo.
+2. **Confirmed boundary:** platform, homogeneous Desks, `SEOGatewayDesk`, `RemoteDevTools`, SDK, and deploy stack are IN. `@heejun/web-config-preset` stays OUT because it serves a wider consumer set.
 3. **Actions billing for `deskcloud` private repo:** fund it (real server-side CI) or keep originals' CIs alive as the enforced gate until cutover? (§6.1)
 4. **Mirror-first vs source-of-truth-first:** confirm the migration-window discipline (originals canonical until per-Desk cutover, archive-on-delay). This trades the owner's "immediate physical consolidation" framing for safety; the end state is still a single consolidated monorepo.
 5. **History rewrite acceptance:** purging `devtools-frontend` (and quarantining remote-devtools) rewrites the 3 done import SHAs; provenance for those then lives only in the live originals. OK?

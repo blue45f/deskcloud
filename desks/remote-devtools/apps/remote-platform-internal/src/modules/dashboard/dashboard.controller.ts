@@ -1,0 +1,206 @@
+import {
+  Controller,
+  Get,
+  InternalServerErrorException,
+  Logger,
+  Query,
+  BadRequestException,
+} from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+
+import { DashboardService } from './dashboard.service';
+import { DashboardStatsDto } from './dto/dashboard-stats.dto';
+import { PeriodQueryDto } from './dto/period-query.dto';
+import { RecordSessionTrendDto } from './dto/record-session-trend.dto';
+import { TicketTrendDto } from './dto/ticket-trend.dto';
+
+@ApiTags('Dashboard')
+@Controller('api/dashboard')
+export class DashboardController {
+  private readonly logger = new Logger(DashboardController.name);
+
+  constructor(private readonly dashboardService: DashboardService) {}
+
+  /**
+   * Retrieve dashboard statistics.
+   * GET /api/dashboard/stats
+   */
+  @Get('stats')
+  @ApiOperation({ summary: '대시보드 통계 조회' })
+  @ApiResponse({ status: 200, description: '통계 데이터 반환' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async getStats(): Promise<DashboardStatsDto> {
+    try {
+      const data = await this.dashboardService.getDashboardStats();
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      this.logger.error('Failed to retrieve dashboard statistics', error);
+      throw new InternalServerErrorException({
+        success: false,
+        error: {
+          code: 'DASHBOARD_STATS_ERROR',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'An error occurred while retrieving dashboard statistics.',
+        },
+      });
+    }
+  }
+
+  /**
+   * Retrieve ticket creation trend.
+   * GET /api/dashboard/tickets/trend
+   */
+  @Get('tickets/trend')
+  @ApiResponse({ status: 200, description: 'Ticket creation trend data' })
+  @ApiResponse({ status: 400, description: 'Invalid or missing period parameter' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async getTicketTrend(@Query() query: PeriodQueryDto): Promise<TicketTrendDto> {
+    try {
+      if (!query.period) {
+        throw new BadRequestException("The 'period' parameter is required.");
+      }
+
+      if (!['day', 'week', 'month'].includes(query.period)) {
+        throw new BadRequestException("The 'period' parameter must be one of: day, week, month.");
+      }
+
+      const data = await this.dashboardService.getTicketTrend(
+        query.period,
+        query.startDate,
+        query.endDate,
+      );
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error('Failed to retrieve ticket trend', error);
+      throw new InternalServerErrorException({
+        success: false,
+        error: {
+          code: 'TICKET_TREND_ERROR',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'An error occurred while retrieving the ticket trend.',
+        },
+      });
+    }
+  }
+
+  /**
+   * Retrieve recording session creation trend.
+   * GET /api/dashboard/record-sessions/trend
+   */
+  @Get('record-sessions/trend')
+  @ApiResponse({ status: 200, description: 'Recording session creation trend data' })
+  @ApiResponse({ status: 400, description: 'Invalid or missing period parameter' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async getRecordSessionTrend(
+    @Query() query: PeriodQueryDto,
+  ): Promise<RecordSessionTrendDto> {
+    try {
+      if (!query.period) {
+        throw new BadRequestException("The 'period' parameter is required.");
+      }
+
+      if (!['day', 'week', 'month'].includes(query.period)) {
+        throw new BadRequestException("The 'period' parameter must be one of: day, week, month.");
+      }
+
+      const data = await this.dashboardService.getRecordSessionTrend(
+        query.period,
+        query.startDate,
+        query.endDate,
+      );
+
+      return {
+        success: true,
+        data,
+      };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error('Failed to retrieve record session trend', error);
+      throw new InternalServerErrorException({
+        success: false,
+        error: {
+          code: 'RECORD_SESSION_TREND_ERROR',
+          message:
+            error instanceof Error
+              ? error.message
+              : 'An error occurred while retrieving the recording session trend.',
+        },
+      });
+    }
+  }
+
+  /**
+   * Top hostnames by record count over the selected period.
+   * GET /api/dashboard/top-hosts?period=day&limit=8
+   */
+  @Get('top-hosts')
+  @ApiOperation({ summary: '기간 내 호스트별 레코드 수 상위 N' })
+  @ApiResponse({ status: 200, description: '[{ host, count }] 배열' })
+  @ApiResponse({ status: 400, description: 'Invalid or missing period parameter' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async getTopHosts(
+    @Query() query: PeriodQueryDto,
+    @Query('limit') limitRaw?: string,
+  ): Promise<{ host: string; count: number }[]> {
+    if (!query.period || !['day', 'week', 'month'].includes(query.period)) {
+      throw new BadRequestException(
+        "The 'period' parameter is required and must be one of: day, week, month.",
+      );
+    }
+    const limit = Number.parseInt(limitRaw ?? '8', 10);
+    return this.dashboardService.getTopHosts(query.period, Number.isFinite(limit) ? limit : 8);
+  }
+
+  /**
+   * Top tags by usage over the selected period.
+   * GET /api/dashboard/top-tags?period=day&limit=8
+   */
+  @Get('top-tags')
+  @ApiOperation({ summary: '기간 내 태그 사용 상위 N' })
+  @ApiResponse({ status: 200, description: '[{ tag, count }] 배열' })
+  @ApiResponse({ status: 400, description: 'Invalid or missing period parameter' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async getTopTags(
+    @Query() query: PeriodQueryDto,
+    @Query('limit') limitRaw?: string,
+  ): Promise<{ tag: string; count: number }[]> {
+    if (!query.period || !['day', 'week', 'month'].includes(query.period)) {
+      throw new BadRequestException(
+        "The 'period' parameter is required and must be one of: day, week, month.",
+      );
+    }
+    const limit = Number.parseInt(limitRaw ?? '8', 10);
+    return this.dashboardService.getTopTags(query.period, Number.isFinite(limit) ? limit : 8);
+  }
+
+  /**
+   * Most recently annotated sessions.
+   * GET /api/dashboard/recent-notes?limit=5
+   */
+  @Get('recent-notes')
+  @ApiOperation({ summary: '최근 메모가 달린 세션' })
+  @ApiResponse({ status: 200, description: '[{ id, name, note, timestamp }] 배열' })
+  @ApiResponse({ status: 500, description: 'Internal server error' })
+  public async getRecentNotes(
+    @Query('limit') limitRaw?: string,
+  ): Promise<{ id: number; name: string; note: string; timestamp: string }[]> {
+    const limit = Number.parseInt(limitRaw ?? '5', 10);
+    return this.dashboardService.getRecentlyAnnotated(Number.isFinite(limit) ? limit : 5);
+  }
+}

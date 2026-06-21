@@ -1,0 +1,310 @@
+import * as a from './../../core/common/common.js';
+import * as s from './../../core/i18n/i18n.js';
+import * as g from './../../core/root/root.js';
+import * as i from './../../core/sdk/sdk.js';
+import * as u from './../../models/workspace/workspace.js';
+import * as k from './../common/common.js';
+import * as n from './../../ui/legacy/legacy.js';
+import * as l from './forward/forward.js';
+var t = {
+    showNetwork: 'Show Network',
+    network: 'Network',
+    showRequestConditions: 'Show Request conditions',
+    networkRequestConditions: 'Request conditions',
+    showNetworkConditions: 'Show Network conditions',
+    networkConditions: 'Network conditions',
+    diskCache: 'disk cache',
+    networkThrottling: 'network throttling',
+    showSearch: 'Show Search',
+    search: 'Search',
+    recordNetworkLog: 'Record network log',
+    stopRecordingNetworkLog: 'Stop recording network log',
+    hideRequestDetails: 'Hide request details',
+    colorcodeResourceTypes: 'Color-code resource types',
+    colorCode: 'color code',
+    resourceType: 'resource type',
+    colorCodeByResourceType: 'Color code by resource type',
+    useDefaultColors: 'Use default colors',
+    groupNetworkLogByFrame: 'Group network log by frame',
+    netWork: 'network',
+    frame: 'frame',
+    group: 'group',
+    groupNetworkLogItemsByFrame: 'Group network log items by frame',
+    dontGroupNetworkLogItemsByFrame: "Don't group network log items by frame",
+    clear: 'Clear network log',
+    addNetworkRequestBlockingOrThrottlingPattern:
+      'Add network request blocking or throttling pattern',
+    removeAllNetworkRequestBlockingOrThrottlingPatterns:
+      'Remove all network request blocking or throttling patterns',
+    allowToGenerateHarWithSensitiveData: 'Allow to generate `HAR` with sensitive data',
+    dontAllowToGenerateHarWithSensitiveData: "Don't allow to generate `HAR` with sensitive data",
+    allowToGenerateHarWithSensitiveDataDocumentation:
+      "By default generated HAR logs are sanitized and don't include `Cookie`, `Set-Cookie`, or `Authorization` HTTP headers. When this setting is enabled, options to export/copy HAR with sensitive data are provided.",
+  },
+  N = s.i18n.registerUIStrings('panels/network/network-meta.ts', t),
+  o = s.i18n.getLazilyComputedLocalizedString.bind(void 0, N),
+  d = s.i18n.getLocalizedString.bind(void 0, N),
+  w,
+  R = g.Runtime.Runtime.isNode();
+async function r() {
+  return (w || (w = await import('./network.js')), w);
+}
+function c(e) {
+  return w === void 0 ? [] : e(w);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'network',
+  commandPrompt: o(t.showNetwork),
+  title: o(t.network),
+  order: 40,
+  isPreviewFeature: R,
+  async loadView() {
+    return (await r()).NetworkPanel.NetworkPanel.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'network.blocked-urls',
+  commandPrompt: () => d(t.showRequestConditions),
+  title: () => d(t.networkRequestConditions),
+  persistence: 'closeable',
+  order: 60,
+  async loadView() {
+    let e = await r();
+    return new e.RequestConditionsDrawer.RequestConditionsDrawer();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'network.config',
+  commandPrompt: o(t.showNetworkConditions),
+  title: o(t.networkConditions),
+  persistence: 'closeable',
+  order: 40,
+  tags: [
+    o(t.diskCache),
+    o(t.networkThrottling),
+    s.i18n.lockedLazyString('useragent'),
+    s.i18n.lockedLazyString('user agent'),
+    s.i18n.lockedLazyString('user-agent'),
+  ],
+  async loadView() {
+    return (await r()).NetworkConfigView.NetworkConfigView.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'network-sidebar',
+  id: 'network.search-network-tab',
+  commandPrompt: o(t.showSearch),
+  title: o(t.search),
+  persistence: 'permanent',
+  async loadView() {
+    return (await r()).NetworkPanel.SearchNetworkView.instance();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'network.toggle-recording',
+  category: 'NETWORK',
+  iconClass: 'record-start',
+  toggleable: !0,
+  toggledIconClass: 'record-stop',
+  toggleWithRedColor: !0,
+  contextTypes() {
+    return c((e) => [e.NetworkPanel.NetworkPanel]);
+  },
+  async loadActionDelegate() {
+    let e = await r();
+    return new e.NetworkPanel.ActionDelegate();
+  },
+  options: [
+    { value: !0, title: o(t.recordNetworkLog) },
+    { value: !1, title: o(t.stopRecordingNetworkLog) },
+  ],
+  bindings: [
+    { shortcut: 'Ctrl+E', platform: 'windows,linux' },
+    { shortcut: 'Meta+E', platform: 'mac' },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'network.clear',
+  category: 'NETWORK',
+  title: o(t.clear),
+  iconClass: 'clear',
+  async loadActionDelegate() {
+    let e = await r();
+    return new e.NetworkPanel.ActionDelegate();
+  },
+  contextTypes() {
+    return c((e) => [e.NetworkPanel.NetworkPanel]);
+  },
+  bindings: [{ shortcut: 'Ctrl+L' }, { shortcut: 'Meta+K', platform: 'mac' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'network.hide-request-details',
+  category: 'NETWORK',
+  title: o(t.hideRequestDetails),
+  contextTypes() {
+    return c((e) => [e.NetworkPanel.NetworkPanel]);
+  },
+  async loadActionDelegate() {
+    let e = await r();
+    return new e.NetworkPanel.ActionDelegate();
+  },
+  bindings: [{ shortcut: 'Esc' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'network.search',
+  category: 'NETWORK',
+  title: o(t.search),
+  contextTypes() {
+    return c((e) => [e.NetworkPanel.NetworkPanel]);
+  },
+  async loadActionDelegate() {
+    let e = await r();
+    return new e.NetworkPanel.ActionDelegate();
+  },
+  bindings: [
+    { platform: 'mac', shortcut: 'Meta+F', keybindSets: ['devToolsDefault', 'vsCode'] },
+    { platform: 'windows,linux', shortcut: 'Ctrl+F', keybindSets: ['devToolsDefault', 'vsCode'] },
+  ],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'network.add-network-request-blocking-pattern',
+  category: 'NETWORK',
+  title: () => d(t.addNetworkRequestBlockingOrThrottlingPattern),
+  iconClass: 'plus',
+  contextTypes() {
+    return c((e) => [e.RequestConditionsDrawer.RequestConditionsDrawer]);
+  },
+  async loadActionDelegate() {
+    let e = await r();
+    return new e.RequestConditionsDrawer.ActionDelegate();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'network.remove-all-network-request-blocking-patterns',
+  category: 'NETWORK',
+  title: () => d(t.removeAllNetworkRequestBlockingOrThrottlingPatterns),
+  iconClass: 'clear',
+  contextTypes() {
+    return c((e) => [e.RequestConditionsDrawer.RequestConditionsDrawer]);
+  },
+  async loadActionDelegate() {
+    let e = await r();
+    return new e.RequestConditionsDrawer.ActionDelegate();
+  },
+});
+a.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  storageType: 'Synced',
+  title: o(t.allowToGenerateHarWithSensitiveData),
+  settingName: 'network.show-options-to-generate-har-with-sensitive-data',
+  settingType: 'boolean',
+  defaultValue: !1,
+  tags: [s.i18n.lockedLazyString('HAR')],
+  options: [
+    { value: !0, title: o(t.allowToGenerateHarWithSensitiveData) },
+    { value: !1, title: o(t.dontAllowToGenerateHarWithSensitiveData) },
+  ],
+  learnMore: {
+    url: 'https://goo.gle/devtools-export-hars',
+    tooltip: o(t.allowToGenerateHarWithSensitiveDataDocumentation),
+  },
+});
+a.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  storageType: 'Synced',
+  title: o(t.colorcodeResourceTypes),
+  settingName: 'network-color-code-resource-types',
+  settingType: 'boolean',
+  defaultValue: !1,
+  tags: [o(t.colorCode), o(t.resourceType)],
+  options: [
+    { value: !0, title: o(t.colorCodeByResourceType) },
+    { value: !1, title: o(t.useDefaultColors) },
+  ],
+});
+a.Settings.registerSettingExtension({
+  category: 'NETWORK',
+  storageType: 'Synced',
+  title: o(t.groupNetworkLogByFrame),
+  settingName: 'network.group-by-frame',
+  settingType: 'boolean',
+  defaultValue: !1,
+  tags: [o(t.netWork), o(t.frame), o(t.group)],
+  options: [
+    { value: !0, title: o(t.groupNetworkLogItemsByFrame) },
+    { value: !1, title: o(t.dontGroupNetworkLogItemsByFrame) },
+  ],
+});
+n.ViewManager.registerLocationResolver({
+  name: 'network-sidebar',
+  category: 'NETWORK',
+  async loadResolver() {
+    return (await r()).NetworkPanel.NetworkPanel.instance();
+  },
+});
+n.ContextMenu.registerProvider({
+  contextTypes() {
+    return [
+      i.NetworkRequest.NetworkRequest,
+      i.Resource.Resource,
+      u.UISourceCode.UISourceCode,
+      i.TraceObject.RevealableNetworkRequest,
+    ];
+  },
+  async loadProvider() {
+    return (await r()).NetworkPanel.NetworkPanel.instance();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [i.NetworkRequest.NetworkRequest];
+  },
+  destination: a.Revealer.RevealerDestination.NETWORK_PANEL,
+  async loadRevealer() {
+    let e = await r();
+    return new e.NetworkPanel.RequestRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [l.UIRequestLocation.UIRequestLocation];
+  },
+  async loadRevealer() {
+    let e = await r();
+    return new e.NetworkPanel.RequestLocationRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [l.NetworkRequestId.NetworkRequestId];
+  },
+  destination: a.Revealer.RevealerDestination.NETWORK_PANEL,
+  async loadRevealer() {
+    let e = await r();
+    return new e.NetworkPanel.RequestIdRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [l.UIFilter.UIRequestFilter, k.ExtensionServer.RevealableNetworkRequestFilter];
+  },
+  destination: a.Revealer.RevealerDestination.NETWORK_PANEL,
+  async loadRevealer() {
+    let e = await r();
+    return new e.NetworkPanel.NetworkLogWithFilterRevealer();
+  },
+});
+a.Revealer.registerRevealer({
+  contextTypes() {
+    return [i.NetworkManager.AppliedNetworkConditions];
+  },
+  destination: a.Revealer.RevealerDestination.NETWORK_PANEL,
+  async loadRevealer() {
+    let e = await r();
+    return new e.RequestConditionsDrawer.AppliedConditionsRevealer();
+  },
+});
+//# sourceMappingURL=network-meta.js.map

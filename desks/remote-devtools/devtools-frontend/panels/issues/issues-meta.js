@@ -1,0 +1,34 @@
+import * as n from './../../core/common/common.js';
+import * as a from './../../core/i18n/i18n.js';
+import * as t from './../../models/issues_manager/issues_manager.js';
+import * as o from './../../ui/legacy/legacy.js';
+var i = { issues: 'Issues', showIssues: 'Show Issues' },
+  I = a.i18n.registerUIStrings('panels/issues/issues-meta.ts', i),
+  r = a.i18n.getLazilyComputedLocalizedString.bind(void 0, I),
+  s;
+async function u() {
+  return (s || (s = await import('./issues.js')), s);
+}
+o.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'issues-pane',
+  title: r(i.issues),
+  commandPrompt: r(i.showIssues),
+  order: 100,
+  persistence: 'closeable',
+  async loadView() {
+    let e = await u();
+    return new e.IssuesPane.IssuesPane();
+  },
+});
+n.Revealer.registerRevealer({
+  contextTypes() {
+    return [t.Issue.Issue];
+  },
+  destination: n.Revealer.RevealerDestination.ISSUES_VIEW,
+  async loadRevealer() {
+    let e = await u();
+    return new e.IssueRevealer.IssueRevealer();
+  },
+});
+//# sourceMappingURL=issues-meta.js.map

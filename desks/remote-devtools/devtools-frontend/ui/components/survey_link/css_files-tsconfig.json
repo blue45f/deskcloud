@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "."
+  },
+  "files": ["surveyLink.css.js"]
+}

@@ -1,0 +1,460 @@
+import * as r from './../../core/common/common.js';
+import * as m from './../../core/i18n/i18n.js';
+import * as c from './../../core/root/root.js';
+import * as a from './../../core/sdk/sdk.js';
+import * as o from './../../ui/legacy/legacy.js';
+import * as d from './elements.js';
+var t = {
+    showElements: 'Show Elements',
+    elements: 'Elements',
+    showEventListeners: 'Show Event Listeners',
+    eventListeners: 'Event Listeners',
+    showProperties: 'Show Properties',
+    properties: 'Properties',
+    showStackTrace: 'Show Stack Trace',
+    stackTrace: 'Stack Trace',
+    showLayout: 'Show Layout',
+    layout: 'Layout',
+    hideElement: 'Hide element',
+    editAsHtml: 'Edit as HTML',
+    duplicateElement: 'Duplicate element',
+    undo: 'Undo',
+    redo: 'Redo',
+    captureAreaScreenshot: 'Capture area screenshot',
+    selectAnElementInThePageTo: 'Select an element in the page to inspect it',
+    newStyleRule: 'New Style Rule',
+    refreshEventListeners: 'Refresh event listeners',
+    wordWrap: 'Word wrap',
+    toggleWordWrap: 'Toggle word wrap',
+    htmlComments: 'HTML comments',
+    showHtmlComments: 'Show `HTML` comments',
+    hideHtmlComments: 'Hide `HTML` comments',
+    revealDomNodeOnHover: 'Reveal `DOM` node on hover',
+    detailedInspectTooltip: 'Detailed inspect tooltip',
+    CSSDocumentationTooltip: 'CSS documentation tooltip',
+    copyStyles: 'Copy styles',
+    toggleA11yTree: 'Toggle accessibility tree',
+    userAgentShadowDOM: 'User agent shadow `DOM`',
+    showComputedStyles: 'Show Computed Styles',
+    showStyles: 'Show Styles',
+    toggleEyeDropper: 'Toggle eye dropper',
+  },
+  g = m.i18n.registerUIStrings('panels/elements/elements-meta.ts', t),
+  n = m.i18n.getLazilyComputedLocalizedString.bind(void 0, g),
+  l;
+async function s() {
+  return (l || (l = await import('./elements.js')), l);
+}
+function i(e) {
+  return l === void 0 ? [] : e(l);
+}
+o.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'elements',
+  commandPrompt: n(t.showElements),
+  title: n(t.elements),
+  order: 10,
+  persistence: 'permanent',
+  hasToolbar: !1,
+  async loadView() {
+    return (await s()).ElementsPanel.ElementsPanel.instance();
+  },
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.show-styles',
+  category: 'ELEMENTS',
+  title: n(t.showStyles),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.show-computed',
+  category: 'ELEMENTS',
+  title: n(t.showComputedStyles),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+});
+o.ViewManager.registerViewExtension({
+  location: 'elements-sidebar',
+  id: 'elements.event-listeners',
+  commandPrompt: n(t.showEventListeners),
+  title: n(t.eventListeners),
+  order: 5,
+  persistence: 'permanent',
+  async loadView() {
+    return (await s()).EventListenersWidget.EventListenersWidget.instance();
+  },
+});
+o.ViewManager.registerViewExtension({
+  location: 'elements-sidebar',
+  id: 'elements.dom-properties',
+  commandPrompt: n(t.showProperties),
+  title: n(t.properties),
+  order: 7,
+  persistence: 'permanent',
+  async loadView() {
+    let e = await s();
+    return new e.PropertiesWidget.PropertiesWidget();
+  },
+});
+o.ViewManager.registerViewExtension({
+  experiment: c.ExperimentNames.ExperimentName.CAPTURE_NODE_CREATION_STACKS,
+  location: 'elements-sidebar',
+  id: 'elements.dom-creation',
+  commandPrompt: n(t.showStackTrace),
+  title: n(t.stackTrace),
+  order: 10,
+  persistence: 'permanent',
+  async loadView() {
+    let e = await s();
+    return new e.NodeStackTraceWidget.NodeStackTraceWidget();
+  },
+});
+o.ViewManager.registerViewExtension({
+  location: 'elements-sidebar',
+  id: 'elements.layout',
+  commandPrompt: n(t.showLayout),
+  title: n(t.layout),
+  order: 4,
+  persistence: 'permanent',
+  async loadView() {
+    return (await s()).LayoutPane.LayoutPane.instance();
+  },
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.hide-element',
+  category: 'ELEMENTS',
+  title: n(t.hideElement),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [{ shortcut: 'H' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.toggle-eye-dropper',
+  category: 'ELEMENTS',
+  title: n(t.toggleEyeDropper),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ColorSwatchPopoverIcon.ColorSwatchPopoverIcon]);
+  },
+  bindings: [{ shortcut: 'c' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.edit-as-html',
+  category: 'ELEMENTS',
+  title: n(t.editAsHtml),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [{ shortcut: 'F2' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.duplicate-element',
+  category: 'ELEMENTS',
+  title: n(t.duplicateElement),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [{ shortcut: 'Shift+Alt+Down' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.copy-styles',
+  category: 'ELEMENTS',
+  title: n(t.copyStyles),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [
+    { shortcut: 'Ctrl+Alt+C', platform: 'windows,linux' },
+    { shortcut: 'Meta+Alt+C', platform: 'mac' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.toggle-a11y-tree',
+  category: 'ELEMENTS',
+  title: n(t.toggleA11yTree),
+  toggleable: !0,
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [{ shortcut: 'A' }],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.undo',
+  category: 'ELEMENTS',
+  title: n(t.undo),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [
+    { shortcut: 'Ctrl+Z', platform: 'windows,linux' },
+    { shortcut: 'Meta+Z', platform: 'mac' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.redo',
+  category: 'ELEMENTS',
+  title: n(t.redo),
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [
+    { shortcut: 'Ctrl+Y', platform: 'windows,linux' },
+    { shortcut: 'Meta+Shift+Z', platform: 'mac' },
+  ],
+});
+o.ActionRegistration.registerActionExtension({
+  actionId: 'elements.capture-area-screenshot',
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.InspectElementModeController.ToggleSearchActionDelegate();
+  },
+  condition: c.Runtime.conditions.canDock,
+  title: n(t.captureAreaScreenshot),
+  category: 'SCREENSHOT',
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'ELEMENTS',
+  actionId: 'elements.toggle-element-search',
+  toggleable: !0,
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.InspectElementModeController.ToggleSearchActionDelegate();
+  },
+  title: n(t.selectAnElementInThePageTo),
+  iconClass: 'select-element',
+  bindings: [
+    { shortcut: 'Ctrl+Shift+C', platform: 'windows,linux' },
+    { shortcut: 'Meta+Shift+C', platform: 'mac' },
+  ],
+  configurableBindings: !1,
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'ELEMENTS',
+  actionId: 'elements.new-style-rule',
+  title: n(t.newStyleRule),
+  iconClass: 'plus',
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.StylesSidebarPane.ActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.StylesSidebarPane.StylesSidebarPane]);
+  },
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'ELEMENTS',
+  actionId: 'elements.refresh-event-listeners',
+  title: n(t.refreshEventListeners),
+  iconClass: 'refresh',
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.EventListenersWidget.ActionDelegate();
+  },
+  contextTypes() {
+    return i((e) => [e.EventListenersWidget.EventListenersWidget]);
+  },
+});
+r.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  order: 1,
+  title: n(t.userAgentShadowDOM),
+  settingName: 'show-ua-shadow-dom',
+  settingType: 'boolean',
+  defaultValue: !1,
+});
+r.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  order: 2,
+  title: n(t.wordWrap),
+  settingName: 'dom-word-wrap',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+o.ActionRegistration.registerActionExtension({
+  category: 'ELEMENTS',
+  actionId: 'elements.toggle-word-wrap',
+  async loadActionDelegate() {
+    let e = await s();
+    return new e.ElementsPanel.ElementsActionDelegate();
+  },
+  title: n(t.toggleWordWrap),
+  contextTypes() {
+    return i((e) => [e.ElementsPanel.ElementsPanel]);
+  },
+  bindings: [{ shortcut: 'Alt+Z', keybindSets: ['vsCode'] }],
+});
+r.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  order: 3,
+  title: n(t.htmlComments),
+  settingName: 'show-html-comments',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: n(t.showHtmlComments) },
+    { value: !1, title: n(t.hideHtmlComments) },
+  ],
+});
+r.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  order: 4,
+  title: n(t.revealDomNodeOnHover),
+  settingName: 'highlight-node-on-hover-in-overlay',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+r.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  order: 5,
+  title: n(t.detailedInspectTooltip),
+  settingName: 'show-detailed-inspect-tooltip',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+r.Settings.registerSettingExtension({
+  settingName: 'show-event-listeners-for-ancestors',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+r.Settings.registerSettingExtension({
+  category: 'ADORNER',
+  storageType: 'Synced',
+  settingName: 'adorner-settings',
+  settingType: 'array',
+  defaultValue: [],
+});
+r.Settings.registerSettingExtension({
+  category: 'ELEMENTS',
+  storageType: 'Synced',
+  title: n(t.CSSDocumentationTooltip),
+  settingName: 'show-css-property-documentation-on-hover',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+o.ContextMenu.registerProvider({
+  contextTypes() {
+    return [a.RemoteObject.RemoteObject, a.DOMModel.DOMNode, a.DOMModel.DeferredDOMNode];
+  },
+  async loadProvider() {
+    let e = await s();
+    return new e.ElementsPanel.ContextMenuProvider();
+  },
+  experiment: void 0,
+});
+o.ViewManager.registerLocationResolver({
+  name: 'elements-sidebar',
+  category: 'ELEMENTS',
+  async loadResolver() {
+    return (await s()).ElementsPanel.ElementsPanel.instance();
+  },
+});
+r.Revealer.registerRevealer({
+  contextTypes() {
+    return [
+      a.DOMModel.DOMNode,
+      a.DOMModel.DeferredDOMNode,
+      a.RemoteObject.RemoteObject,
+      a.DOMModel.AdoptedStyleSheet,
+      d.ElementsPanel.NodeComputedStyles,
+    ];
+  },
+  destination: r.Revealer.RevealerDestination.ELEMENTS_PANEL,
+  async loadRevealer() {
+    let e = await s();
+    return new e.ElementsPanel.DOMNodeRevealer();
+  },
+});
+r.Revealer.registerRevealer({
+  contextTypes() {
+    return [a.CSSProperty.CSSProperty];
+  },
+  destination: r.Revealer.RevealerDestination.STYLES_SIDEBAR,
+  async loadRevealer() {
+    let e = await s();
+    return new e.ElementsPanel.CSSPropertyRevealer();
+  },
+});
+o.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await s()).LayersWidget.ButtonProvider.instance();
+  },
+  order: 1,
+  location: 'styles-sidebarpane-toolbar',
+});
+o.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await s()).ElementStatePaneWidget.ButtonProvider.instance();
+  },
+  order: 2,
+  location: 'styles-sidebarpane-toolbar',
+});
+o.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await s()).ClassesPaneWidget.ButtonProvider.instance();
+  },
+  order: 3,
+  location: 'styles-sidebarpane-toolbar',
+});
+o.Toolbar.registerToolbarItem({
+  async loadItem() {
+    return (await s()).StylesSidebarPane.ButtonProvider.instance();
+  },
+  order: 100,
+  location: 'styles-sidebarpane-toolbar',
+});
+o.Toolbar.registerToolbarItem({
+  actionId: 'elements.toggle-element-search',
+  location: 'main-toolbar-left',
+  order: 0,
+});
+o.UIUtils.registerRenderer({
+  contextTypes() {
+    return [a.DOMModel.DOMNode, a.DOMModel.DeferredDOMNode];
+  },
+  async loadRenderer() {
+    return (await s()).ElementsTreeOutlineRenderer.Renderer.instance();
+  },
+});
+//# sourceMappingURL=elements-meta.js.map

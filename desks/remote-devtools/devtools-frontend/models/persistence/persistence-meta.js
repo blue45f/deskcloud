@@ -1,0 +1,27 @@
+import * as i from './../../core/common/common.js';
+import * as t from './../../core/i18n/i18n.js';
+var e = {
+    localOverrides: 'Local overrides',
+    interception: 'interception',
+    override: 'override',
+    network: 'network',
+    rewrite: 'rewrite',
+    request: 'request',
+    enableOverrideNetworkRequests: 'Enable override network requests',
+    disableOverrideNetworkRequests: 'Disable override network requests',
+  },
+  s = t.i18n.registerUIStrings('models/persistence/persistence-meta.ts', e),
+  r = t.i18n.getLazilyComputedLocalizedString.bind(void 0, s);
+i.Settings.registerSettingExtension({
+  category: 'PERSISTENCE',
+  title: r(e.localOverrides),
+  settingName: 'persistence-network-overrides-enabled',
+  settingType: 'boolean',
+  defaultValue: !1,
+  tags: [r(e.interception), r(e.override), r(e.network), r(e.rewrite), r(e.request)],
+  options: [
+    { value: !0, title: r(e.enableOverrideNetworkRequests) },
+    { value: !1, title: r(e.disableOverrideNetworkRequests) },
+  ],
+});
+//# sourceMappingURL=persistence-meta.js.map

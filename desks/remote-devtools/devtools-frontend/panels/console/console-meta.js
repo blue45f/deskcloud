@@ -1,0 +1,249 @@
+import * as o from './../../core/common/common.js';
+import * as r from './../../core/i18n/i18n.js';
+import * as n from './../../ui/legacy/legacy.js';
+var e = {
+    console: 'Console',
+    showConsole: 'Show Console',
+    toggleConsole: 'Toggle Console',
+    clearConsole: 'Clear console',
+    clearConsoleHistory: 'Clear console history',
+    createLiveExpression: 'Create live expression',
+    networkMessages: 'Network messages',
+    hideNetworkMessages: 'Hide network messages',
+    showNetworkMessages: 'Show network messages',
+    selectedContextOnly: 'Selected context only',
+    onlyShowMessagesFromTheCurrent:
+      'Only show messages from the current context (`top`, `iframe`, `worker`, extension)',
+    showMessagesFromAllContexts: 'Show messages from all contexts',
+    timestamps: 'Timestamps',
+    showTimestamps: 'Show timestamps',
+    hideTimestamps: 'Hide timestamps',
+    autocompleteFromHistory: 'Autocomplete from history',
+    doNotAutocompleteFromHistory: 'Do not autocomplete from history',
+    autocompleteOnEnter: 'Accept autocomplete suggestion on Enter',
+    doNotAutocompleteOnEnter: 'Do not accept autocomplete suggestion on Enter',
+    groupSimilarMessages: 'Group similar messages',
+    doNotGroupSimilarMessages: "Don't group similar messages",
+    corsErrorsInConsole: 'CORS errors in console',
+    showCorsErrorsInConsole: 'Show CORS errors in console',
+    doNotShowCorsErrorsIn: "Don't show CORS errors in console",
+    eagerEvaluation: 'Eager evaluation',
+    eagerlyEvaluateConsolePromptText: 'Eagerly evaluate console prompt text',
+    doNotEagerlyEvaluateConsole: 'Do not eagerly evaluate console prompt text',
+    evaluateTriggersUserActivation: 'Treat code evaluation as user action',
+    treatEvaluationAsUserActivation: 'Treat evaluation as user activation',
+    doNotTreatEvaluationAsUser: 'Do not treat evaluation as user activation',
+    expandConsoleTraceMessagesByDefault: 'Automatically expand `console.trace()` messages',
+    collapseConsoleTraceMessagesByDefault: 'Do not automatically expand `console.trace()` messages',
+    consoleInsightTeasers: 'AI summaries for console messages',
+  },
+  i = r.i18n.registerUIStrings('panels/console/console-meta.ts', e),
+  t = r.i18n.getLazilyComputedLocalizedString.bind(void 0, i),
+  l;
+async function a() {
+  return (l || (l = await import('./console.js')), l);
+}
+function c(s) {
+  return l === void 0 ? [] : s(l);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'console',
+  title: t(e.console),
+  commandPrompt: t(e.showConsole),
+  order: 20,
+  async loadView() {
+    return (await a()).ConsolePanel.ConsolePanel.instance();
+  },
+});
+n.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'console-view',
+  title: t(e.console),
+  commandPrompt: t(e.showConsole),
+  persistence: 'permanent',
+  order: 0,
+  async loadView() {
+    return (await a()).ConsolePanel.WrapperView.instance();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'console.toggle',
+  category: 'CONSOLE',
+  title: t(e.toggleConsole),
+  async loadActionDelegate() {
+    let s = await a();
+    return new s.ConsoleView.ActionDelegate();
+  },
+  bindings: [{ shortcut: 'Ctrl+`', keybindSets: ['devToolsDefault', 'vsCode'] }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'console.clear',
+  category: 'CONSOLE',
+  title: t(e.clearConsole),
+  iconClass: 'clear',
+  async loadActionDelegate() {
+    let s = await a();
+    return new s.ConsoleView.ActionDelegate();
+  },
+  contextTypes() {
+    return c((s) => [s.ConsoleView.ConsoleView]);
+  },
+  bindings: [{ shortcut: 'Ctrl+L' }, { shortcut: 'Meta+K', platform: 'mac' }],
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'console.clear.history',
+  category: 'CONSOLE',
+  title: t(e.clearConsoleHistory),
+  async loadActionDelegate() {
+    let s = await a();
+    return new s.ConsoleView.ActionDelegate();
+  },
+});
+n.ActionRegistration.registerActionExtension({
+  actionId: 'console.create-pin',
+  category: 'CONSOLE',
+  title: t(e.createLiveExpression),
+  iconClass: 'eye',
+  async loadActionDelegate() {
+    let s = await a();
+    return new s.ConsoleView.ActionDelegate();
+  },
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.networkMessages),
+  settingName: 'network-messages',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.showNetworkMessages) },
+    { value: !1, title: t(e.hideNetworkMessages) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.selectedContextOnly),
+  settingName: 'selected-context-filter-enabled',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.onlyShowMessagesFromTheCurrent) },
+    { value: !1, title: t(e.showMessagesFromAllContexts) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.timestamps),
+  settingName: 'console-timestamps-enabled',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.showTimestamps) },
+    { value: !1, title: t(e.hideTimestamps) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  title: t(e.autocompleteFromHistory),
+  settingName: 'console-history-autocomplete',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.autocompleteFromHistory) },
+    { value: !1, title: t(e.doNotAutocompleteFromHistory) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.autocompleteOnEnter),
+  settingName: 'console-autocomplete-on-enter',
+  settingType: 'boolean',
+  defaultValue: !1,
+  options: [
+    { value: !0, title: t(e.autocompleteOnEnter) },
+    { value: !1, title: t(e.doNotAutocompleteOnEnter) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.groupSimilarMessages),
+  settingName: 'console-group-similar',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.groupSimilarMessages) },
+    { value: !1, title: t(e.doNotGroupSimilarMessages) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  title: t(e.corsErrorsInConsole),
+  settingName: 'console-shows-cors-errors',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.showCorsErrorsInConsole) },
+    { value: !1, title: t(e.doNotShowCorsErrorsIn) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.eagerEvaluation),
+  settingName: 'console-eager-eval',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.eagerlyEvaluateConsolePromptText) },
+    { value: !1, title: t(e.doNotEagerlyEvaluateConsole) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.evaluateTriggersUserActivation),
+  settingName: 'console-user-activation-eval',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.treatEvaluationAsUserActivation) },
+    { value: !1, title: t(e.doNotTreatEvaluationAsUser) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.expandConsoleTraceMessagesByDefault),
+  settingName: 'console-trace-expand',
+  settingType: 'boolean',
+  defaultValue: !0,
+  options: [
+    { value: !0, title: t(e.expandConsoleTraceMessagesByDefault) },
+    { value: !1, title: t(e.collapseConsoleTraceMessagesByDefault) },
+  ],
+});
+o.Settings.registerSettingExtension({
+  category: 'CONSOLE',
+  storageType: 'Synced',
+  title: t(e.consoleInsightTeasers),
+  settingName: 'console-insight-teasers-enabled',
+  settingType: 'boolean',
+  defaultValue: !0,
+});
+o.Revealer.registerRevealer({
+  contextTypes() {
+    return [o.Console.Console];
+  },
+  destination: void 0,
+  async loadRevealer() {
+    let s = await a();
+    return new s.ConsolePanel.ConsoleRevealer();
+  },
+});
+//# sourceMappingURL=console-meta.js.map

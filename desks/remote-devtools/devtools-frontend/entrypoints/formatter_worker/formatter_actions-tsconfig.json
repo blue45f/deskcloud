@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "outDir": ".",
+    "baseUrl": ".",
+    "rootDir": "../../../../../../front_end/entrypoints/formatter_worker"
+  },
+  "files": ["../../../../../../front_end/entrypoints/formatter_worker/FormatterActions.ts"],
+  "references": []
+}

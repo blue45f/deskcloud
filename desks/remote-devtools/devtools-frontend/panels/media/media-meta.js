@@ -1,0 +1,23 @@
+import * as n from './../../core/i18n/i18n.js';
+import * as t from './../../ui/legacy/legacy.js';
+var i = { media: 'Media', video: 'video', showMedia: 'Show Media' },
+  o = n.i18n.registerUIStrings('panels/media/media-meta.ts', i),
+  e = n.i18n.getLazilyComputedLocalizedString.bind(void 0, o),
+  a;
+async function r() {
+  return (a || (a = await import('./media.js')), a);
+}
+t.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'medias',
+  title: e(i.media),
+  commandPrompt: e(i.showMedia),
+  persistence: 'closeable',
+  order: 100,
+  async loadView() {
+    let d = await r();
+    return new d.MainView.MainView();
+  },
+  tags: [e(i.media), e(i.video)],
+});
+//# sourceMappingURL=media-meta.js.map

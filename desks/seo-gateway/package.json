@@ -1,5 +1,5 @@
 {
-  "name": "spa-seo-gateway-monorepo",
+  "name": "@desk/seo-gateway",
   "version": "1.0.0",
   "private": true,
   "packageManager": "pnpm@11.4.0",

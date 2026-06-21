@@ -1,0 +1,31 @@
+import * as n from './../../core/i18n/i18n.js';
+import * as t from './../../ui/legacy/legacy.js';
+var o = {
+    performanceMonitor: 'Performance monitor',
+    performance: 'performance',
+    systemMonitor: 'system monitor',
+    monitor: 'monitor',
+    activity: 'activity',
+    metrics: 'metrics',
+    showPerformanceMonitor: 'Show Performance monitor',
+  },
+  a = n.i18n.registerUIStrings('panels/performance_monitor/performance_monitor-meta.ts', o),
+  r = n.i18n.getLazilyComputedLocalizedString.bind(void 0, a),
+  e;
+async function m() {
+  return (e || (e = await import('./performance_monitor.js')), e);
+}
+t.ViewManager.registerViewExtension({
+  location: 'drawer-view',
+  id: 'performance.monitor',
+  title: r(o.performanceMonitor),
+  commandPrompt: r(o.showPerformanceMonitor),
+  persistence: 'closeable',
+  order: 100,
+  async loadView() {
+    let i = await m();
+    return new i.PerformanceMonitor.PerformanceMonitorImpl();
+  },
+  tags: [r(o.performance), r(o.systemMonitor), r(o.monitor), r(o.activity), r(o.metrics)],
+});
+//# sourceMappingURL=performance_monitor-meta.js.map

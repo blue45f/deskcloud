@@ -1,0 +1,21 @@
+import * as r from './../../core/i18n/i18n.js';
+import * as n from './../../ui/legacy/legacy.js';
+var a = { layers: 'Layers', showLayers: 'Show Layers' },
+  i = r.i18n.registerUIStrings('panels/layers/layers-meta.ts', a),
+  s = r.i18n.getLazilyComputedLocalizedString.bind(void 0, i),
+  e;
+async function t() {
+  return (e || (e = await import('./layers.js')), e);
+}
+n.ViewManager.registerViewExtension({
+  location: 'panel',
+  id: 'layers',
+  title: s(a.layers),
+  commandPrompt: s(a.showLayers),
+  order: 100,
+  persistence: 'closeable',
+  async loadView() {
+    return (await t()).LayersPanel.LayersPanel.instance();
+  },
+});
+//# sourceMappingURL=layers-meta.js.map
