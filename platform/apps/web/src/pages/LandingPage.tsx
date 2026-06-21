@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
 import { InstallTabs } from '@/components/ui/install-tabs'
-import { DESK_CATALOG, PRODUCT_DESKS, sdkSnippet } from '@/data/deskCatalog'
+import { DESK_CATALOG, PRODUCT_DESKS, deskMicrositePath, sdkSnippet } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 const VALUE = [
@@ -161,7 +161,7 @@ export default function LandingPage() {
           {PRODUCT_DESKS.map((d) => (
             <li key={d.id}>
               <Link
-                to="/catalog"
+                to={deskMicrositePath(d)}
                 className="flex h-full items-start gap-3 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-2"
               >
                 <DeskGlyph icon={d.icon} tone={d.tone} size="sm" />

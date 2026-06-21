@@ -45,6 +45,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, lazy: lazyRetry(() => import('@/pages/LandingPage')) },
           { path: 'catalog', lazy: lazyRetry(() => import('@/pages/CatalogPage')) },
+          { path: 'desks/:deskId', lazy: lazyRetry(() => import('@/pages/DeskMicrositePage')) },
           { path: 'pricing', lazy: lazyRetry(() => import('@/pages/PricingPage')) },
           { path: 'docs', lazy: lazyRetry(() => import('@/pages/DocsPage')) },
           { path: 'signup', lazy: lazyRetry(() => import('@/pages/SignupPage')) },

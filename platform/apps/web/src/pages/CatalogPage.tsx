@@ -6,10 +6,19 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
 import { InstallTabs } from '@/components/ui/install-tabs'
-import { DESK_CATALOG, PRODUCT_DESKS, sdkSnippet, type DeskEntry } from '@/data/deskCatalog'
+import {
+  DESK_CATALOG,
+  PRODUCT_DESKS,
+  deskMicrositePath,
+  sdkSnippet,
+  type DeskEntry,
+} from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
 function DeskCard({ desk }: { desk: DeskEntry }) {
+  const destination = deskMicrositePath(desk)
+  const destinationLabel = desk.isCore ? '문서 보기' : '마이크로사이트'
+
   return (
     <article className="flex flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex items-start gap-3">
@@ -42,7 +51,16 @@ function DeskCard({ desk }: { desk: DeskEntry }) {
         ))}
       </ul>
 
-      <div className="mt-4">
+      <div className="mt-4 flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">SDK 예시</p>
+        <Button asChild variant="ghost" size="sm">
+          <Link to={destination}>
+            {destinationLabel} <ArrowRight className="size-4" />
+          </Link>
+        </Button>
+      </div>
+
+      <div className="mt-2">
         <CodeBlock code={sdkSnippet(desk)} language={desk.isCore ? 'bash' : 'ts'} />
       </div>
     </article>

@@ -84,6 +84,11 @@ export interface DeskEntry {
   isCore?: boolean
 }
 
+/** 포털 안에서 각 제품 Desk 를 소개하는 마이크로사이트 경로. */
+export function deskMicrositePath(desk: Pick<DeskEntry, 'id' | 'isCore'>): string {
+  return desk.isCore ? '/docs' : `/desks/${desk.id}`
+}
+
 /** 통합 엔드포인트 — 빌드 타임 주입(VITE_API_BASE_URL), 없으면 데모 도메인. */
 export function apiEndpoint(): string {
   const fromEnv = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '')
