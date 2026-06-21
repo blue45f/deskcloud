@@ -41,6 +41,8 @@ describe('MIGRATIONS (PGlite)', () => {
         'idx_inquiries_app',
         'idx_inquiries_app_created',
         'idx_inquiries_app_status_created',
+        'idx_inquiries_app_origin_created',
+        'idx_inquiries_app_origin_status_created',
         'daily_visits_app_day_uq',
         'idx_daily_visits_app',
       ])

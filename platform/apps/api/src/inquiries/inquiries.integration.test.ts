@@ -123,11 +123,52 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
     expect(all.items).toHaveLength(2)
     expect(all.items.some((i) => i.contactEmail === 'partner@example.com')).toBe(true)
     expect(all.items.some((i) => i.originUrl === 'https://rotifolk.example/contact')).toBe(true)
+    expect(all.items.some((i) => i.originHost === 'rotifolk.example')).toBe(true)
 
     await service.setStatus('rotifolk', created.inquiry!.id, 'resolved')
     const resolved = await service.listAdmin('rotifolk', { status: 'resolved' })
     expect(resolved.items).toHaveLength(1)
     expect(resolved.items[0]!.status).toBe('resolved')
+  })
+
+  it('listAdmin — 서비스 도메인 originHost 로 문의 큐를 격리 조회', async () => {
+    const first = await service.submit('rotifolk', {
+      ...base,
+      title: '프로덕션 도메인',
+      originUrl: 'https://app.example.com/contact',
+    })
+    await service.submit('rotifolk', {
+      ...base,
+      title: '어드민 도메인',
+      originUrl: 'https://admin.example.com/support',
+    })
+    await service.submit('rotifolk', {
+      ...base,
+      title: '포트 포함 도메인',
+      originUrl: 'https://app.example.com:8443/contact',
+    })
+
+    await service.setStatus('rotifolk', first.inquiry!.id, 'resolved')
+
+    const appDomain = await service.listAdmin('rotifolk', { originHost: 'app.example.com' })
+    expect(appDomain.items.map((item) => item.title)).toEqual(['프로덕션 도메인'])
+    expect(appDomain.items[0]!.originHost).toBe('app.example.com')
+
+    const adminDomain = await service.listAdmin('rotifolk', {
+      originHost: 'admin.example.com',
+    })
+    expect(adminDomain.items.map((item) => item.title)).toEqual(['어드민 도메인'])
+
+    const appPort = await service.listAdmin('rotifolk', {
+      originHost: 'app.example.com:8443',
+    })
+    expect(appPort.items.map((item) => item.title)).toEqual(['포트 포함 도메인'])
+
+    const resolvedInAdmin = await service.listAdmin('rotifolk', {
+      originHost: 'admin.example.com',
+      status: 'resolved',
+    })
+    expect(resolvedInAdmin.items).toHaveLength(0)
   })
 
   it('setStatus — 상태 변경 반영, 다른 appId 의 문의는 갱신 안 됨(null)', async () => {

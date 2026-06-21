@@ -177,7 +177,7 @@ const API_REFERENCE = [
     method: 'GET',
     path: '/api/v1/apps/:appId/inquiries/admin',
     auth: 'X-Admin-Token',
-    purpose: '문의 운영 보드용 관리자 목록 조회',
+    purpose: '문의 운영 보드 목록 조회, status/originHost 필터',
   },
 ] as const
 

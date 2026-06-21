@@ -75,6 +75,8 @@ export interface InquiryAdminDto extends InquiryDto {
   contactEmail: string | null
   /** 문의가 제출된 출처 URL(선택). */
   originUrl: string | null
+  /** 출처 URL에서 정규화한 host[:port]. 서비스 도메인별 운영 필터에 사용한다. */
+  originHost: string | null
 }
 
 /** 문의 목록 응답(페이지네이션) — 공개 게시판/어드민 공용 봉투. */

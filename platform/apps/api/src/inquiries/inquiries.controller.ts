@@ -40,7 +40,7 @@ import type { Response } from 'express'
  *  - `GET  /api/v1/apps/:appId/inquiries` — 공개 게시판 목록(회신 이메일 redact).
  *
  * 어드민(X-Admin-Token):
- *  - `GET   /api/v1/apps/:appId/inquiries/admin` — 회신 이메일 포함 목록.
+ *  - `GET   /api/v1/apps/:appId/inquiries/admin` — 회신 이메일 포함 목록(status/originHost 필터).
  *  - `PATCH /api/v1/apps/:appId/inquiries/:id/status` — 상태 변경(트리아지).
  */
 @ApiTags('inquiries')
@@ -82,7 +82,9 @@ export class InquiriesController {
   @Get('admin')
   @UseGuards(AdminTokenGuard)
   @ApiSecurity('adminToken')
-  @ApiOperation({ summary: '어드민 목록(X-Admin-Token) — 회신 이메일·출처 URL 포함, status 필터' })
+  @ApiOperation({
+    summary: '어드민 목록(X-Admin-Token) — 회신 이메일·출처 URL 포함, status/originHost 필터',
+  })
   listAdmin(
     @Param('appId') appId: string,
     @Query(new ZodValidationPipe(inquiryListQuerySchema)) query: InquiryListQuery

@@ -100,8 +100,8 @@ export const subscriptions = pgTable(
 /**
  * 문의(Inquiry) — 형제 앱이 공개 API 로 제출하는 게시판 항목. 테넌트가 아니라
  * `appId`(형제 앱 식별자)로 묶인다(공개 위젯이라 키 인증 없이 들어온다).
- * (appId)·(appId, createdAt)·(appId, status, createdAt) 인덱스로 앱별 최신순/상태별
- * 어드민 큐 조회를 가속한다.
+ * (appId)·(appId, createdAt)·(appId, status, createdAt)·(appId, originHost, createdAt)
+ * 인덱스로 앱별 최신순/상태별/서비스 도메인별 어드민 큐 조회를 가속한다.
  */
 export const inquiries = pgTable(
   'inquiries',
@@ -114,6 +114,7 @@ export const inquiries = pgTable(
     body: text('body').notNull(),
     contactEmail: text('contact_email'),
     originUrl: text('origin_url'),
+    originHost: text('origin_host'),
     authorName: text('author_name'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
@@ -122,6 +123,13 @@ export const inquiries = pgTable(
     index('idx_inquiries_app').on(t.appId),
     index('idx_inquiries_app_created').on(t.appId, t.createdAt),
     index('idx_inquiries_app_status_created').on(t.appId, t.status, t.createdAt),
+    index('idx_inquiries_app_origin_created').on(t.appId, t.originHost, t.createdAt),
+    index('idx_inquiries_app_origin_status_created').on(
+      t.appId,
+      t.originHost,
+      t.status,
+      t.createdAt
+    ),
   ]
 )
 

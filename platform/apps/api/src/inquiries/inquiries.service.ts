@@ -85,7 +85,7 @@ export class InquiriesService {
     return { appId, items: rows.map(toPublicDto), limit, offset }
   }
 
-  /** 어드민 목록 — 회신 이메일·출처 URL 포함. status 로 필터 가능. */
+  /** 어드민 목록 — 회신 이메일·출처 URL 포함. status/originHost 로 필터 가능. */
   async listAdmin(
     appIdRaw: string,
     query: InquiryListQuery
@@ -93,7 +93,12 @@ export class InquiriesService {
     const appId = normalizeAppId(appIdRaw)
     const limit = clampLimit(query.limit)
     const offset = query.offset ?? 0
-    const rows = await this.store.listByApp(appId, { limit, offset, status: query.status })
+    const rows = await this.store.listByApp(appId, {
+      limit,
+      offset,
+      status: query.status,
+      originHost: query.originHost,
+    })
     return { appId, items: rows, limit, offset }
   }
 

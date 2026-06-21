@@ -6,8 +6,8 @@ import {
   type InquiryStatus,
 } from '@desk/shared/browser'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Inbox, Mail, Moon, RefreshCw, Sun } from 'lucide-react'
-import { useState } from 'react'
+import { Building2, Globe2, Inbox, Mail, Moon, RefreshCw, ShieldCheck, Sun, X } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import { useTheme } from '@/app/ThemeContext'
@@ -17,11 +17,24 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Banner, EmptyState, Spinner } from '@/components/ui/feedback'
 import { Field, Input, Select } from '@/components/ui/field'
+import {
+  buildAdminInquirySummary,
+  inquiryOriginHost,
+  type AdminInquirySummary,
+  type InquiryOriginFacet,
+} from '@/data/adminInquiries'
+import { PRODUCT_DESKS } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { CONSOLE_API_READY, fetchInquiriesAdmin, updateInquiryStatus } from '@/services/api'
 
 const APP_ID_KEY = 'dc-admin-inquiries-appid'
 const TOKEN_KEY = 'dc-admin-token'
+
+const ADMIN_APP_OPTIONS = PRODUCT_DESKS.map((desk) => ({
+  id: desk.id,
+  name: desk.name,
+  tagline: desk.tagline,
+})).toSorted((a, b) => a.name.localeCompare(b.name))
 
 function readStored(key: string): string {
   if (typeof localStorage === 'undefined') return ''
@@ -39,6 +52,169 @@ const STATUS_TONE: Record<InquiryStatus, BadgeProps['tone']> = {
   in_progress: 'warning',
   resolved: 'success',
   closed: 'neutral',
+}
+
+function SummaryStat({
+  label,
+  value,
+  helper,
+}: {
+  label: string
+  value: string | number
+  helper: string
+}) {
+  return (
+    <div className="rounded-md bg-surface-2 p-4">
+      <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">{label}</p>
+      <p className="mt-1 text-xl font-semibold text-text">{value}</p>
+      <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">{helper}</p>
+    </div>
+  )
+}
+
+function DomainFacetButton({
+  facet,
+  selected,
+  onSelect,
+}: {
+  facet: InquiryOriginFacet
+  selected: boolean
+  onSelect: (host: string) => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(facet.host)}
+      className={[
+        'flex min-h-12 items-center justify-between gap-3 rounded-md border px-3 py-2 text-left transition-colors',
+        selected
+          ? 'border-accent-strong bg-accent-soft text-accent-fg'
+          : 'border-border bg-surface hover:border-border-strong hover:bg-surface-2',
+      ].join(' ')}
+      aria-pressed={selected}
+    >
+      <span className="min-w-0">
+        <span className="block truncate text-sm font-semibold">{facet.host}</span>
+        <span className="block text-[0.75rem] opacity-75">미처리 {facet.openCount}건</span>
+      </span>
+      <Badge tone={selected ? 'accent' : 'outline'} size="sm">
+        {facet.count}
+      </Badge>
+    </button>
+  )
+}
+
+function AdminInquirySummaryPanel({
+  appId,
+  token,
+  selectedOriginHost,
+  onSelectOriginHost,
+}: {
+  appId: string
+  token: string
+  selectedOriginHost: string
+  onSelectOriginHost: (host: string) => void
+}) {
+  const enabled = appId.length > 0 && token.length > 0
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['admin-inquiries-summary', appId],
+    queryFn: () => fetchInquiriesAdmin(appId, token, { limit: 50 }),
+    enabled,
+    staleTime: 30_000,
+  })
+  const summary: AdminInquirySummary = useMemo(
+    () => buildAdminInquirySummary(data?.items ?? []),
+    [data?.items]
+  )
+
+  if (!enabled) return null
+
+  return (
+    <Card className="mb-6">
+      <CardHeader>
+        <CardTitle>통합 문의 운영 상태</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {isError ? (
+          <Banner tone="warning">
+            문의 요약을 불러오지 못했습니다. {(error as Error).message}
+          </Banner>
+        ) : null}
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <SummaryStat
+            label="전체 문의"
+            value={isLoading ? '확인 중' : summary.total}
+            helper="최근 50건 기준 운영 큐"
+          />
+          <SummaryStat
+            label="미처리"
+            value={isLoading ? '확인 중' : summary.open}
+            helper="new + in progress"
+          />
+          <SummaryStat
+            label="서비스 도메인"
+            value={isLoading ? '확인 중' : summary.origins.length}
+            helper="origin host 기준 격리"
+          />
+          <SummaryStat
+            label="출처 미확인"
+            value={isLoading ? '확인 중' : summary.missingOrigin}
+            helper="originUrl 없이 접수된 문의"
+          />
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <h2 className="text-sm font-semibold text-text">서비스 도메인 필터</h2>
+              {selectedOriginHost ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onSelectOriginHost('')}
+                >
+                  <X className="size-4" /> 해제
+                </Button>
+              ) : null}
+            </div>
+            {summary.origins.length > 0 ? (
+              <div className="grid gap-2 sm:grid-cols-2">
+                {summary.origins.map((facet) => (
+                  <DomainFacetButton
+                    key={facet.host}
+                    facet={facet}
+                    selected={selectedOriginHost === facet.host}
+                    onSelect={onSelectOriginHost}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-md border border-dashed border-border bg-surface-2 p-4 text-sm text-text-muted">
+                출처 URL이 있는 문의가 쌓이면 서비스 도메인별 필터가 표시됩니다.
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-md border border-border bg-surface p-4">
+            <h2 className="text-sm font-semibold text-text">상태 분포</h2>
+            <dl className="mt-3 space-y-2 text-sm">
+              {INQUIRY_STATUSES.map((status) => (
+                <div key={status} className="flex items-center justify-between gap-3">
+                  <dt className="inline-flex items-center gap-2 text-text-muted">
+                    <Badge tone={STATUS_TONE[status]} size="sm">
+                      {INQUIRY_STATUS_LABELS[status]}
+                    </Badge>
+                  </dt>
+                  <dd className="font-mono text-text">{summary.statusCounts[status]}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
 }
 
 function ThemeToggle() {
@@ -103,6 +279,7 @@ function InquiryRow({
   appId: string
   token: string
 }) {
+  const originHost = inquiryOriginHost(inquiry)
   return (
     <li className="space-y-2 px-5 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -139,6 +316,11 @@ function InquiryRow({
             {inquiry.originUrl}
           </a>
         ) : null}
+        {originHost ? (
+          <span className="inline-flex items-center gap-1 font-mono">
+            <Globe2 className="size-3" aria-hidden /> {originHost}
+          </span>
+        ) : null}
         <span className="font-mono">{inquiry.createdAt.slice(0, 16).replace('T', ' ')}</span>
       </div>
     </li>
@@ -149,14 +331,21 @@ function InquiryList({
   appId,
   token,
   status,
+  originHost,
 }: {
   appId: string
   token: string
   status: InquiryStatus | ''
+  originHost: string
 }) {
   const { data, isLoading, isError, error, refetch, isFetching } = useQuery({
-    queryKey: ['admin-inquiries', appId, status],
-    queryFn: () => fetchInquiriesAdmin(appId, token, { status: status || undefined, limit: 50 }),
+    queryKey: ['admin-inquiries', appId, status, originHost],
+    queryFn: () =>
+      fetchInquiriesAdmin(appId, token, {
+        status: status || undefined,
+        originHost: originHost || undefined,
+        limit: 50,
+      }),
     enabled: appId.length > 0 && token.length > 0,
   })
 
@@ -189,7 +378,13 @@ function InquiryList({
   const items = data?.items ?? []
   if (items.length === 0) {
     return (
-      <EmptyState icon={Inbox} title="문의가 없습니다" description="아직 접수된 문의가 없어요." />
+      <EmptyState
+        icon={Inbox}
+        title="문의가 없습니다"
+        description={
+          originHost ? `${originHost} 조건에 맞는 문의가 없습니다.` : '아직 접수된 문의가 없어요.'
+        }
+      />
     )
   }
   return (
@@ -210,16 +405,20 @@ export default function AdminInquiriesPage() {
   const [appId, setAppId] = useState(() => readStored(APP_ID_KEY))
   const [token, setToken] = useState(() => readStored(TOKEN_KEY))
   const [status, setStatus] = useState<InquiryStatus | ''>('')
+  const [originHost, setOriginHost] = useState('')
   const qc = useQueryClient()
+  const selectedDesk = useMemo(() => ADMIN_APP_OPTIONS.find((desk) => desk.id === appId), [appId])
 
   const apply = (nextAppId: string, nextToken: string) => {
     const a = nextAppId.trim().toLowerCase()
     const t = nextToken.trim()
     setAppId(a)
     setToken(t)
+    setOriginHost('')
     writeStored(APP_ID_KEY, a)
     writeStored(TOKEN_KEY, t)
     void qc.invalidateQueries({ queryKey: ['admin-inquiries'] })
+    void qc.invalidateQueries({ queryKey: ['admin-inquiries-summary'] })
   }
 
   return (
@@ -242,13 +441,29 @@ export default function AdminInquiriesPage() {
       <main
         id="main-content"
         tabIndex={-1}
-        className="mx-auto max-w-5xl px-4 py-8 outline-none sm:px-6"
+        className="mx-auto max-w-6xl px-4 py-8 outline-none sm:px-6"
       >
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight text-text">문의 관리</h1>
-          <p className="mt-1 text-sm text-text-muted">
-            전체 Desk 패밀리 앱이 공개 API 로 보낸 문의를 한곳에서 분류·처리합니다.
-          </p>
+        <div className="mb-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
+          <div>
+            <Badge tone="accent" size="sm">
+              Admin operations
+            </Badge>
+            <h1 className="mt-3 text-2xl font-semibold tracking-tight text-text">문의 관리</h1>
+            <p className="mt-1 max-w-3xl text-sm leading-6 text-text-muted">
+              전체 Desk 패밀리 앱이 공개 API 로 보낸 문의를 한곳에서 분류·처리하고, 서비스 도메인
+              origin host 기준으로 운영 큐를 격리합니다.
+            </p>
+          </div>
+          <div className="rounded-lg border border-border bg-surface p-4">
+            <div className="flex items-center gap-2 text-sm font-semibold text-text">
+              <ShieldCheck className="size-4 text-accent-strong" aria-hidden />
+              통합 관리 경계
+            </div>
+            <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+              appId, X-Admin-Token, originHost를 함께 사용해 앱별·서비스 도메인별 문의 접근을
+              분리합니다.
+            </p>
+          </div>
         </div>
 
         {!CONSOLE_API_READY ? (
@@ -271,14 +486,30 @@ export default function AdminInquiriesPage() {
                 apply(String(fd.get('appId') ?? ''), String(fd.get('token') ?? ''))
               }}
             >
-              <Field label="앱 ID" htmlFor="inq-app" hint="형제 앱 식별자 (예: rotifolk)">
+              <Field
+                label="서비스 앱"
+                htmlFor="inq-app"
+                hint={
+                  selectedDesk
+                    ? `${selectedDesk.name} · ${selectedDesk.tagline}`
+                    : '형제 앱 또는 Desk 식별자'
+                }
+              >
                 <Input
                   id="inq-app"
                   name="appId"
+                  list="desk-admin-app-options"
                   defaultValue={appId}
-                  placeholder="rotifolk"
+                  placeholder="seo-gateway"
                   autoComplete="off"
                 />
+                <datalist id="desk-admin-app-options">
+                  {ADMIN_APP_OPTIONS.map((desk) => (
+                    <option key={desk.id} value={desk.id}>
+                      {desk.name}
+                    </option>
+                  ))}
+                </datalist>
               </Field>
               <Field label="X-Admin-Token" htmlFor="inq-token" hint="어드민 트리아지 토큰">
                 <Input
@@ -295,27 +526,50 @@ export default function AdminInquiriesPage() {
           </CardContent>
         </Card>
 
+        <AdminInquirySummaryPanel
+          appId={appId}
+          token={token}
+          selectedOriginHost={originHost}
+          onSelectOriginHost={setOriginHost}
+        />
+
         <Card>
           <CardHeader
             action={
-              <Select
-                aria-label="상태 필터"
-                className="h-8 w-36 text-xs"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as InquiryStatus | '')}
-              >
-                <option value="">전체 상태</option>
-                {INQUIRY_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {INQUIRY_STATUS_LABELS[s]}
-                  </option>
-                ))}
-              </Select>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {originHost ? (
+                  <Badge tone="info" size="sm">
+                    <Globe2 className="size-3" aria-hidden /> {originHost}
+                  </Badge>
+                ) : null}
+                <Select
+                  aria-label="상태 필터"
+                  className="h-8 w-36 text-xs"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as InquiryStatus | '')}
+                >
+                  <option value="">전체 상태</option>
+                  {INQUIRY_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {INQUIRY_STATUS_LABELS[s]}
+                    </option>
+                  ))}
+                </Select>
+              </div>
             }
           >
-            <CardTitle>{appId ? `${appId} 문의` : '문의'}</CardTitle>
+            <CardTitle>
+              {appId ? (
+                <span className="inline-flex items-center gap-2">
+                  <Building2 className="size-4 text-accent-strong" aria-hidden />
+                  {appId} 문의
+                </span>
+              ) : (
+                '문의'
+              )}
+            </CardTitle>
           </CardHeader>
-          <InquiryList appId={appId} token={token} status={status} />
+          <InquiryList appId={appId} token={token} status={status} originHost={originHost} />
         </Card>
       </main>
     </div>

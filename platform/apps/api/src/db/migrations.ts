@@ -109,4 +109,20 @@ CREATE INDEX IF NOT EXISTS idx_daily_visits_app ON daily_visits (app_id);
 CREATE INDEX IF NOT EXISTS idx_inquiries_app_status_created ON inquiries (app_id, status, created_at);
 `,
   },
+  {
+    name: '0005_inquiry_origin_host',
+    sql: /* sql */ `
+ALTER TABLE inquiries ADD COLUMN IF NOT EXISTS origin_host text;
+
+UPDATE inquiries
+SET origin_host = lower(split_part(regexp_replace(origin_url, '^https?://', ''), '/', 1))
+WHERE origin_url IS NOT NULL
+  AND origin_host IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_inquiries_app_origin_created
+  ON inquiries (app_id, origin_host, created_at);
+CREATE INDEX IF NOT EXISTS idx_inquiries_app_origin_status_created
+  ON inquiries (app_id, origin_host, status, created_at);
+`,
+  },
 ]

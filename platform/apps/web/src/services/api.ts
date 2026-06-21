@@ -176,7 +176,7 @@ export function cancelSubscription(): Promise<SubscriptionDto> {
 export function fetchInquiriesAdmin(
   appId: string,
   adminToken: string,
-  params?: { status?: InquiryStatus; limit?: number; offset?: number }
+  params?: { status?: InquiryStatus; originHost?: string; limit?: number; offset?: number }
 ): Promise<InquiryListDto<InquiryAdminDto>> {
   return request<InquiryListDto<InquiryAdminDto>>(
     `v1/apps/${encodeURIComponent(appId)}/inquiries/admin`,
@@ -184,6 +184,7 @@ export function fetchInquiriesAdmin(
       adminToken,
       query: {
         status: params?.status,
+        originHost: params?.originHost,
         limit: params?.limit != null ? String(params.limit) : undefined,
         offset: params?.offset != null ? String(params.offset) : undefined,
       },

@@ -90,12 +90,25 @@ export const submitInquirySchema = z.object({
 })
 export type SubmitInquiryInput = z.infer<typeof submitInquirySchema>
 
+/** 서비스 도메인 host[:port] 필터 — URL 전체가 아니라 origin host 경계만 받는다. */
+export const originHostSchema = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(1)
+  .max(255)
+  .refine((v) => !v.includes('://') && !/[/?#\s]/.test(v), {
+    message: 'originHost는 host[:port] 형식이어야 합니다',
+  })
+
 /** 문의 목록 페이지네이션 쿼리 — limit(1..50, 기본 20) · offset(≥0, 기본 0). */
 export const inquiryListQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(INQUIRY_LIST_MAX_LIMIT).optional(),
   offset: z.coerce.number().int().min(0).optional(),
   /** 어드민 목록 한정 — 상태로 필터(미지정 시 전체). */
   status: z.enum(INQUIRY_STATUSES).optional(),
+  /** 어드민 목록 한정 — 서비스 도메인 host[:port]로 격리 조회. */
+  originHost: originHostSchema.optional(),
 })
 export type InquiryListQuery = z.infer<typeof inquiryListQuerySchema>
 

@@ -23,6 +23,7 @@ function toAdminDto(row: Row): InquiryAdminDto {
     authorName: row.authorName,
     contactEmail: row.contactEmail,
     originUrl: row.originUrl,
+    originHost: row.originHost,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   }
@@ -42,21 +43,23 @@ export class DrizzleInquiryStore implements InquiryStorePort {
         body: rec.body,
         contactEmail: rec.contactEmail,
         originUrl: rec.originUrl,
+        originHost: rec.originHost,
         authorName: rec.authorName,
       })
       .returning()
     return toAdminDto(inserted[0]!)
   }
 
-  /** 앱별 최신순(createdAt desc) + 페이지네이션. status 지정 시 해당 상태만(어드민). */
+  /** 앱별 최신순(createdAt desc) + 페이지네이션. status/originHost 지정 시 해당 큐만(어드민). */
   async listByApp(appId: string, opts: ListInquiriesOptions): Promise<InquiryAdminDto[]> {
-    const where = opts.status
-      ? and(eq(inquiries.appId, appId), eq(inquiries.status, opts.status))
-      : eq(inquiries.appId, appId)
+    const filters = [eq(inquiries.appId, appId)]
+    if (opts.status) filters.push(eq(inquiries.status, opts.status))
+    if (opts.originHost) filters.push(eq(inquiries.originHost, opts.originHost))
+
     const rows = await this.dbs.db
       .select()
       .from(inquiries)
-      .where(where)
+      .where(and(...filters))
       .orderBy(desc(inquiries.createdAt))
       .limit(opts.limit)
       .offset(opts.offset)
