@@ -1,3 +1,4 @@
+import { workspaceDeskManifestById, type Plan, type UsageMetric } from '@desk/shared/browser'
 import {
   Bell,
   Boxes,
@@ -19,8 +20,6 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react'
-
-import type { Plan, UsageMetric } from '@desk/shared/browser'
 
 /**
  * DeskCloud 통합 디렉터리 — 모든 Desk SaaS 의 정적 카탈로그.
@@ -192,6 +191,16 @@ function ops(id: string, value: Partial<Omit<DeskOperations, 'adminPath'>>): Des
   }
 }
 
+function requiredWorkspaceManifest(id: string) {
+  const manifest = workspaceDeskManifestById(id)
+  if (!manifest) throw new Error(`Missing workspace Desk manifest for ${id}`)
+  return manifest
+}
+
+const AIDIGEST_WORKSPACE = requiredWorkspaceManifest('aidigestdesk')
+const SEO_GATEWAY_WORKSPACE = requiredWorkspaceManifest('seo-gateway')
+const REMOTE_DEVTOOLS_WORKSPACE = requiredWorkspaceManifest('remote-devtools')
+
 export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
   termsdesk: ops('termsdesk', {
     gatewayPath: '/terms',
@@ -289,13 +298,13 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
     operatorTasks: ['사용자 상태 확인', '세션 정책 변경', '로그인 실패 분석'],
   }),
   aidigestdesk: ops('aidigestdesk', {
-    gatewayPath: '/aidigest',
-    primaryMetric: 'events',
+    gatewayPath: AIDIGEST_WORKSPACE.gatewayPath,
+    primaryMetric: AIDIGEST_WORKSPACE.primaryMetric,
     billingDriver:
       '소스 스냅샷, 업데이트 후보, 뉴스레터 내보내기, 편집 워크벤치 작업을 이벤트로 집계합니다.',
     config: ['source schedule', 'content snapshot', 'editorial pipeline', 'Pages base path'],
     operatorTasks: ['공식 소스 스냅샷', '업데이트 후보 검수', '뉴스레터/런북 내보내기'],
-    recommendedPlan: 'pro',
+    recommendedPlan: AIDIGEST_WORKSPACE.recommendedPlan,
   }),
   filedesk: ops('filedesk', {
     gatewayPath: '/file',
@@ -306,17 +315,17 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
     recommendedPlan: 'scale',
   }),
   'seo-gateway': ops('seo-gateway', {
-    gatewayPath: '/seo-gateway',
-    primaryMetric: 'api_calls',
+    gatewayPath: SEO_GATEWAY_WORKSPACE.gatewayPath,
+    primaryMetric: SEO_GATEWAY_WORKSPACE.primaryMetric,
     billingDriver:
       '봇 렌더, 캐시 hit/miss, 워밍, Lighthouse/VisualDiff 실행을 렌더 이벤트로 집계합니다.',
     config: ['origin URL', 'route rules', 'cache TTL/SWR', 'bot detection', 'admin token'],
     operatorTasks: ['렌더 라우트 관리', '캐시/워밍 점검', 'SEO 품질 게이트 확인'],
-    recommendedPlan: 'scale',
+    recommendedPlan: SEO_GATEWAY_WORKSPACE.recommendedPlan,
   }),
   'remote-devtools': ops('remote-devtools', {
-    gatewayPath: '/remote-devtools',
-    primaryMetric: 'events',
+    gatewayPath: REMOTE_DEVTOOLS_WORKSPACE.gatewayPath,
+    primaryMetric: REMOTE_DEVTOOLS_WORKSPACE.primaryMetric,
     billingDriver:
       '라이브 연결, 녹화 세션, 리플레이 조회, Jira/Slack/Sheets 연동 이벤트를 테넌트 사용량으로 합산합니다.',
     config: [
@@ -327,7 +336,7 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
       'S3 backup',
     ],
     operatorTasks: ['녹화/라이브 세션 점검', 'SDK 허용 도메인 관리', 'Jira/Slack/Sheets 연동 확인'],
-    recommendedPlan: 'scale',
+    recommendedPlan: REMOTE_DEVTOOLS_WORKSPACE.recommendedPlan,
   }),
 }
 
@@ -369,11 +378,9 @@ function readiness(value: Partial<DeskReadiness>): DeskReadiness {
 
 export const DESK_READINESS: Readonly<Record<string, DeskReadiness>> = {
   aidigestdesk: readiness({
-    summary:
-      'AIDigestDesk는 공개 콘텐츠 포털과 편집 데이터플레인을 유지하면서 DeskCloud에서 서비스 도메인, 콘텐츠 운영 이벤트, export run을 통합 관리합니다.',
-    controlPlane:
-      'DeskCloud tenant, Pages base path, source snapshot usage, editorial export audit',
-    dataPlane: 'desks/aidigestdesk Vite portal and @aidigestdesk/content package',
+    summary: AIDIGEST_WORKSPACE.readinessSummary,
+    controlPlane: AIDIGEST_WORKSPACE.controlPlane,
+    dataPlane: AIDIGEST_WORKSPACE.dataPlane,
     checks: [
       {
         label: 'Pages base path',
@@ -394,10 +401,9 @@ export const DESK_READINESS: Readonly<Record<string, DeskReadiness>> = {
     ],
   }),
   'seo-gateway': readiness({
-    summary:
-      'SEOGatewayDesk는 별도 제품으로 분리 운영하지 않습니다. Fastify 렌더 데이터플레인은 desks/seo-gateway에 두고, 가입회사·서비스 도메인·렌더 사용량·요금 한도는 DeskCloud 콘솔에서 통합 운영합니다.',
-    controlPlane: 'DeskCloud tenant, service origin, gateway path, render usage, plan limit',
-    dataPlane: 'desks/seo-gateway Fastify renderer, Puppeteer pool, cache/SWR, quality gates',
+    summary: SEO_GATEWAY_WORKSPACE.readinessSummary,
+    controlPlane: SEO_GATEWAY_WORKSPACE.controlPlane,
+    dataPlane: SEO_GATEWAY_WORKSPACE.dataPlane,
     checks: [
       {
         label: '원본 SPA origin',
@@ -424,11 +430,9 @@ export const DESK_READINESS: Readonly<Record<string, DeskReadiness>> = {
     ],
   }),
   'remote-devtools': readiness({
-    summary:
-      'RemoteDevTools도 분리 운영 대상이 아닙니다. CDP/rrweb/WebSocket 데이터플레인은 desks/remote-devtools에 보존하고, 조직·origin·세션 사용량·연동 상태는 DeskCloud 운영 콘솔에서 통합 관리합니다.',
-    controlPlane:
-      'DeskCloud tenant, SDK allowed origin, WS gateway, session usage, integration status',
-    dataPlane: 'desks/remote-devtools NestJS/TypeORM CDP gateway, rrweb replay, S3 backup',
+    summary: REMOTE_DEVTOOLS_WORKSPACE.readinessSummary,
+    controlPlane: REMOTE_DEVTOOLS_WORKSPACE.controlPlane,
+    dataPlane: REMOTE_DEVTOOLS_WORKSPACE.dataPlane,
     checks: [
       {
         label: 'SDK origin allowlist',
@@ -1501,9 +1505,9 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     status: 'live',
     metrics: ['소스 스냅샷', '업데이트 후보', '뉴스레터', '플레이북'],
     integrationMode: 'workspace',
-    integrationPackage: '@aidigestdesk/content',
-    workspacePath: 'desks/aidigestdesk',
-    sourceRepositoryUrl: 'https://github.com/blue45f/aidigestdesk',
+    integrationPackage: AIDIGEST_WORKSPACE.integrationPackage,
+    workspacePath: AIDIGEST_WORKSPACE.workspacePath,
+    sourceRepositoryUrl: AIDIGEST_WORKSPACE.sourceRepositoryUrl,
   },
   {
     id: 'filedesk',
@@ -1529,9 +1533,9 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     status: 'live',
     metrics: ['프리렌더', '캐시/SWR', 'Lighthouse', 'VisualDiff'],
     integrationMode: 'workspace',
-    integrationPackage: '@heejun/spa-seo-gateway-core',
-    workspacePath: 'desks/seo-gateway',
-    sourceRepositoryUrl: 'https://github.com/blue45f/spa-seo-gateway',
+    integrationPackage: SEO_GATEWAY_WORKSPACE.integrationPackage,
+    workspacePath: SEO_GATEWAY_WORKSPACE.workspacePath,
+    sourceRepositoryUrl: SEO_GATEWAY_WORKSPACE.sourceRepositoryUrl,
   },
   {
     id: 'remote-devtools',
@@ -1543,9 +1547,9 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     status: 'live',
     metrics: ['라이브 세션', '녹화 리플레이', 'CDP 이벤트', '외부 연동'],
     integrationMode: 'workspace',
-    integrationPackage: 'remote-debug-sdk',
-    workspacePath: 'desks/remote-devtools',
-    sourceRepositoryUrl: 'https://github.com/blue45f/remote-devtools',
+    integrationPackage: REMOTE_DEVTOOLS_WORKSPACE.integrationPackage,
+    workspacePath: REMOTE_DEVTOOLS_WORKSPACE.workspacePath,
+    sourceRepositoryUrl: REMOTE_DEVTOOLS_WORKSPACE.sourceRepositoryUrl,
   },
 ]
 

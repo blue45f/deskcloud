@@ -11,6 +11,7 @@ import { HealthModule } from './health/health.module'
 import { InquiriesModule } from './inquiries/inquiries.module'
 import { TenantsModule } from './tenants/tenants.module'
 import { VisitsModule } from './visits/visits.module'
+import { WorkspaceDesksModule } from './workspace-desks/workspace-desks.module'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { VisitsModule } from './visits/visits.module'
     BillingModule,
     InquiriesModule,
     VisitsModule,
+    WorkspaceDesksModule,
     HealthModule,
   ],
   providers: [

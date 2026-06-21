@@ -1,3 +1,4 @@
+import { WORKSPACE_DESK_MANIFEST, workspaceDeskManifestById } from '@desk/shared/browser'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -53,29 +54,30 @@ describe('DeskCloud catalog contracts', () => {
 
   it('keeps absorbed non-native Desks integrated as workspace Desks', () => {
     const workspaceDesks = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
+    const manifestIds = WORKSPACE_DESK_MANIFEST.map((item) => item.id)
 
-    expect(workspaceDesks.map((desk) => desk.id).toSorted()).toEqual([
-      'aidigestdesk',
-      'remote-devtools',
-      'seo-gateway',
-    ])
+    expect(workspaceDesks.map((desk) => desk.id).toSorted()).toEqual([...manifestIds].toSorted())
 
     for (const desk of workspaceDesks) {
+      const manifest = workspaceDeskManifestById(desk.id)
       const operations = deskOperations(desk)
       const details = deskDetails(desk)
       const readiness = deskReadiness(desk)
 
-      expect(desk.workspacePath).toMatch(/^desks\//)
-      expect(desk.integrationPackage).toBeTruthy()
-      expect(desk.sourceRepositoryUrl).toMatch(/^https:\/\/github\.com\/blue45f\//)
+      expect(manifest).toBeDefined()
+      expect(desk.workspacePath).toBe(manifest?.workspacePath)
+      expect(desk.integrationPackage).toBe(manifest?.integrationPackage)
+      expect(desk.sourceRepositoryUrl).toBe(manifest?.sourceRepositoryUrl)
       expect(desk.liveUrl).toBeUndefined()
-      expect(operations.recommendedPlan).toBeTruthy()
+      expect(operations.gatewayPath).toBe(manifest?.gatewayPath)
+      expect(operations.primaryMetric).toBe(manifest?.primaryMetric)
+      expect(operations.recommendedPlan).toBe(manifest?.recommendedPlan)
       expect(details.summary).toContain(desk.name)
       expect(details.domainIsolation).toContain('DeskCloud')
       expect(DESK_READINESS).toHaveProperty(desk.id)
-      expect(readiness.summary).toContain('DeskCloud')
-      expect(readiness.controlPlane).toContain('DeskCloud')
-      expect(readiness.dataPlane).toContain(desk.workspacePath)
+      expect(readiness.summary).toBe(manifest?.readinessSummary)
+      expect(readiness.controlPlane).toBe(manifest?.controlPlane)
+      expect(readiness.dataPlane).toBe(manifest?.dataPlane)
     }
   })
 

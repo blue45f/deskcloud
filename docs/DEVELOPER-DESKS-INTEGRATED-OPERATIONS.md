@@ -13,6 +13,7 @@
 | Public product  | `SEOGatewayDesk`, `RemoteDevTools`                               |
 | Control-plane   | DeskCloud tenant, service origin allowlist, usage, plan, billing |
 | Data-plane      | SEO Fastify renderer, RemoteDevTools NestJS/TypeORM CDP gateway  |
+| API manifest    | `/api/workspace-desks`, `/api/workspace-desks/:id`               |
 | Console entry   | `/dashboard?desk=seo-gateway`, `/dashboard?desk=remote-devtools` |
 | Microsite       | `/desks/seo-gateway`, `/desks/remote-devtools`                   |
 
@@ -84,6 +85,16 @@ pnpm run dev:remote-devtools:external
 `remote-devtools.vercel.app` 같은 과거 URL이 아니라 `VITE_API_BASE_URL` 기반 DeskCloud
 통합 엔드포인트를 사용한다.
 
+플랫폼 API는 workspace Desk manifest를 공개한다. 콘솔과 API가 서로 다른 gateway path나
+source-of-truth를 말하지 않도록 `@desk/shared`의 `WORKSPACE_DESK_MANIFEST`를 단일 계약으로
+사용한다.
+
+```bash
+curl "$VITE_API_BASE_URL/api/workspace-desks"
+curl "$VITE_API_BASE_URL/api/workspace-desks/remote-devtools"
+curl "$VITE_API_BASE_URL/api/workspace-desks/seo-gateway"
+```
+
 ## 원본 저장소 처리
 
 `/Users/hjunkim/WebstormProjects/spa-seo-gateway`와
@@ -102,5 +113,8 @@ pnpm run dev:remote-devtools:external
   표면으로 연결된다.
 - `/desks/seo-gateway`, `/desks/remote-devtools`가 standalone URL 대신 통합 엔드포인트를
   설명한다.
+- `/api/workspace-desks/seo-gateway`, `/api/workspace-desks/remote-devtools`가
+  `workspace_integrated` 상태와 `liveUrl: null`을 반환한다.
 - `pnpm --filter @desk/web test`가 Workspace Desk 계약을 검증한다.
+- `pnpm --filter @desk/api test`가 API manifest 계약을 검증한다.
 - `pnpm run verify:developer-desks`가 두 데이터플레인을 루트에서 검증한다.
