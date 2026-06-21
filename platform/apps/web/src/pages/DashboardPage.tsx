@@ -281,6 +281,195 @@ function DomainIsolationPanel({ tenant }: { tenant?: TenantDto }) {
   )
 }
 
+const WORKSPACE_DESK_BOUNDARY: Record<
+  string,
+  {
+    controlPlane: string
+    dataPlane: string
+    adminSurface: string
+    verification: readonly string[]
+  }
+> = {
+  'seo-gateway': {
+    controlPlane: 'DeskCloud tenant, service origin, usage, billing, plan limit',
+    dataPlane: 'Fastify render gateway, Puppeteer pool, cache/SWR, SEO quality gates',
+    adminSurface: 'Route rules, cache warm/invalidate, Lighthouse/VisualDiff review',
+    verification: ['workspace package', 'gateway route', 'render metric', 'origin allowlist'],
+  },
+  'remote-devtools': {
+    controlPlane: 'DeskCloud tenant, service origin, usage, billing, integration status',
+    dataPlane: 'NestJS/TypeORM CDP gateway, rrweb replay, S3 backup, issue integrations',
+    adminSurface: 'Live sessions, replay queue, SDK domain policy, Jira/Slack/Sheets status',
+    verification: ['workspace package', 'WS gateway', 'session metric', 'org/origin namespace'],
+  },
+}
+
+function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
+  const workspaceDesks = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
+  if (workspaceDesks.length === 0) return null
+
+  const domainCount = tenant?.corsOrigins.length ?? 0
+
+  return (
+    <Card id="workspace-desks">
+      <CardHeader
+        action={
+          <Button asChild variant="secondary" size="sm">
+            <a href="#desk-operations">
+              운영 허브 <ArrowRight className="size-4" />
+            </a>
+          </Button>
+        }
+      >
+        <CardTitle>
+          <span className="inline-flex items-center gap-1.5">
+            <Database className="size-4" aria-hidden /> Workspace Desk 통합 상태
+          </span>
+        </CardTitle>
+        <CardDescription>
+          별도 저장소로 운영하던 개발자 도구형 Desk를 DeskCloud 계정·도메인·요금·사용량 콘솔
+          아래에서 관리합니다.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Workspace desks
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">{workspaceDesks.length}</p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              소스와 운영 메타데이터를 같은 모노레포에서 검증
+            </p>
+          </div>
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Service origins
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {domainCount > 0 ? `${domainCount}개` : '미등록'}
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              모든 workspace Desk의 브라우저/SDK 호출 경계
+            </p>
+          </div>
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Control plane
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">DeskCloud</p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              데이터플레인은 보존하고 계정·과금·감사는 통합
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-3 xl:grid-cols-2">
+          {workspaceDesks.map((desk) => {
+            const operations = deskOperations(desk)
+            const detail = deskDetails(desk)
+            const boundary = WORKSPACE_DESK_BOUNDARY[desk.id]
+
+            return (
+              <div key={desk.id} className="rounded-md border border-border bg-surface p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <DeskGlyph icon={desk.icon} tone={desk.tone} size="sm" />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-sm font-semibold text-text">{desk.name}</h3>
+                        <Badge tone="success" size="sm" dot>
+                          workspace
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                        {desk.tagline}
+                      </p>
+                    </div>
+                  </div>
+                  <Button asChild variant="ghost" size="sm">
+                    <Link to={deskMicrositePath(desk)}>상세</Link>
+                  </Button>
+                </div>
+
+                <dl className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <div className="min-w-0 rounded-md bg-surface-2 p-3">
+                    <dt className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                      Source
+                    </dt>
+                    <dd className="mt-1 truncate font-mono text-[0.8125rem] text-text">
+                      {desk.workspacePath}
+                    </dd>
+                  </div>
+                  <div className="min-w-0 rounded-md bg-surface-2 p-3">
+                    <dt className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                      Package
+                    </dt>
+                    <dd className="mt-1 truncate font-mono text-[0.8125rem] text-text">
+                      {desk.integrationPackage}
+                    </dd>
+                  </div>
+                  <div className="min-w-0 rounded-md bg-surface-2 p-3">
+                    <dt className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                      Gateway
+                    </dt>
+                    <dd className="mt-1 truncate font-mono text-[0.8125rem] text-text">
+                      {operations.gatewayPath}
+                    </dd>
+                  </div>
+                  <div className="min-w-0 rounded-md bg-surface-2 p-3">
+                    <dt className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                      Metric
+                    </dt>
+                    <dd className="mt-1 text-[0.8125rem] font-semibold text-text">
+                      {USAGE_METRIC_LABEL[operations.primaryMetric]}
+                    </dd>
+                  </div>
+                </dl>
+
+                <div className="mt-4 grid gap-3 lg:grid-cols-2">
+                  <div>
+                    <SectionTitle>통합 경계</SectionTitle>
+                    <ul className="space-y-2 text-[0.8125rem] leading-5 text-text-muted">
+                      <li>
+                        <strong className="text-text">Control:</strong>{' '}
+                        {boundary?.controlPlane ?? 'DeskCloud account and billing control plane'}
+                      </li>
+                      <li>
+                        <strong className="text-text">Data:</strong>{' '}
+                        {boundary?.dataPlane ?? detail.domainIsolation}
+                      </li>
+                      <li>
+                        <strong className="text-text">Admin:</strong>{' '}
+                        {boundary?.adminSurface ?? operations.operatorTasks.join(', ')}
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <SectionTitle>운영 검증</SectionTitle>
+                    <ul className="flex flex-wrap gap-1.5">
+                      {(boundary?.verification ?? operations.config).map((item) => (
+                        <li key={item}>
+                          <Badge tone="outline" size="sm">
+                            {item}
+                          </Badge>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-3 text-[0.8125rem] leading-5 text-text-muted">
+                      {detail.domainIsolation}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 function DeskOperationsHub() {
   const [params, setParams] = useSearchParams()
   const fallbackDesk = PRODUCT_DESKS[0]
@@ -302,7 +491,7 @@ function DeskOperationsHub() {
   }
 
   return (
-    <Card>
+    <Card id="desk-operations">
       <CardHeader
         action={
           <Button asChild variant="secondary" size="sm">
@@ -899,6 +1088,7 @@ export default function DashboardPage() {
         <ConsolePreviewNotice title="콘솔" />
         <AdminCommandCenter />
         <DomainIsolationPanel />
+        <WorkspaceDeskPanel />
         <DeskOperationsHub />
       </div>
     )
@@ -932,6 +1122,8 @@ export default function DashboardPage() {
       </div>
 
       <DomainIsolationPanel tenant={tenant} />
+
+      <WorkspaceDeskPanel tenant={tenant} />
 
       <BillingPanel />
 

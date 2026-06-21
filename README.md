@@ -37,7 +37,8 @@ provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 4. **디자인 패밀리** — 공유 DNA(OKLCH 토큰·셸·내비·배지) + Desk별 액센트/캐릭터 (균질화 아님)
 
 플랜: 아키텍처 와이어링 = `docs/INTEGRATION-PLAN.md` · 모노레포 구축/마이그레이션 =
-`docs/MONOREPO-CONSOLIDATION-PLAN.md` · 플랫폼 DB 구조 = `platform/docs/DATA_MODEL.md`.
+`docs/MONOREPO-CONSOLIDATION-PLAN.md` · 운영 콘솔 기준 =
+`docs/ADMIN-CONSOLE-OPERATIONS.md` · 플랫폼 DB 구조 = `platform/docs/DATA_MODEL.md`.
 
 ## 개발
 

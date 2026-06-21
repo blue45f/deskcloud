@@ -1,16 +1,29 @@
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInAnonymously,
-  signInWithEmailAndPassword,
-  signOut as fbSignOut,
-  type User,
-} from 'firebase/auth'
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 
 import { isFirebaseAuthConfigured } from './config'
 import { AuthContext, authErrorMessage, type AuthState, type AuthUser } from './context'
-import { auth } from './firebase'
+
+import type { Auth, User } from 'firebase/auth'
+
+type FirebaseAuthApi = typeof import('firebase/auth')
+type FirebaseRuntime = {
+  api: FirebaseAuthApi
+  auth: Auth
+}
+
+let runtimePromise: Promise<FirebaseRuntime> | null = null
+
+function loadFirebaseRuntime(): Promise<FirebaseRuntime> {
+  runtimePromise ??= Promise.all([import('firebase/auth'), import('./firebase')]).then(
+    ([api, runtime]) => {
+      if (!runtime.auth) {
+        throw new Error(authErrorMessage('auth/configuration-not-found'))
+      }
+      return { api, auth: runtime.auth }
+    }
+  )
+  return runtimePromise
+}
 
 /** Firebase User → 앱이 쓰는 가벼운 형태로 투영. */
 function toAuthUser(user: User): AuthUser {
@@ -53,47 +66,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         mounted.current = false
       }
     }
-    const unsub = onAuthStateChanged(auth, (fbUser) => {
-      if (!mounted.current) return
-      setUser(fbUser ? toAuthUser(fbUser) : null)
-      setLoading(false)
-    })
+    let unsub: (() => void) | undefined
+
+    void loadFirebaseRuntime()
+      .then(({ api, auth }) => {
+        if (!mounted.current) return
+        unsub = api.onAuthStateChanged(auth, (fbUser) => {
+          if (!mounted.current) return
+          setUser(fbUser ? toAuthUser(fbUser) : null)
+          setLoading(false)
+        })
+      })
+      .catch((err: unknown) => {
+        if (!mounted.current) return
+        setError(err instanceof Error ? err.message : authErrorMessage(undefined))
+        setLoading(false)
+      })
+
     return () => {
       mounted.current = false
-      unsub()
+      unsub?.()
     }
   }, [])
 
   const clearError = useCallback(() => setError(null), [])
 
   /** 인증 액션 공통 래퍼 — 미설정 가드 + 에러 정규화. 성공 시 onAuthStateChanged 가 user 갱신. */
-  const run = useCallback(async (op: () => Promise<unknown>): Promise<void> => {
-    if (!isFirebaseAuthConfigured) {
-      setError(authErrorMessage('auth/configuration-not-found'))
-      return
-    }
-    setError(null)
-    try {
-      await op()
-    } catch (err) {
-      const message = authErrorMessage(errorCodeOf(err))
-      if (mounted.current) setError(message)
-      throw new Error(message, { cause: err })
-    }
-  }, [])
+  const run = useCallback(
+    async (op: (runtime: FirebaseRuntime) => Promise<unknown>): Promise<void> => {
+      if (!isFirebaseAuthConfigured) {
+        setError(authErrorMessage('auth/configuration-not-found'))
+        return
+      }
+      setError(null)
+      try {
+        await op(await loadFirebaseRuntime())
+      } catch (err) {
+        const message = authErrorMessage(errorCodeOf(err))
+        if (mounted.current) setError(message)
+        throw new Error(message, { cause: err })
+      }
+    },
+    []
+  )
 
   const signUp = useCallback(
     (email: string, password: string) =>
-      run(() => createUserWithEmailAndPassword(auth, email, password)),
+      run(({ api, auth }) => api.createUserWithEmailAndPassword(auth, email, password)),
     [run]
   )
   const signIn = useCallback(
     (email: string, password: string) =>
-      run(() => signInWithEmailAndPassword(auth, email, password)),
+      run(({ api, auth }) => api.signInWithEmailAndPassword(auth, email, password)),
     [run]
   )
-  const signInAsGuest = useCallback(() => run(() => signInAnonymously(auth)), [run])
-  const signOut = useCallback(() => run(() => fbSignOut(auth)), [run])
+  const signInAsGuest = useCallback(
+    () => run(({ api, auth }) => api.signInAnonymously(auth)),
+    [run]
+  )
+  const signOut = useCallback(() => run(({ api, auth }) => api.signOut(auth)), [run])
 
   const value = useMemo<AuthState>(
     () => ({ user, loading, error, signUp, signIn, signInAsGuest, signOut, clearError }),

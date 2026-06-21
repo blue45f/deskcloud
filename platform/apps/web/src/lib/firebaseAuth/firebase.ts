@@ -11,4 +11,4 @@ export const firebaseApp: FirebaseApp | null = isFirebaseAuthConfigured
     : initializeApp(firebaseConfig)
   : null
 
-export const auth: Auth = firebaseApp ? getAuth(firebaseApp) : (null as unknown as Auth)
+export const auth: Auth | null = firebaseApp ? getAuth(firebaseApp) : null
