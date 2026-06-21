@@ -103,4 +103,10 @@ CREATE TABLE IF NOT EXISTS daily_visits (
 CREATE INDEX IF NOT EXISTS idx_daily_visits_app ON daily_visits (app_id);
 `,
   },
+  {
+    name: '0004_inquiry_status_index',
+    sql: /* sql */ `
+CREATE INDEX IF NOT EXISTS idx_inquiries_app_status_created ON inquiries (app_id, status, created_at);
+`,
+  },
 ]

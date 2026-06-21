@@ -100,7 +100,8 @@ export const subscriptions = pgTable(
 /**
  * 문의(Inquiry) — 형제 앱이 공개 API 로 제출하는 게시판 항목. 테넌트가 아니라
  * `appId`(형제 앱 식별자)로 묶인다(공개 위젯이라 키 인증 없이 들어온다).
- * (appId)·(appId, createdAt) 인덱스로 앱별 최신순 조회를 가속한다.
+ * (appId)·(appId, createdAt)·(appId, status, createdAt) 인덱스로 앱별 최신순/상태별
+ * 어드민 큐 조회를 가속한다.
  */
 export const inquiries = pgTable(
   'inquiries',
@@ -120,6 +121,7 @@ export const inquiries = pgTable(
   (t) => [
     index('idx_inquiries_app').on(t.appId),
     index('idx_inquiries_app_created').on(t.appId, t.createdAt),
+    index('idx_inquiries_app_status_created').on(t.appId, t.status, t.createdAt),
   ]
 )
 
