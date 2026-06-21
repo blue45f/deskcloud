@@ -47,9 +47,13 @@ export function CodeBlock({
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- 스크롤 가능한 코드 영역의 키보드 접근용
         tabIndex={0}
         aria-label={`${language} 코드 스니펫`}
-        className="overflow-x-auto p-4 pt-12 text-[0.8125rem] leading-relaxed focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:outline-none"
+        className="overflow-x-auto p-4 pt-12 text-[0.8125rem] leading-relaxed whitespace-pre-wrap break-words focus-visible:ring-2 focus-visible:ring-accent-strong focus-visible:outline-none sm:whitespace-pre"
       >
-        <code className={cn('font-mono text-text', `language-${language}`)}>{code}</code>
+        <code
+          className={cn('block min-w-0 max-w-full font-mono text-text', `language-${language}`)}
+        >
+          {code}
+        </code>
       </pre>
     </div>
   )

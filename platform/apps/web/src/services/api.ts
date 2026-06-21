@@ -11,6 +11,8 @@ import type {
   TenantWithSecretDto,
   UpdateTenantInput,
   UsageSummaryDto,
+  WorkspaceDeskManifestItem,
+  WorkspaceDesksManifestDto,
 } from '@desk/shared/browser'
 
 import { getSessionToken, useSessionStore } from '@/app/sessionStore'
@@ -110,6 +112,16 @@ function extractMessage(data: unknown): string | null {
 /** 공개 가격표 — @desk/billing 단일 소스. */
 export function fetchPlans(): Promise<PlanSummaryDto[]> {
   return request<PlanSummaryDto[]>('billing/plans')
+}
+
+/** deskcloud workspace 로 흡수된 Desk 통합 manifest — 운영 콘솔/마이크로사이트 공통 기준. */
+export function fetchWorkspaceDesksManifest(): Promise<WorkspaceDesksManifestDto> {
+  return request<WorkspaceDesksManifestDto>('workspace-desks')
+}
+
+/** 단일 workspace Desk manifest. */
+export function fetchWorkspaceDeskManifest(id: string): Promise<WorkspaceDeskManifestItem> {
+  return request<WorkspaceDeskManifestItem>(`workspace-desks/${encodeURIComponent(id)}`)
 }
 
 /** 가입(테넌트 생성) — secret 키 평문은 이 응답에서 1회만. */

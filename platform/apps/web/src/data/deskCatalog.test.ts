@@ -1,4 +1,8 @@
-import { WORKSPACE_DESK_MANIFEST, workspaceDeskManifestById } from '@desk/shared/browser'
+import {
+  WORKSPACE_DESKS_MANIFEST,
+  WORKSPACE_DESK_MANIFEST,
+  workspaceDeskManifestById,
+} from '@desk/shared/browser'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -13,6 +17,7 @@ import {
   deskReadiness,
   sdkSnippet,
 } from './deskCatalog'
+import { buildWorkspaceDeskConsoleState } from './workspaceDeskConsole'
 
 describe('DeskCloud catalog contracts', () => {
   it('keeps every product Desk wired to operations, details, and console routes', () => {
@@ -133,5 +138,41 @@ describe('DeskCloud catalog contracts', () => {
       expect(readiness.controlPlane).toContain('DeskCloud')
       expect(readiness.checks.map((check) => check.status)).toContain('needs_config')
     }
+  })
+
+  it('builds a console control-plane state from the live workspace manifest contract', () => {
+    const workspaceDesks = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
+    const state = buildWorkspaceDeskConsoleState(workspaceDesks, WORKSPACE_DESKS_MANIFEST)
+
+    expect(state.apiReachable).toBe(true)
+    expect(state.apiItemCount).toBe(WORKSPACE_DESK_MANIFEST.length)
+    expect(state.catalogItemCount).toBe(workspaceDesks.length)
+    expect(state.missingFromApi).toEqual([])
+    expect(state.extraFromApi).toEqual([])
+    expect(state.policyVerified).toBe(true)
+    expect(state.controlPlane).toContain('admin console')
+
+    for (const item of state.items) {
+      expect(item.syncStatus).toBe('api_synced')
+      expect(item.mismatchedFields).toEqual([])
+      expect(item.apiItem?.adminPath).toBe(`/dashboard?desk=${item.desk.id}`)
+      expect(item.apiItem?.micrositePath).toBe(`/desks/${item.desk.id}`)
+      expect(item.apiItem?.liveUrl).toBeNull()
+    }
+  })
+
+  it('keeps the workspace console usable when the manifest API is unavailable', () => {
+    const workspaceDesks = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
+    const state = buildWorkspaceDeskConsoleState(workspaceDesks)
+
+    expect(state.apiReachable).toBe(false)
+    expect(state.apiItemCount).toBe(0)
+    expect(state.catalogItemCount).toBe(workspaceDesks.length)
+    expect(state.missingFromApi).toEqual(workspaceDesks.map((desk) => desk.id))
+    expect(state.extraFromApi).toEqual([])
+    expect(state.policyVerified).toBe(false)
+    expect(state.items.map((item) => item.syncStatus)).toEqual(
+      workspaceDesks.map(() => 'api_missing')
+    )
   })
 })

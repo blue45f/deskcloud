@@ -39,7 +39,8 @@ provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 플랜: 아키텍처 와이어링 = `docs/INTEGRATION-PLAN.md` · 모노레포 구축/마이그레이션 =
 `docs/MONOREPO-CONSOLIDATION-PLAN.md` · 운영 콘솔 기준 =
 `docs/ADMIN-CONSOLE-OPERATIONS.md` · 개발자 도구형 Desk 통합 운영 =
-`docs/DEVELOPER-DESKS-INTEGRATED-OPERATIONS.md` · 플랫폼 DB 구조 =
+`docs/DEVELOPER-DESKS-INTEGRATED-OPERATIONS.md` · 개발자 문서/튜토리얼 기준 =
+`docs/DEVELOPER-DOCS-BENCHMARK.md` · 플랫폼 DB 구조 =
 `platform/docs/DATA_MODEL.md`.
 
 ## 개발

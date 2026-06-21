@@ -130,6 +130,11 @@
     text-decoration: none;
   }
 
+  :not(pre) > code {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
   ::selection {
     background: var(--color-accent-soft);
     color: var(--color-accent-fg);

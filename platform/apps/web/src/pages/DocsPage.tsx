@@ -33,10 +33,13 @@ const NAV = [
   { id: 'install', label: '설치' },
   { id: 'concepts', label: '핵심 개념' },
   { id: 'quickstart', label: '빠른 시작' },
+  { id: 'tutorials', label: '튜토리얼' },
   { id: 'react', label: 'React 통합' },
   { id: 'auth', label: '인증·키' },
+  { id: 'api-reference', label: 'API Reference' },
   { id: 'clients', label: 'Desk별 클라이언트' },
   { id: 'operations', label: '운영 콘솔' },
+  { id: 'production-checklist', label: '운영 체크리스트' },
   { id: 'service-reference', label: '서비스별 설명' },
   { id: 'webhooks', label: '웹훅' },
 ] as const
@@ -96,6 +99,119 @@ const admin = createAdAdminClient({
   endpoint: '${endpoint}',
   secretKey: process.env.DESK_SECRET_KEY!, // 'sk_…'
 })`
+
+const workspaceManifestSnippet = `# DeskCloud control-plane에서 흡수된 workspace Desk 확인
+curl '${endpoint}/api/workspace-desks'
+curl '${endpoint}/api/workspace-desks/seo-gateway'
+curl '${endpoint}/api/workspace-desks/remote-devtools'`
+
+const tenantQuickstartSnippet = `# 1) 가입회사 테넌트 생성 — secretKey는 응답에서 한 번만 표시됩니다.
+curl -X POST '${endpoint}/api/tenants' \\
+  -H 'content-type: application/json' \\
+  -d '{"name":"Acme","corsOrigins":["https://app.acme.com"]}'
+
+# 2) 콘솔 로그인/서버 호출 — sk_ 키를 Bearer로 전달합니다.
+curl '${endpoint}/api/tenant' \\
+  -H 'authorization: Bearer sk_…'
+
+# 3) 운영 사용량 확인
+curl '${endpoint}/api/usage?period=current' \\
+  -H 'authorization: Bearer sk_…'`
+
+const API_REFERENCE = [
+  {
+    method: 'GET',
+    path: '/api/billing/plans',
+    auth: 'public',
+    purpose: 'Free/Pro/Scale/Enterprise 가격과 월간 사용량 한도 조회',
+  },
+  {
+    method: 'POST',
+    path: '/api/tenants',
+    auth: 'public',
+    purpose: '가입회사 테넌트 생성, publishableKey와 1회용 secretKey 발급',
+  },
+  {
+    method: 'GET',
+    path: '/api/tenant',
+    auth: 'Bearer sk_',
+    purpose: '현재 테넌트와 서비스 도메인 allowlist 조회',
+  },
+  {
+    method: 'PUT',
+    path: '/api/tenant',
+    auth: 'Bearer sk_',
+    purpose: '회사명과 서비스 도메인 origin allowlist 수정',
+  },
+  {
+    method: 'POST',
+    path: '/api/tenant/rotate-keys',
+    auth: 'Bearer sk_',
+    purpose: 'secretKey 회전, 새 키 1회 반환',
+  },
+  {
+    method: 'GET',
+    path: '/api/usage',
+    auth: 'Bearer sk_',
+    purpose: '월간 API 호출·이벤트·저장량·좌석 사용량 조회',
+  },
+  {
+    method: 'GET',
+    path: '/api/workspace-desks',
+    auth: 'public',
+    purpose: 'AIDigestDesk, SEOGatewayDesk, RemoteDevTools 통합 manifest 조회',
+  },
+  {
+    method: 'GET',
+    path: '/api/workspace-desks/:id',
+    auth: 'public',
+    purpose: '단일 workspace Desk의 source, gateway, control/data plane 조회',
+  },
+  {
+    method: 'POST',
+    path: '/api/v1/apps/:appId/visits/ping',
+    auth: 'public',
+    purpose: '서비스 앱별 방문 이벤트 집계',
+  },
+  {
+    method: 'GET',
+    path: '/api/v1/apps/:appId/inquiries/admin',
+    auth: 'X-Admin-Token',
+    purpose: '문의 운영 보드용 관리자 목록 조회',
+  },
+] as const
+
+const TUTORIALS = [
+  {
+    title: '가입회사와 서비스 도메인 등록',
+    summary: '테넌트 생성, pk_/sk_ 키 발급, origin allowlist 등록까지 콘솔 운영의 첫 경로입니다.',
+    steps: ['POST /api/tenants', '서비스 origin 등록', '대시보드에서 키/사용량 확인'],
+    href: '/signup',
+  },
+  {
+    title: '첫 Desk SDK 붙이기',
+    summary: '카탈로그에서 Desk를 고르고 createXClient 패턴으로 앱 컴포넌트에 직접 렌더합니다.',
+    steps: ['pnpm add @heejun/deskcloud', 'createXClient 생성', 'pk_ 키와 endpoint 주입'],
+    href: '/catalog',
+  },
+  {
+    title: 'Workspace Desk 운영 검증',
+    summary:
+      'SEOGatewayDesk와 RemoteDevTools가 별도 제품이 아니라 통합 manifest에 묶였는지 확인합니다.',
+    steps: ['GET /api/workspace-desks', '콘솔 parity 확인', 'gateway path와 adminPath 대조'],
+    href: '/dashboard?desk=seo-gateway',
+  },
+] as const
+
+const PRODUCTION_CHECKLIST = [
+  'VITE_API_BASE_URL 또는 동일 출처 /api 프록시가 운영 API로 연결되어 있다.',
+  '서비스 도메인 origin allowlist에 실제 운영 origin만 등록되어 있다.',
+  'sk_ secret key는 서버 환경변수에만 저장하고 브라우저 번들에 포함하지 않는다.',
+  '/api/workspace-desks가 seo-gateway, remote-devtools를 workspace_integrated로 반환한다.',
+  '대시보드 Workspace Desk 패널의 API manifest parity가 일치 상태다.',
+  'billing/usage/tenant API는 Bearer sk_ 인증 실패 시 401/403으로 실패한다.',
+  'EC2 Caddy gateway의 /platform/health와 Vercel /api 프록시가 모두 정상이다.',
+] as const
 
 export default function DocsPage() {
   useDocumentTitle('문서')
@@ -202,6 +318,42 @@ export default function DocsPage() {
             </p>
           </Section>
 
+          <Section id="tutorials" title="튜토리얼">
+            <p className="text-sm leading-6 text-text-muted">
+              DeskCloud 문서는 Stripe식 API reference, Vercel식 운영 체크리스트, Supabase식
+              quickstart/tutorial 분리를 기준으로 구성합니다. 처음 붙이는 팀은 아래 순서대로
+              진행하면 콘솔, SDK, workspace Desk까지 한 흐름으로 검증할 수 있습니다.
+            </p>
+            <div className="grid gap-4 lg:grid-cols-3">
+              {TUTORIALS.map((tutorial, index) => (
+                <article
+                  key={tutorial.title}
+                  className="rounded-lg border border-border bg-surface p-4"
+                >
+                  <p className="font-mono text-[0.6875rem] text-accent-strong">
+                    TUTORIAL {String(index + 1).padStart(2, '0')}
+                  </p>
+                  <h3 className="mt-2 text-sm font-semibold text-text">{tutorial.title}</h3>
+                  <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                    {tutorial.summary}
+                  </p>
+                  <ol className="mt-3 space-y-1.5">
+                    {tutorial.steps.map((step, stepIndex) => (
+                      <li key={step} className="flex gap-2 text-[0.8125rem] text-text-muted">
+                        <span className="font-mono text-accent-strong">{stepIndex + 1}</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ol>
+                  <Button asChild variant="secondary" size="sm" className="mt-4">
+                    <Link to={tutorial.href}>열기</Link>
+                  </Button>
+                </article>
+              ))}
+            </div>
+            <CodeBlock code={tenantQuickstartSnippet} language="bash" />
+          </Section>
+
           <Section id="react" title="React 통합">
             <p className="text-sm text-text-muted">
               SDK 는 프레임워크에 독립적입니다. React 에서는 클라이언트를 모듈 스코프에 한 번
@@ -240,13 +392,123 @@ export default function DocsPage() {
             </Button>
           </Section>
 
+          <Section id="api-reference" title="API Reference">
+            <p className="text-sm leading-6 text-text-muted">
+              공개 API는 표준 HTTP verb, JSON 응답, 명확한 인증 경계를 따릅니다. 공개 조회는 키 없이
+              호출할 수 있고, 테넌트·빌링·사용량·운영 작업은 Bearer secret key 또는 X-Admin-Token을
+              요구합니다.
+            </p>
+            <div className="grid gap-2 md:hidden">
+              {API_REFERENCE.map((row) => (
+                <article
+                  key={`${row.method} ${row.path}`}
+                  className="rounded-lg border border-border bg-surface p-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <Badge tone={row.method === 'GET' ? 'info' : 'accent'} size="sm">
+                      {row.method}
+                    </Badge>
+                    <span className="font-mono text-[0.75rem] text-text-subtle">{row.auth}</span>
+                  </div>
+                  <p className="mt-2 break-words font-mono text-[0.8125rem] text-text">
+                    {row.path}
+                  </p>
+                  <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">{row.purpose}</p>
+                </article>
+              ))}
+            </div>
+            <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
+              <table className="w-full min-w-[48rem] text-left text-sm">
+                <thead className="border-b border-border bg-surface-2 text-xs text-text-subtle">
+                  <tr>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Method
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Path
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Auth
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      용도
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {API_REFERENCE.map((row) => (
+                    <tr
+                      key={`${row.method} ${row.path}`}
+                      className="border-b border-border last:border-0"
+                    >
+                      <td className="px-4 py-2.5">
+                        <Badge tone={row.method === 'GET' ? 'info' : 'accent'} size="sm">
+                          {row.method}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-2.5 font-mono text-[0.8125rem] text-text">
+                        {row.path}
+                      </td>
+                      <td className="px-4 py-2.5 font-mono text-[0.8125rem] text-text-muted">
+                        {row.auth}
+                      </td>
+                      <td className="px-4 py-2.5 text-[0.8125rem] leading-5 text-text-muted">
+                        {row.purpose}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <CodeBlock code={workspaceManifestSnippet} language="bash" />
+          </Section>
+
           <Section id="clients" title="Desk별 클라이언트">
             <p className="text-sm text-text-muted">
               네이티브 Desk의 브라우저(pk_)와 서버(sk_) 팩토리는 Desk 마다 이름만 다르고 시그니처는
               동일합니다. 워크스페이스 Desk는 자체 SDK/런타임을 보존하되 같은 모노레포와 운영
               콘솔에서 관리합니다.
             </p>
-            <div className="overflow-x-auto rounded-lg border border-border">
+            <div className="grid gap-2 md:hidden">
+              {PRODUCT_DESKS.map((d) => {
+                const clientValue = d.sdkFactory
+                  ? `${d.sdkFactory}()`
+                  : d.integrationPackage
+                    ? d.integrationPackage
+                    : '—'
+                const adminValue = d.sdkFactory
+                  ? `${adminFactory(d.sdkFactory)}()`
+                  : d.integrationMode === 'workspace'
+                    ? 'workspace console'
+                    : d.integrationMode === 'linked'
+                      ? 'linked console'
+                      : '—'
+
+                return (
+                  <article key={d.id} className="rounded-lg border border-border bg-surface p-3">
+                    <div className="flex items-center gap-2 font-medium text-text">
+                      <DeskGlyph icon={d.icon} tone={d.tone} size="sm" />
+                      {d.name}
+                    </div>
+                    <dl className="mt-3 grid gap-2 text-[0.8125rem]">
+                      <div>
+                        <dt className="text-text-subtle">클라이언트 (pk_)</dt>
+                        <dd className="mt-0.5 break-words font-mono text-text-muted">
+                          {clientValue}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-text-subtle">어드민 (sk_, /server)</dt>
+                        <dd className="mt-0.5 break-words font-mono text-text-muted">
+                          {adminValue}
+                        </dd>
+                      </div>
+                    </dl>
+                  </article>
+                )
+              })}
+            </div>
+            <div className="hidden overflow-x-auto rounded-lg border border-border md:block">
               <table className="w-full min-w-[36rem] text-left text-sm">
                 <thead className="border-b border-border bg-surface-2 text-xs text-text-subtle">
                   <tr>
@@ -337,6 +599,24 @@ export default function DocsPage() {
                 관리합니다.
               </p>
             </div>
+          </Section>
+
+          <Section id="production-checklist" title="운영 체크리스트">
+            <p className="text-sm leading-6 text-text-muted">
+              배포 전에는 문서와 콘솔이 같은 운영 사실을 가리켜야 합니다. 아래 항목이 모두 통과해야
+              DeskCloud control-plane으로 통합 운영된다고 볼 수 있습니다.
+            </p>
+            <ul className="grid gap-2 md:grid-cols-2">
+              {PRODUCTION_CHECKLIST.map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-2 rounded-md bg-surface-2 p-3 text-sm text-text-muted"
+                >
+                  <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
           </Section>
 
           <Section id="service-reference" title="서비스별 상세 설명">

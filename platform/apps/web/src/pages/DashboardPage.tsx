@@ -15,7 +15,7 @@ import {
   ShieldCheck,
   TriangleAlert,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 
 import type { TenantDto, TenantWithSecretDto, UsageMetric } from '@desk/shared/browser'
@@ -47,6 +47,10 @@ import {
   deskReadiness,
   type ReadinessStatus,
 } from '@/data/deskCatalog'
+import {
+  buildWorkspaceDeskConsoleState,
+  type WorkspaceDeskConsoleItem,
+} from '@/data/workspaceDeskConsole'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { PoweredByDeskCloud } from '@/PoweredByDeskCloud'
 import {
@@ -55,6 +59,7 @@ import {
   fetchPlans,
   fetchSubscription,
   fetchTenant,
+  fetchWorkspaceDesksManifest,
   fetchUsage,
   rotateKeys,
   startCheckout,
@@ -321,7 +326,40 @@ const WORKSPACE_DESK_BOUNDARY: Record<
 
 const WORKSPACE_DESKS = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
 
+const WORKSPACE_SYNC_META: Record<
+  WorkspaceDeskConsoleItem['syncStatus'],
+  { label: string; tone: BadgeProps['tone'] }
+> = {
+  api_synced: { label: 'API 동기화', tone: 'success' },
+  api_field_mismatch: { label: '필드 불일치', tone: 'warning' },
+  api_missing: { label: 'API 누락', tone: 'danger' },
+}
+
+function workspaceSyncBadge(
+  item: WorkspaceDeskConsoleItem,
+  apiReachable: boolean
+): { label: string; tone: BadgeProps['tone']; dot: boolean } {
+  if (!apiReachable) return { label: 'catalog fallback', tone: 'neutral', dot: false }
+  const meta = WORKSPACE_SYNC_META[item.syncStatus]
+  return { ...meta, dot: meta.tone === 'success' }
+}
+
 function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
+  const manifestQuery = useQuery({
+    queryKey: ['workspace-desks-manifest'],
+    queryFn: fetchWorkspaceDesksManifest,
+    staleTime: 60_000,
+  })
+  const consoleState = useMemo(
+    () => buildWorkspaceDeskConsoleState(WORKSPACE_DESKS, manifestQuery.data),
+    [manifestQuery.data]
+  )
+  const parityIssues =
+    consoleState.missingFromApi.length +
+    consoleState.extraFromApi.length +
+    consoleState.items.filter((item) => item.syncStatus === 'api_field_mismatch').length
+  const catalogParityOk = consoleState.apiReachable && parityIssues === 0
+
   if (WORKSPACE_DESKS.length === 0) return null
 
   const domainCount = tenant?.corsOrigins.length ?? 0
@@ -348,43 +386,96 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <div className="rounded-md bg-surface-2 p-4">
             <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
-              Workspace desks
+              Manifest API
             </p>
-            <p className="mt-1 text-xl font-semibold text-text">{WORKSPACE_DESKS.length}</p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {manifestQuery.isLoading ? '확인 중' : manifestQuery.isError ? '연결 실패' : '연결됨'}
+            </p>
             <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
-              소스와 운영 메타데이터를 같은 모노레포에서 검증
+              /api/workspace-desks 운영 응답 기준
             </p>
           </div>
           <div className="rounded-md bg-surface-2 p-4">
             <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
-              Service origins
+              Workspace desks
             </p>
             <p className="mt-1 text-xl font-semibold text-text">
-              {domainCount > 0 ? `${domainCount}개` : '미등록'}
+              {consoleState.catalogItemCount}개
             </p>
             <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
-              모든 workspace Desk의 브라우저/SDK 호출 경계
+              {consoleState.apiReachable
+                ? `운영 API ${consoleState.apiItemCount}개와 대조`
+                : '정적 catalog fallback 표시'}
+            </p>
+          </div>
+          <div className="rounded-md bg-surface-2 p-4">
+            <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+              Catalog parity
+            </p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {catalogParityOk ? '일치' : consoleState.apiReachable ? `${parityIssues}건` : '대기'}
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
+              API manifest와 정적 운영 catalog 동기화
             </p>
           </div>
           <div className="rounded-md bg-surface-2 p-4">
             <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
               Control plane
             </p>
-            <p className="mt-1 text-xl font-semibold text-text">DeskCloud</p>
+            <p className="mt-1 text-xl font-semibold text-text">
+              {consoleState.policyVerified ? '통합 운영' : '확인 필요'}
+            </p>
             <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
-              데이터플레인은 보존하고 계정·과금·감사는 통합
+              {domainCount > 0 ? `${domainCount}개 origin 격리 적용` : 'origin 등록 후 격리 적용'}
             </p>
           </div>
         </div>
 
+        {manifestQuery.isLoading ? (
+          <Banner tone="info">
+            <span className="inline-flex items-center gap-2">
+              <Spinner /> 운영 workspace manifest 연결을 확인하고 있습니다.
+            </span>
+          </Banner>
+        ) : null}
+        {manifestQuery.isError ? (
+          <Banner tone="warning">
+            운영 workspace manifest API에 연결하지 못했습니다. 콘솔은 정적 catalog fallback으로 계속
+            표시되며, 배포 게이트웨이 또는 /api/workspace-desks 상태를 확인해야 합니다.{' '}
+            {(manifestQuery.error as Error).message}
+          </Banner>
+        ) : null}
+        {catalogParityOk ? (
+          <Banner tone="success">
+            운영 API manifest와 웹 catalog가 일치합니다. SEOGatewayDesk와 RemoteDevTools는 분리
+            운영이 아니라 DeskCloud control-plane의 workspace Desk로 검증 중입니다.
+          </Banner>
+        ) : consoleState.apiReachable ? (
+          <Banner tone="warning">
+            운영 API와 catalog가 일치하지 않습니다.
+            {consoleState.missingFromApi.length > 0
+              ? ` API 누락: ${consoleState.missingFromApi.join(', ')}.`
+              : ''}
+            {consoleState.extraFromApi.length > 0
+              ? ` API 초과: ${consoleState.extraFromApi.join(', ')}.`
+              : ''}
+          </Banner>
+        ) : null}
+
         <div className="grid gap-3 xl:grid-cols-2">
-          {WORKSPACE_DESKS.map((desk) => {
+          {consoleState.items.map((item) => {
+            const { desk, apiItem } = item
             const operations = deskOperations(desk)
             const detail = deskDetails(desk)
             const boundary = WORKSPACE_DESK_BOUNDARY[desk.id]
+            const sync = workspaceSyncBadge(item, consoleState.apiReachable)
+            const controlPlane = apiItem?.controlPlane ?? boundary?.controlPlane
+            const dataPlane = apiItem?.dataPlane ?? boundary?.dataPlane
+            const readinessSummary = apiItem?.readinessSummary ?? detail.domainIsolation
 
             return (
               <div key={desk.id} className="rounded-md border border-border bg-surface p-4">
@@ -394,8 +485,8 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-sm font-semibold text-text">{desk.name}</h3>
-                        <Badge tone="success" size="sm" dot>
-                          workspace
+                        <Badge tone={sync.tone} size="sm" dot={sync.dot}>
+                          {sync.label}
                         </Badge>
                       </div>
                       <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
@@ -414,7 +505,7 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                       Source
                     </dt>
                     <dd className="mt-1 truncate font-mono text-[0.8125rem] text-text">
-                      {desk.workspacePath}
+                      {apiItem?.workspacePath ?? desk.workspacePath}
                     </dd>
                   </div>
                   <div className="min-w-0 rounded-md bg-surface-2 p-3">
@@ -422,7 +513,7 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                       Package
                     </dt>
                     <dd className="mt-1 truncate font-mono text-[0.8125rem] text-text">
-                      {desk.integrationPackage}
+                      {apiItem?.integrationPackage ?? desk.integrationPackage}
                     </dd>
                   </div>
                   <div className="min-w-0 rounded-md bg-surface-2 p-3">
@@ -430,7 +521,7 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                       Gateway
                     </dt>
                     <dd className="mt-1 truncate font-mono text-[0.8125rem] text-text">
-                      {operations.gatewayPath}
+                      {apiItem?.gatewayPath ?? operations.gatewayPath}
                     </dd>
                   </div>
                   <div className="min-w-0 rounded-md bg-surface-2 p-3">
@@ -438,10 +529,16 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                       Metric
                     </dt>
                     <dd className="mt-1 text-[0.8125rem] font-semibold text-text">
-                      {USAGE_METRIC_LABEL[operations.primaryMetric]}
+                      {USAGE_METRIC_LABEL[apiItem?.primaryMetric ?? operations.primaryMetric]}
                     </dd>
                   </div>
                 </dl>
+
+                {consoleState.apiReachable && item.mismatchedFields.length > 0 ? (
+                  <Banner tone="warning" className="mt-4">
+                    Manifest 불일치 필드: {item.mismatchedFields.join(', ')}
+                  </Banner>
+                ) : null}
 
                 <div className="mt-4 grid gap-3 lg:grid-cols-2">
                   <div>
@@ -449,11 +546,11 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                     <ul className="space-y-2 text-[0.8125rem] leading-5 text-text-muted">
                       <li>
                         <strong className="text-text">Control:</strong>{' '}
-                        {boundary?.controlPlane ?? 'DeskCloud account and billing control plane'}
+                        {controlPlane ?? 'DeskCloud account and billing control plane'}
                       </li>
                       <li>
                         <strong className="text-text">Data:</strong>{' '}
-                        {boundary?.dataPlane ?? detail.domainIsolation}
+                        {dataPlane ?? detail.domainIsolation}
                       </li>
                       <li>
                         <strong className="text-text">Admin:</strong>{' '}
@@ -473,7 +570,7 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
                       ))}
                     </ul>
                     <p className="mt-3 text-[0.8125rem] leading-5 text-text-muted">
-                      {detail.domainIsolation}
+                      {readinessSummary}
                     </p>
                   </div>
                 </div>
