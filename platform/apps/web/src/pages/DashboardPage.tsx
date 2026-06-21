@@ -290,6 +290,12 @@ const WORKSPACE_DESK_BOUNDARY: Record<
     verification: readonly string[]
   }
 > = {
+  aidigestdesk: {
+    controlPlane: 'DeskCloud tenant, service origin, content usage, editorial exports',
+    dataPlane: 'Vite portal, GitHub Pages fallback, @aidigestdesk/content source snapshots',
+    adminSurface: 'Source monitor queue, update pipeline, newsletter/export runbook',
+    verification: ['workspace package', 'content snapshot', 'Pages base path', 'editorial export'],
+  },
   'seo-gateway': {
     controlPlane: 'DeskCloud tenant, service origin, usage, billing, plan limit',
     dataPlane: 'Fastify render gateway, Puppeteer pool, cache/SWR, SEO quality gates',
@@ -304,9 +310,10 @@ const WORKSPACE_DESK_BOUNDARY: Record<
   },
 }
 
+const WORKSPACE_DESKS = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
+
 function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
-  const workspaceDesks = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
-  if (workspaceDesks.length === 0) return null
+  if (WORKSPACE_DESKS.length === 0) return null
 
   const domainCount = tenant?.corsOrigins.length ?? 0
 
@@ -337,7 +344,7 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
             <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
               Workspace desks
             </p>
-            <p className="mt-1 text-xl font-semibold text-text">{workspaceDesks.length}</p>
+            <p className="mt-1 text-xl font-semibold text-text">{WORKSPACE_DESKS.length}</p>
             <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">
               소스와 운영 메타데이터를 같은 모노레포에서 검증
             </p>
@@ -365,7 +372,7 @@ function WorkspaceDeskPanel({ tenant }: { tenant?: TenantDto }) {
         </div>
 
         <div className="grid gap-3 xl:grid-cols-2">
-          {workspaceDesks.map((desk) => {
+          {WORKSPACE_DESKS.map((desk) => {
             const operations = deskOperations(desk)
             const detail = deskDetails(desk)
             const boundary = WORKSPACE_DESK_BOUNDARY[desk.id]

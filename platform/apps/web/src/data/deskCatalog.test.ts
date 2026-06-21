@@ -1,0 +1,92 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  DESK_DETAILS,
+  DESK_OPERATIONS,
+  PRODUCT_DESKS,
+  apiEndpoint,
+  deskDetails,
+  deskMicrositePath,
+  deskOperations,
+  sdkSnippet,
+} from './deskCatalog'
+
+describe('DeskCloud catalog contracts', () => {
+  it('keeps every product Desk wired to operations, details, and console routes', () => {
+    const ids = PRODUCT_DESKS.map((desk) => desk.id)
+
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids.length).toBeGreaterThanOrEqual(17)
+
+    for (const desk of PRODUCT_DESKS) {
+      expect(DESK_OPERATIONS).toHaveProperty(desk.id)
+      expect(DESK_DETAILS).toHaveProperty(desk.id)
+
+      const operations = deskOperations(desk)
+      const details = deskDetails(desk)
+
+      expect(operations.adminPath).toBe(`/dashboard?desk=${desk.id}`)
+      expect(operations.gatewayPath).toMatch(/^\/[a-z]/)
+      expect(operations.config.length).toBeGreaterThan(0)
+      expect(operations.operatorTasks.length).toBeGreaterThan(0)
+      expect(details.summary.length).toBeGreaterThan(80)
+      expect(details.bestFor.length).toBeGreaterThan(0)
+      expect(details.dataModel.length).toBeGreaterThan(0)
+      expect(details.adminGuide.length).toBeGreaterThan(0)
+      expect(details.integrationGuide.length).toBeGreaterThan(0)
+      expect(details.domainIsolation.length).toBeGreaterThan(40)
+      expect(deskMicrositePath(desk)).toBe(`/desks/${desk.id}`)
+    }
+  })
+
+  it('keeps absorbed non-native Desks integrated as workspace Desks', () => {
+    const workspaceDesks = PRODUCT_DESKS.filter((desk) => desk.integrationMode === 'workspace')
+
+    expect(workspaceDesks.map((desk) => desk.id).toSorted()).toEqual([
+      'aidigestdesk',
+      'remote-devtools',
+      'seo-gateway',
+    ])
+
+    for (const desk of workspaceDesks) {
+      const operations = deskOperations(desk)
+      const details = deskDetails(desk)
+
+      expect(desk.workspacePath).toMatch(/^desks\//)
+      expect(desk.integrationPackage).toBeTruthy()
+      expect(desk.sourceRepositoryUrl).toMatch(/^https:\/\/github\.com\/blue45f\//)
+      expect(desk.liveUrl).toBeUndefined()
+      expect(operations.recommendedPlan).toBeTruthy()
+      expect(details.summary).toContain(desk.name)
+      expect(details.domainIsolation).toContain('DeskCloud')
+    }
+  })
+
+  it('serves workspace Desk snippets from integrated runtime boundaries', () => {
+    const aiDigest = PRODUCT_DESKS.find((desk) => desk.id === 'aidigestdesk')
+    const seoGateway = PRODUCT_DESKS.find((desk) => desk.id === 'seo-gateway')
+    const remoteDevtools = PRODUCT_DESKS.find((desk) => desk.id === 'remote-devtools')
+
+    expect(aiDigest).toBeDefined()
+    expect(seoGateway).toBeDefined()
+    expect(remoteDevtools).toBeDefined()
+
+    const aiDigestSnippet = sdkSnippet(aiDigest!)
+    const seoSnippet = sdkSnippet(seoGateway!)
+    const remoteSnippet = sdkSnippet(remoteDevtools!)
+
+    expect(aiDigest?.name).toBe('AIDigestDesk')
+    expect(aiDigestSnippet).toContain('@aidigestdesk/content')
+    expect(aiDigestSnippet).toContain('getSourceSnapshotCandidates')
+
+    expect(seoGateway?.name).toBe('SEOGatewayDesk')
+    expect(seoSnippet).toContain('@heejun/spa-seo-gateway-core')
+    expect(seoSnippet).toContain('registerAdminUI')
+    expect(seoSnippet).toContain('Fastify')
+
+    expect(remoteDevtools?.name).toBe('RemoteDevTools')
+    expect(remoteSnippet).toContain(`${apiEndpoint()}/remote-devtools/sdk/index.umd.js`)
+    expect(remoteSnippet).toContain('RemoteDebugSdk')
+    expect(remoteSnippet).not.toContain('remote-devtools.vercel.app')
+  })
+})

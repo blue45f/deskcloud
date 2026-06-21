@@ -269,6 +269,15 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
     config: ['session TTL', 'password policy', 'allowed origins', 'JWT audience'],
     operatorTasks: ['사용자 상태 확인', '세션 정책 변경', '로그인 실패 분석'],
   }),
+  aidigestdesk: ops('aidigestdesk', {
+    gatewayPath: '/aidigest',
+    primaryMetric: 'events',
+    billingDriver:
+      '소스 스냅샷, 업데이트 후보, 뉴스레터 내보내기, 편집 워크벤치 작업을 이벤트로 집계합니다.',
+    config: ['source schedule', 'content snapshot', 'editorial pipeline', 'Pages base path'],
+    operatorTasks: ['공식 소스 스냅샷', '업데이트 후보 검수', '뉴스레터/런북 내보내기'],
+    recommendedPlan: 'pro',
+  }),
   filedesk: ops('filedesk', {
     gatewayPath: '/file',
     primaryMetric: 'storage_mb',
@@ -880,6 +889,59 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
     domainIsolation:
       'AuthDesk는 allowed origin과 JWT audience로 도메인별 인증 경계를 만듭니다. 같은 회사 테넌트의 여러 앱이 같은 사용자 풀을 공유할 수 있지만, 토큰 사용처는 audience로 제한합니다.',
   }),
+  aidigestdesk: details({
+    summary:
+      'AIDigestDesk는 GPT, Claude, Gemini, Grok, Manus 같은 주요 AI/LLM 업데이트, 벤치마크, 기능 비교, 사용법, 한국어 강좌와 도서 정보를 큐레이션하는 콘텐츠 Desk입니다. apps/web 포털과 packages/content 데이터 계약, 편집실 운영 표면, 공식 소스 스냅샷, 이벤트 정합성 검증, 뉴스레터/CSV/런북 내보내기를 유지하면서 DeskCloud 콘솔에서는 가입회사·서비스 도메인·콘텐츠 운영 작업·사용량을 통합 관리합니다.',
+    bestFor: [
+      'AI/LLM 업데이트 한국어 큐레이션',
+      '공식 문서·벤치마크 소스 모니터링',
+      '주간 뉴스레터와 직군별 플레이북 운영',
+    ],
+    dataModel: [
+      {
+        name: 'ModelCatalog',
+        description: '모델, 제공사, 기능, 비용, 벤치마크, 사용처를 묶은 콘텐츠 카탈로그입니다.',
+      },
+      {
+        name: 'SourceSnapshot',
+        description: '공식 문서와 벤치마크 출처의 URL, 해시, 확인 상태, 실패 정보를 보관합니다.',
+      },
+      {
+        name: 'EditorialCandidate',
+        description:
+          '수집, 검토, 한국어 요약, 게시 준비, 게시 단계로 움직이는 업데이트 후보입니다.',
+      },
+      {
+        name: 'ExportRun',
+        description:
+          '뉴스레터 Markdown, 소스 모니터 CSV, 편집 파이프라인 JSON 내보내기 기록입니다.',
+      },
+    ],
+    adminGuide: [
+      {
+        title: '공식 소스 스냅샷',
+        description:
+          '주요 모델 공식 문서와 벤치마크 페이지를 확인하고 본문 해시 변화와 실패 상태를 점검합니다.',
+      },
+      {
+        title: '업데이트 후보 검수',
+        description:
+          '수집된 후보를 한국어 요약, 출처 확인, 게시 준비 단계로 옮기고 중복/날짜/상태 규칙을 확인합니다.',
+      },
+      {
+        title: '뉴스레터와 런북 내보내기',
+        description:
+          '주간 요약 Markdown, 소스 모니터 CSV, 스냅샷 Runbook을 내려받아 편집/운영 채널에 배포합니다.',
+      },
+    ],
+    integrationGuide: [
+      'apps/web 포털은 Vercel 운영 URL과 GitHub Pages 보조 URL을 모두 유지합니다.',
+      'packages/content의 catalog, sourceSnapshots, translatedNews 데이터를 빌드 산출물로 검증합니다.',
+      '운영 콘솔에서는 소스 스냅샷 실행, 업데이트 후보 상태, export run을 이벤트 사용량으로 추적합니다.',
+    ],
+    domainIsolation:
+      'AIDigestDesk는 공개 콘텐츠 포털이지만 DeskCloud에서는 서비스 도메인 allowlist와 Pages base path로 운영 경계를 기록합니다. 같은 회사가 내부 AI 포털과 공개 큐레이션 사이트를 함께 운영해도 소스 스냅샷, 편집 후보, 내보내기 이벤트를 도메인별로 분리해 감사할 수 있습니다.',
+  }),
   filedesk: details({
     summary:
       'FileDesk는 범용 파일 업로드, 공개/비공개 가시성, signed URL 다운로드를 제공하는 스토리지 Desk입니다. MediaDesk가 이미지 변환에 초점을 맞춘다면 FileDesk는 문서, 첨부, 백오피스 파일처럼 원본 파일 보관과 접근 제어에 집중합니다.',
@@ -969,7 +1031,7 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
       '봇 트래픽은 CDN/nginx/Caddy에서 게이트웨이로 보내고 일반 사용자는 원본 SPA로 통과시킵니다.',
     ],
     domainIsolation:
-      'SEOGatewayDesk는 Site origin과 route rule namespace로 도메인별 렌더 범위를 분리합니다. 같은 가입회사가 여러 SPA를 운영해도 각 origin의 캐시, 워밍, 품질 리포트, admin token 범위를 나눠 관리합니다.',
+      'SEOGatewayDesk는 DeskCloud 서비스 도메인 allowlist, Site origin, route rule namespace로 도메인별 렌더 범위를 분리합니다. 같은 가입회사가 여러 SPA를 운영해도 각 origin의 캐시, 워밍, 품질 리포트, admin token 범위를 나눠 관리합니다.',
   }),
   'remote-devtools': details({
     summary:
@@ -1055,6 +1117,15 @@ app.get('/render', async (req, reply) => {
   const html = await render({ url, pool: browserPool })
   return reply.type('text/html').send(html)
 })`
+  }
+
+  if (desk.id === 'aidigestdesk') {
+    return `import { getSourceSnapshotCandidates, modelProfiles, translatedArticles } from '@aidigestdesk/content'
+
+const latestUpdates = translatedArticles.slice(0, 5)
+const sourceQueue = getSourceSnapshotCandidates().slice(0, 10)
+
+console.log(modelProfiles.length, latestUpdates, sourceQueue)`
   }
 
   if (desk.id === 'remote-devtools' || desk.integrationMode === 'linked') {
@@ -1274,6 +1345,20 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     sdkVar: 'auth',
     sdkUsage: 'const { user, token } = await auth.login({ email, password })',
     metrics: ['회원', '세션', 'JWT'],
+  },
+  {
+    id: 'aidigestdesk',
+    name: 'AIDigestDesk',
+    tagline: 'AI/LLM 업데이트 큐레이션',
+    what: '주요 AI/LLM의 공식 업데이트, 벤치마크, 기능 비교, 한국어 강좌와 직군별 플레이북을 큐레이션하고 편집실 워크플로로 운영합니다.',
+    icon: Sparkles,
+    tone: 'accent',
+    status: 'live',
+    metrics: ['소스 스냅샷', '업데이트 후보', '뉴스레터', '플레이북'],
+    integrationMode: 'workspace',
+    integrationPackage: '@aidigestdesk/content',
+    workspacePath: 'desks/aidigestdesk',
+    sourceRepositoryUrl: 'https://github.com/blue45f/aidigestdesk',
   },
   {
     id: 'filedesk',

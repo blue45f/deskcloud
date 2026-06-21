@@ -1,9 +1,9 @@
 # DeskCloud Admin Console Operations
 
 DeskCloud 운영 콘솔은 가입회사 테넌트를 중심으로 서비스 도메인, Desk, API 키,
-사용량, 빌링을 한 화면에서 관리한다. `seo-gateway`와 `remote-devtools`처럼 자체
-데이터플레인을 가진 Desk도 별도 운영 콘솔로 분리하지 않고, DeskCloud 콘솔의
-control-plane 아래에 둔다.
+사용량, 빌링을 한 화면에서 관리한다. `aidigestdesk`, `seo-gateway`,
+`remote-devtools`처럼 자체 앱 또는 데이터플레인을 가진 Desk도 별도 운영 콘솔로
+분리하지 않고, DeskCloud 콘솔의 control-plane 아래에 둔다.
 
 ## 운영 단위
 
@@ -19,6 +19,7 @@ control-plane 아래에 둔다.
 
 | Desk           | Control-plane                               | Data-plane                                                     | 운영 콘솔 표면                                            |
 | -------------- | ------------------------------------------- | -------------------------------------------------------------- | --------------------------------------------------------- |
+| AIDigestDesk   | Tenant, origin, content usage, export run   | Vite portal, GitHub Pages fallback, `@aidigestdesk/content`    | source monitor, update pipeline, newsletter/runbook       |
 | SEOGatewayDesk | Tenant, origin, usage, plan limit, billing  | Fastify render gateway, Puppeteer pool, cache/SWR, SEO gates   | route rule, cache warm/invalidate, Lighthouse/VisualDiff  |
 | RemoteDevTools | Tenant, origin, usage, billing, integration | NestJS/TypeORM CDP gateway, rrweb replay, S3, issue connectors | live session, replay queue, SDK domain, Jira/Slack/Sheets |
 
@@ -39,8 +40,10 @@ pnpm --filter @desk/web test
 브라우저에서는 다음 라우트를 확인한다.
 
 ```text
+/dashboard?desk=aidigestdesk
 /dashboard?desk=seo-gateway
 /dashboard?desk=remote-devtools
+/desks/aidigestdesk
 /desks/seo-gateway
 /desks/remote-devtools
 /docs
