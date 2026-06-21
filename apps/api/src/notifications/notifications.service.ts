@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common'
 import {
   type NotificationDto,
   type NotificationListDto,
@@ -8,6 +8,7 @@ import { and, desc, eq, isNull, sql } from 'drizzle-orm'
 
 import { DatabaseService } from '../db/database.service'
 import { notifications } from '../db/schema'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 
 import type { AuthUser } from '../common/request-context'
 
@@ -31,7 +32,10 @@ export interface NotifyInput {
 export class NotificationsService {
   private readonly logger = new Logger('Notifications')
 
-  constructor(private readonly dbs: DatabaseService) {}
+  constructor(
+    private readonly dbs: DatabaseService,
+    @Optional() private readonly realtime?: RealtimeGateway
+  ) {}
 
   /**
    * 알림 1건 생성(best-effort). 통지 실패가 본 트랜잭션(제안·수락 등)을 깨뜨리지 않도록
@@ -41,14 +45,24 @@ export class NotificationsService {
     if (!input.userId) return
     if (input.actorUserId && input.actorUserId === input.userId) return
     try {
-      await this.dbs.db.insert(notifications).values({
-        userId: input.userId,
-        orgId: input.orgId,
-        type: input.type,
-        title: input.title,
-        body: input.body,
-        requestId: input.requestId ?? null,
-      })
+      const [saved] = await this.dbs.db
+        .insert(notifications)
+        .values({
+          userId: input.userId,
+          orgId: input.orgId,
+          type: input.type,
+          title: input.title,
+          body: input.body,
+          requestId: input.requestId ?? null,
+        })
+        .returning()
+      if (saved) {
+        this.realtime?.emitNotification(
+          input.userId,
+          this.toDto(saved),
+          await this.unreadCountForUser(input.userId)
+        )
+      }
     } catch (err) {
       this.logger.warn(`알림 생성 실패(무시): ${err instanceof Error ? err.message : String(err)}`)
     }
@@ -77,10 +91,14 @@ export class NotificationsService {
   }
 
   async unreadCount(user: AuthUser): Promise<number> {
+    return this.unreadCountForUser(user.userId)
+  }
+
+  private async unreadCountForUser(userId: string): Promise<number> {
     const rows = await this.dbs.db
       .select({ c: sql<number>`count(*)::int` })
       .from(notifications)
-      .where(and(eq(notifications.userId, user.userId), isNull(notifications.readAt)))
+      .where(and(eq(notifications.userId, userId), isNull(notifications.readAt)))
     return Number(rows[0]?.c ?? 0)
   }
 
@@ -106,6 +124,9 @@ export class NotificationsService {
         .limit(1)
       if (!exists[0]) throw new NotFoundException('알림을 찾을 수 없습니다')
     }
+    if (rows.length > 0) {
+      this.realtime?.emitUnreadCount(user.userId, await this.unreadCountForUser(user.userId))
+    }
     return { ok: true }
   }
 
@@ -115,6 +136,7 @@ export class NotificationsService {
       .set({ readAt: new Date() })
       .where(and(eq(notifications.userId, user.userId), isNull(notifications.readAt)))
       .returning({ id: notifications.id })
+    this.realtime?.emitUnreadCount(user.userId, await this.unreadCountForUser(user.userId))
     return { ok: true, updated: rows.length }
   }
 

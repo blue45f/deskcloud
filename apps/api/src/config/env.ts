@@ -44,6 +44,7 @@ export const envSchema = z.object({
   SEED_ADMIN_PASSWORD: optionalNonEmpty,
   PUBLIC_CACHE_TTL: numericString,
   GOOGLE_CLIENT_ID: optionalNonEmpty,
+  REALTIME_ORIGIN: optionalNonEmpty,
 })
 
 export type Env = z.infer<typeof envSchema>

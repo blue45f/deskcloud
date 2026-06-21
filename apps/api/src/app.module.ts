@@ -21,6 +21,7 @@ import { NotificationsModule } from './notifications/notifications.module'
 import { OrgsModule } from './orgs/orgs.module'
 import { PoliciesModule } from './policies/policies.module'
 import { PublicModule } from './public/public.module'
+import { RealtimeModule } from './realtime/realtime.module'
 import { SupportModule } from './support/support.module'
 
 import type { IncomingMessage } from 'node:http'
@@ -47,6 +48,7 @@ const isProd = process.env.NODE_ENV === 'production'
     ConsentsModule,
     PublicModule,
     SupportModule,
+    RealtimeModule,
     AuditModule,
     ApiKeysModule,
     InsightsModule,

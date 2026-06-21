@@ -76,6 +76,7 @@ import {
   useUpdateServiceRequest,
   useWithdrawProposal,
 } from '@/services/brokerage'
+import { useRealtimeRequestRoom } from '@/services/useRealtimeRequestRoom'
 import { cn } from '@/utils/cn'
 import { formatDate, formatRelative } from '@/utils/format'
 import { zodFormResolver } from '@/utils/zodFormResolver'
@@ -774,6 +775,7 @@ function FlagRequestDialog({
 
 export default function RequestDetailPage() {
   const { id } = useParams<{ id: string }>()
+  useRealtimeRequestRoom(id)
   const detail = useServiceRequest(id)
   const session = useSession()
   const confirm = useConfirm()

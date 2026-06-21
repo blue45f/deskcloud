@@ -12,9 +12,8 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  // @heejun/deskcloud 는 socket.io-client 를 optional 하게 동적 import(try/catch) 한다.
-  // socket.io-client 가 없으면 dev 의 esbuild 사전 번들이 그 bare import 해소에 실패하므로
-  // 사전 번들에서 제외해 런타임 동적 import(실패 시 catch)로 넘긴다. 프로덕션 빌드엔 영향 없음.
+  // @heejun/deskcloud 는 socket.io-client 를 optional 동적 import 한다.
+  // 앱은 실시간 알림용으로 socket.io-client 를 직접 사용하지만 deskcloud 의 동적 경로는 제외 유지.
   optimizeDeps: { exclude: ['@heejun/deskcloud'] },
   server: {
     port: 5270,

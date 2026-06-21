@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common'
 import { AuthModule } from '../auth/auth.module'
 import { NotificationsModule } from '../notifications/notifications.module'
 import { PoliciesModule } from '../policies/policies.module'
+import { RealtimeModule } from '../realtime/realtime.module'
 
 import { AttachmentStorageService } from './attachment-storage.service'
 import {
@@ -19,7 +20,7 @@ import { BrokerageService } from './brokerage.service'
  * PoliciesModule 은 완료 산출물 → 약관 버전 가져오기(PoliciesService·VersionsService)용.
  */
 @Module({
-  imports: [AuthModule, PoliciesModule, NotificationsModule],
+  imports: [AuthModule, PoliciesModule, NotificationsModule, RealtimeModule],
   controllers: [
     RequestsController,
     MarketplaceController,

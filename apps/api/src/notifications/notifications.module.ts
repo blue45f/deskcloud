@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 
 import { AuthModule } from '../auth/auth.module'
+import { RealtimeModule } from '../realtime/realtime.module'
 
 import { NotificationsController } from './notifications.controller'
 import { NotificationsService } from './notifications.service'
@@ -10,7 +11,7 @@ import { NotificationsService } from './notifications.service'
  * NotificationsService 를 export 해 BrokerageModule 이 이벤트 시 통지에 사용.
  */
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, RealtimeModule],
   controllers: [NotificationsController],
   providers: [NotificationsService],
   exports: [NotificationsService],

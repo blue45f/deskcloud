@@ -30,6 +30,8 @@ export interface AppConfig {
     forcePathStyle: boolean
     maxBytes: number
   }
+  /** WebSocket(Socket.IO) 접속 origin. Vercel 배포는 API 프록시가 WS 를 유지하지 못해 EC2 origin 을 반환한다. */
+  realtimeOrigin?: string | null
 }
 
 function envBool(v: string | undefined, fallback: boolean): boolean {
@@ -66,6 +68,7 @@ export function loadConfig(): AppConfig {
       forcePathStyle: envBool(process.env.BROKERAGE_ATTACHMENTS_S3_FORCE_PATH_STYLE, false),
       maxBytes: Number(process.env.BROKERAGE_ATTACHMENTS_MAX_BYTES ?? 10 * 1024 * 1024),
     },
+    realtimeOrigin: process.env.REALTIME_ORIGIN?.trim().replace(/\/$/, '') || null,
   }
 }
 
