@@ -74,6 +74,7 @@ import {
 import { NotificationsService } from '../notifications/notifications.service'
 import { PoliciesService } from '../policies/policies.service'
 import { VersionsService } from '../policies/versions.service'
+import { RealtimeGateway } from '../realtime/realtime.gateway'
 
 import { AttachmentStorageService } from './attachment-storage.service'
 
@@ -170,7 +171,8 @@ export class BrokerageService {
     private readonly policiesService: PoliciesService,
     private readonly versionsService: VersionsService,
     private readonly notifications: NotificationsService,
-    @Optional() private readonly attachmentStorage?: AttachmentStorageService
+    @Optional() private readonly attachmentStorage?: AttachmentStorageService,
+    @Optional() private readonly realtime?: RealtimeGateway
   ) {}
 
   // ── 의뢰 작성·조회 ────────────────────────────────────────────────────────────
@@ -1183,10 +1185,12 @@ export class BrokerageService {
       }
     }
 
-    return this.toMessageDto(
+    const message = this.toMessageDto(
       saved!,
       attachments.map((a) => this.toAttachmentDto({ ...a, messageId: saved!.id }))
     )
+    this.realtime?.emitRequestMessage(message)
+    return message
   }
 
   // ── 마켓플레이스 ──────────────────────────────────────────────────────────────
