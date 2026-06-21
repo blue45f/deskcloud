@@ -1,8 +1,17 @@
-import { ArrowRight, BookOpen, KeyRound, Package, Plug, Webhook } from 'lucide-react'
+import {
+  ArrowRight,
+  BookOpen,
+  Database,
+  KeyRound,
+  Package,
+  Plug,
+  ShieldCheck,
+  Webhook,
+} from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
-import { Badge } from '@/components/ui/badge'
+import { Badge, PlanBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
 import { InstallTabs } from '@/components/ui/install-tabs'
@@ -10,8 +19,12 @@ import {
   PRODUCT_DESKS,
   SDK_PACKAGE,
   SDK_SERVER_IMPORT,
+  USAGE_METRIC_LABEL,
   adminFactory,
   apiEndpoint,
+  deskDetails,
+  deskMicrositePath,
+  deskOperations,
   sdkSnippet,
 } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
@@ -23,6 +36,8 @@ const NAV = [
   { id: 'react', label: 'React 통합' },
   { id: 'auth', label: '인증·키' },
   { id: 'clients', label: 'Desk별 클라이언트' },
+  { id: 'operations', label: '운영 콘솔' },
+  { id: 'service-reference', label: '서비스별 설명' },
   { id: 'webhooks', label: '웹훅' },
 ] as const
 
@@ -227,8 +242,8 @@ export default function DocsPage() {
 
           <Section id="clients" title="Desk별 클라이언트">
             <p className="text-sm text-text-muted">
-              브라우저(pk_)와 서버(sk_) 팩토리는 Desk 마다 이름만 다르고 시그니처는 동일합니다. 모두
-              같은 <code className="font-mono">{SDK_PACKAGE}</code> 패키지에서 나옵니다.
+              네이티브 Desk의 브라우저(pk_)와 서버(sk_) 팩토리는 Desk 마다 이름만 다르고 시그니처는
+              동일합니다. 연결형 Desk는 자체 SDK와 배포 URL을 유지하면서 운영 콘솔에 묶습니다.
             </p>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full min-w-[36rem] text-left text-sm">
@@ -255,15 +270,152 @@ export default function DocsPage() {
                         </span>
                       </th>
                       <td className="px-4 py-2.5 font-mono text-[0.8125rem] text-text-muted">
-                        {d.sdkFactory ? `${d.sdkFactory}()` : '—'}
+                        {d.sdkFactory
+                          ? `${d.sdkFactory}()`
+                          : d.integrationPackage
+                            ? d.integrationPackage
+                            : '—'}
                       </td>
                       <td className="px-4 py-2.5 font-mono text-[0.8125rem] text-text-muted">
-                        {d.sdkFactory ? `${adminFactory(d.sdkFactory)}()` : '—'}
+                        {d.sdkFactory
+                          ? `${adminFactory(d.sdkFactory)}()`
+                          : d.integrationMode === 'linked'
+                            ? 'linked console'
+                            : '—'}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+          </Section>
+
+          <Section id="operations" title="운영 콘솔과 서비스 도메인 격리">
+            <p className="text-sm leading-6 text-text-muted">
+              DeskCloud 운영 콘솔은 가입회사 테넌트를 중심으로 동작합니다. 회사 하나가 여러 서비스
+              도메인을 운영하더라도 플랜, 키, 사용량, 결제는 하나로 묶고 브라우저 SDK 접근은
+              <code className="mx-1 rounded bg-surface-2 px-1 py-0.5 font-mono text-[0.8125rem] text-text">
+                tenant.corsOrigins
+              </code>
+              allowlist로 제한합니다.
+            </p>
+            <div className="grid gap-4 md:grid-cols-3">
+              {[
+                {
+                  icon: ShieldCheck,
+                  title: 'Tenant boundary',
+                  body: '가입회사 단위의 계정, 플랜, 사용량, publishable key, secret key 회전 정책입니다.',
+                },
+                {
+                  icon: Plug,
+                  title: 'Service origins',
+                  body: '서비스 도메인 origin을 등록해 pk_ 키가 호출 가능한 브라우저 범위를 제한합니다.',
+                },
+                {
+                  icon: Database,
+                  title: 'Desk data scopes',
+                  body: '각 Desk는 slug, namespace, index, board, bucket 같은 도메인별 스코프로 데이터를 나눕니다.',
+                },
+              ].map((item) => (
+                <div key={item.title} className="rounded-lg border border-border bg-surface p-4">
+                  <DeskGlyph icon={item.icon} tone="accent" size="sm" />
+                  <h3 className="mt-3 text-sm font-semibold text-text">{item.title}</h3>
+                  <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">{item.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="rounded-lg border border-dashed border-border bg-surface p-4">
+              <h3 className="text-sm font-semibold text-text">
+                Remote DevTools 같은 외부/대형 서비스
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-text-muted">
+                물리적으로 같은 모노레포에 흡수하지 않아도 운영 콘솔에서는 같은 방식으로 묶을 수
+                있습니다. 먼저 서비스 도메인, 운영 URL, primary metric, billing driver를 등록해 통합
+                관리하고, 벤더 자산이 큰 저장소 흡수는 별도 마이그레이션으로 검증합니다.
+              </p>
+            </div>
+          </Section>
+
+          <Section id="service-reference" title="서비스별 상세 설명">
+            <p className="text-sm leading-6 text-text-muted">
+              각 Desk는 운영 데이터, 격리 기준, 과금 메트릭이 다릅니다. 네이티브 Desk는 단일 SDK
+              패턴을 공유하고, 연결형 Desk는 자체 저장소와 런타임을 유지한 채 같은 테넌트/도메인
+              운영 모델에 묶습니다. 아래 레퍼런스는 콘솔·마이크로사이트와 같은 카탈로그 데이터를
+              사용합니다.
+            </p>
+            <div className="grid gap-4 lg:grid-cols-2">
+              {PRODUCT_DESKS.map((desk) => {
+                const operations = deskOperations(desk)
+                const detail = deskDetails(desk)
+
+                return (
+                  <article key={desk.id} className="rounded-lg border border-border bg-surface p-5">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <DeskGlyph icon={desk.icon} tone={desk.tone} size="sm" />
+                        <div className="min-w-0">
+                          <h3 className="text-base font-semibold text-text">{desk.name}</h3>
+                          <p className="mt-0.5 text-[0.8125rem] text-accent-strong">
+                            {desk.tagline}
+                          </p>
+                        </div>
+                      </div>
+                      <PlanBadge plan={operations.recommendedPlan} size="sm" />
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-text-muted">{detail.summary}</p>
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                      <div className="rounded-md bg-surface-2 p-3">
+                        <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                          SDK
+                        </p>
+                        <p className="mt-1 font-mono text-[0.8125rem] text-text">
+                          {desk.integrationPackage ?? SDK_PACKAGE}
+                        </p>
+                      </div>
+                      <div className="rounded-md bg-surface-2 p-3">
+                        <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                          Gateway
+                        </p>
+                        <p className="mt-1 font-mono text-[0.8125rem] text-text">
+                          {operations.gatewayPath}
+                        </p>
+                      </div>
+                      <div className="rounded-md bg-surface-2 p-3">
+                        <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                          과금
+                        </p>
+                        <p className="mt-1 text-[0.8125rem] font-semibold text-text">
+                          {USAGE_METRIC_LABEL[operations.primaryMetric]}
+                        </p>
+                      </div>
+                      <div className="rounded-md bg-surface-2 p-3">
+                        <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                          데이터
+                        </p>
+                        <p className="mt-1 text-[0.8125rem] font-semibold text-text">
+                          {detail.dataModel.length} objects
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+                        도메인 격리
+                      </p>
+                      <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                        {detail.domainIsolation}
+                      </p>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <Button asChild variant="secondary" size="sm">
+                        <Link to={deskMicrositePath(desk)}>마이크로사이트</Link>
+                      </Button>
+                      <Button asChild variant="ghost" size="sm">
+                        <Link to={operations.adminPath}>콘솔에서 관리</Link>
+                      </Button>
+                    </div>
+                  </article>
+                )
+              })}
             </div>
           </Section>
 

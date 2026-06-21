@@ -5,10 +5,13 @@ import {
   CheckCircle2,
   Copy,
   CreditCard,
+  Database,
   KeyRound,
+  ListChecks,
   Package,
   Route,
   Settings,
+  ShieldCheck,
 } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
@@ -22,6 +25,7 @@ import {
   SDK_PACKAGE,
   USAGE_METRIC_LABEL,
   apiEndpoint,
+  deskDetails,
   deskOperations,
   deskMicrositePath,
   restSnippet,
@@ -73,6 +77,20 @@ export default function DeskMicrositePage() {
 
   const siblingDesks = PRODUCT_DESKS.filter((d) => d.id !== desk.id).slice(0, 4)
   const operations = deskOperations(desk)
+  const detail = deskDetails(desk)
+  const integrationPackage = desk.integrationPackage ?? SDK_PACKAGE
+  const serviceEndpoint = desk.liveUrl ?? endpoint
+  const isLinkedDesk = desk.integrationMode === 'linked'
+  const apiShapeCode = isLinkedDesk
+    ? `# Internal dashboard API
+curl '${serviceEndpoint}/api/dashboard/stats'
+
+# Recorded sessions
+curl '${serviceEndpoint}/sessions/record'
+
+# External SDK bundle
+curl '${serviceEndpoint}/sdk/index.umd.js'`
+    : restSnippet('/api/tenants')
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -128,7 +146,9 @@ export default function DeskMicrositePage() {
               <Package className="mt-0.5 size-4 shrink-0 text-accent-strong" aria-hidden />
               <div>
                 <dt className="font-medium text-text">SDK</dt>
-                <dd className="mt-0.5 font-mono text-[0.8125rem] text-text-muted">{SDK_PACKAGE}</dd>
+                <dd className="mt-0.5 font-mono text-[0.8125rem] text-text-muted">
+                  {integrationPackage}
+                </dd>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -136,7 +156,7 @@ export default function DeskMicrositePage() {
               <div>
                 <dt className="font-medium text-text">Auth</dt>
                 <dd className="mt-0.5 text-[0.8125rem] text-text-muted">
-                  publishable key + tenant CORS
+                  {isLinkedDesk ? 'SDK origin + tenant allowlist' : 'publishable key + tenant CORS'}
                 </dd>
               </div>
             </div>
@@ -145,7 +165,7 @@ export default function DeskMicrositePage() {
               <div>
                 <dt className="font-medium text-text">Endpoint</dt>
                 <dd className="mt-0.5 break-all font-mono text-[0.8125rem] text-text-muted">
-                  {endpoint}
+                  {serviceEndpoint}
                 </dd>
               </div>
             </div>
@@ -169,6 +189,77 @@ export default function DeskMicrositePage() {
             <p className="mt-2 text-sm font-semibold text-text">{metric}</p>
           </div>
         ))}
+      </section>
+
+      <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-2">
+            <ListChecks className="size-4 text-accent-strong" aria-hidden />
+            <h2 className="text-lg font-semibold tracking-tight text-text">서비스 상세</h2>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-pretty text-text-muted">{detail.summary}</p>
+          <div className="mt-5">
+            <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+              대표 사용처
+            </p>
+            <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+              {detail.bestFor.map((item) => (
+                <li key={item} className="rounded-md bg-surface-2 px-3 py-2 text-sm text-text">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <aside className="rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="size-4 text-accent-strong" aria-hidden />
+            <h2 className="text-lg font-semibold tracking-tight text-text">도메인 격리</h2>
+          </div>
+          <p className="mt-3 text-sm leading-6 text-text-muted">{detail.domainIsolation}</p>
+          <Button asChild variant="secondary" size="sm" className="mt-4 w-full">
+            <Link to={operations.adminPath}>콘솔에서 도메인 관리</Link>
+          </Button>
+        </aside>
+      </section>
+
+      <section className="mt-12 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-2">
+            <Database className="size-4 text-accent-strong" aria-hidden />
+            <h2 className="text-lg font-semibold tracking-tight text-text">관리 데이터 모델</h2>
+          </div>
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+            {detail.dataModel.map((item) => (
+              <div key={item.name} className="rounded-lg bg-surface-2 p-3">
+                <dt className="text-sm font-semibold text-text">{item.name}</dt>
+                <dd className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                  {item.description}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-2">
+            <ListChecks className="size-4 text-accent-strong" aria-hidden />
+            <h2 className="text-lg font-semibold tracking-tight text-text">운영 런북</h2>
+          </div>
+          <ol className="mt-4 space-y-3">
+            {detail.adminGuide.map((item, index) => (
+              <li key={item.title} className="rounded-lg bg-surface-2 p-3">
+                <p className="text-sm font-semibold text-text">
+                  {index + 1}. {item.title}
+                </p>
+                <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                  {item.description}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </div>
       </section>
 
       <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -245,20 +336,46 @@ export default function DeskMicrositePage() {
         <div className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-lg font-semibold tracking-tight text-text">SDK quickstart</h2>
+              <h2 className="text-lg font-semibold tracking-tight text-text">
+                {isLinkedDesk ? '연결형 SDK quickstart' : 'SDK quickstart'}
+              </h2>
               <p className="mt-1 text-sm text-text-muted">
-                같은 패키지, 같은 클라이언트 패턴으로 앱 안에 붙입니다.
+                {isLinkedDesk
+                  ? '별도 저장소와 배포를 유지하면서 DeskCloud 운영 콘솔에 연결해 관리합니다.'
+                  : '같은 패키지, 같은 클라이언트 패턴으로 앱 안에 붙입니다.'}
               </p>
             </div>
             <Badge tone="outline" size="sm">
-              {desk.sdkFactory}
+              {desk.sdkFactory ?? desk.integrationPackage ?? 'REST'}
             </Badge>
           </div>
-          <div className="mt-4">
-            <InstallTabs />
-          </div>
+          {isLinkedDesk ? (
+            <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-border bg-surface-2 p-3 text-[0.8125rem] text-text-muted">
+              <p>
+                운영 URL은{' '}
+                <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-text">
+                  {serviceEndpoint}
+                </code>
+                이고, 소스 저장소는 별도 릴리스 주기를 유지합니다.
+              </p>
+              {desk.sourceRepositoryUrl ? (
+                <a
+                  href={desk.sourceRepositoryUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-accent-strong hover:text-accent"
+                >
+                  저장소 열기
+                </a>
+              ) : null}
+            </div>
+          ) : (
+            <div className="mt-4">
+              <InstallTabs />
+            </div>
+          )}
           <div className="mt-5">
-            <CodeBlock code={sdkSnippet(desk)} language="ts" />
+            <CodeBlock code={sdkSnippet(desk)} language={isLinkedDesk ? 'html' : 'ts'} />
           </div>
         </div>
 
@@ -268,13 +385,15 @@ export default function DeskMicrositePage() {
             <h2 className="text-lg font-semibold tracking-tight text-text">API shape</h2>
           </div>
           <p className="mt-1 text-sm text-text-muted">
-            SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.
+            {isLinkedDesk
+              ? '자체 Internal API, External SDK 번들, WebSocket gateway를 분리해 운영합니다.'
+              : 'SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.'}
           </p>
           <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] text-text-muted">
-            {operations.gatewayPath}/api
+            {isLinkedDesk ? serviceEndpoint : `${operations.gatewayPath}/api`}
           </p>
           <div className="mt-4">
-            <CodeBlock code={restSnippet('/api/tenants')} language="bash" />
+            <CodeBlock code={apiShapeCode} language="bash" />
           </div>
         </aside>
       </section>

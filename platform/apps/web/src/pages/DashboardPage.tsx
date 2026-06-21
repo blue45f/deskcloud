@@ -3,11 +3,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   AlertTriangle,
   ArrowRight,
+  Building2,
   Check,
+  Database,
+  Globe2,
   KeyRound,
   LayoutGrid,
+  ListChecks,
   RotateCw,
   Settings,
+  ShieldCheck,
   TriangleAlert,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -20,7 +25,7 @@ import { ConsolePreviewNotice } from '@/components/ConsolePreviewNotice'
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge, PlanBadge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogClose,
@@ -36,6 +41,7 @@ import { Meter } from '@/components/ui/meter'
 import {
   PRODUCT_DESKS,
   USAGE_METRIC_LABEL,
+  deskDetails,
   deskMicrositePath,
   deskOperations,
 } from '@/data/deskCatalog'
@@ -67,6 +73,214 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   )
 }
 
+function originLabel(origin: string): string {
+  if (origin === '*') return '전체 origin'
+  try {
+    return new URL(origin).host
+  } catch {
+    return origin
+  }
+}
+
+function AdminCommandCenter({ tenant }: { tenant?: TenantDto }) {
+  const origins = tenant?.corsOrigins ?? []
+  const domainLabel = origins.includes('*')
+    ? '전체 허용'
+    : origins.length > 0
+      ? `${origins.length}개`
+      : '미등록'
+
+  const stats = [
+    {
+      icon: Building2,
+      label: '가입회사',
+      value: tenant?.name ?? '콘솔 프리뷰',
+      helper: tenant?.slug ? `tenant:${tenant.slug}` : '테넌트 연결 후 자동 표시',
+    },
+    {
+      icon: Globe2,
+      label: '서비스 도메인',
+      value: domainLabel,
+      helper: 'CORS allowlist로 브라우저 SDK 범위 제한',
+    },
+    {
+      icon: LayoutGrid,
+      label: '운영 Desk',
+      value: `${PRODUCT_DESKS.length}개`,
+      helper: '같은 계정·키·빌링으로 통합 관리',
+    },
+    {
+      icon: ShieldCheck,
+      label: '격리 경계',
+      value: 'Tenant + Origin',
+      helper: '서비스 도메인별 데이터 접근 범위 분리',
+    },
+  ]
+
+  const flow = [
+    {
+      title: '회사 테넌트',
+      description: '가입회사 단위로 플랜, 키, 사용량, 결제 상태를 하나로 묶습니다.',
+    },
+    {
+      title: '서비스 도메인',
+      description: '실제 제품 도메인을 origin allowlist에 등록해 브라우저 호출을 제한합니다.',
+    },
+    {
+      title: 'Desk 운영 표면',
+      description: '약관, 설문, 검색, 알림 등 각 Desk는 같은 테넌트 안에서 운영 큐를 나눕니다.',
+    },
+    {
+      title: '사용량/빌링',
+      description: '도메인과 Desk가 달라도 월간 사용량은 테넌트 플랜 한도에 합산됩니다.',
+    },
+  ]
+
+  return (
+    <Card>
+      <CardHeader
+        action={
+          <Button asChild variant="secondary" size="sm">
+            <a href="#domain-isolation">
+              도메인 격리 <ArrowRight className="size-4" />
+            </a>
+          </Button>
+        }
+      >
+        <CardTitle>통합 운영 콘솔</CardTitle>
+        <CardDescription>
+          가입회사, 서비스 도메인, Desk, 키, 사용량, 빌링을 한 화면의 운영 단위로 묶습니다.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {stats.map((item) => (
+            <div key={item.label} className="rounded-md bg-surface-2 p-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-text-subtle">
+                <item.icon className="size-4 text-accent-strong" aria-hidden />
+                <span>{item.label}</span>
+              </div>
+              <p className="mt-2 truncate text-base font-semibold text-text">{item.value}</p>
+              <p className="mt-1 text-[0.75rem] leading-5 text-text-muted">{item.helper}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 lg:grid-cols-4">
+          {flow.map((item, index) => (
+            <div key={item.title} className="rounded-md border border-border bg-surface p-4">
+              <span className="font-mono text-[0.6875rem] text-accent-strong">
+                {String(index + 1).padStart(2, '0')}
+              </span>
+              <h3 className="mt-2 text-sm font-semibold text-text">{item.title}</h3>
+              <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">{item.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="rounded-md border border-dashed border-border px-4 py-3">
+          <p className="text-sm text-text-muted">
+            RemoteDevTools처럼 물리적으로 분리된 저장소 서비스도 같은 방식으로 연결할 수 있습니다.
+            먼저 서비스 도메인, 운영 URL, 사용량 메트릭을 콘솔에 묶고, 소스 모노레포 흡수는 별도
+            단계로 검증합니다.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function DomainIsolationPanel({ tenant }: { tenant?: TenantDto }) {
+  const origins = tenant?.corsOrigins ?? []
+  const hasOrigins = origins.length > 0
+
+  return (
+    <Card id="domain-isolation">
+      <CardHeader
+        action={
+          <Button asChild variant="secondary" size="sm">
+            <a href="#settings">도메인 설정</a>
+          </Button>
+        }
+      >
+        <CardTitle>
+          <span className="inline-flex items-center gap-1.5">
+            <Globe2 className="size-4" aria-hidden /> 서비스 도메인 격리
+          </span>
+        </CardTitle>
+        <CardDescription>
+          가입회사 테넌트 안에서 서비스 도메인별 브라우저 SDK 호출 범위를 분리합니다.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-5">
+        {!hasOrigins ? (
+          <Banner tone="warning">
+            등록된 서비스 도메인이 없습니다. 운영 배포 전 실제 origin을 등록해 pk_ 키 호출 범위를
+            제한하세요.
+          </Banner>
+        ) : null}
+
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <div>
+            <SectionTitle>등록된 서비스 도메인</SectionTitle>
+            <div className="grid gap-2">
+              {(hasOrigins ? origins : ['https://app.example.com']).map((origin) => (
+                <div
+                  key={origin}
+                  className={cn(
+                    'flex items-center justify-between gap-3 rounded-md border px-3 py-2.5',
+                    hasOrigins
+                      ? 'border-border bg-surface'
+                      : 'border-dashed border-border bg-surface-2'
+                  )}
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold text-text">
+                      {originLabel(origin)}
+                    </span>
+                    <code className="mt-0.5 block truncate text-[0.75rem] text-text-muted">
+                      {origin}
+                    </code>
+                  </span>
+                  <Badge tone={hasOrigins ? 'success' : 'warning'} size="sm" dot={hasOrigins}>
+                    {hasOrigins ? '격리 적용' : '예시'}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <SectionTitle>격리 규칙</SectionTitle>
+            <ul className="space-y-2 text-sm text-text-muted">
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                <span>
+                  브라우저 호출은 <strong className="text-text">pk_ 키 + origin allowlist</strong>로
+                  제한합니다.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                <span>
+                  서버 운영 작업은 <strong className="text-text">sk_ 키</strong>를 가진
+                  BFF/API에서만 실행합니다.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                <span>
+                  사용량과 플랜은 가입회사 테넌트 단위로 합산하고 Desk별 메트릭으로 나눠 봅니다.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 function DeskOperationsHub() {
   const [params, setParams] = useSearchParams()
   const fallbackDesk = PRODUCT_DESKS[0]
@@ -78,6 +292,7 @@ function DeskOperationsHub() {
   const selectedId = params.get('desk') ?? fallbackDesk.id
   const selected = PRODUCT_DESKS.find((d) => d.id === selectedId) ?? fallbackDesk
   const operations = deskOperations(selected)
+  const detail = deskDetails(selected)
   const format = metricFormat(operations.primaryMetric)
 
   const selectDesk = (id: string) => {
@@ -155,6 +370,11 @@ function DeskOperationsHub() {
               <PlanBadge plan={operations.recommendedPlan} size="sm" />
             </div>
 
+            <div className="mt-5 rounded-md border border-border bg-surface p-4">
+              <SectionTitle>서비스 상세</SectionTitle>
+              <p className="text-sm leading-6 text-text-muted">{detail.summary}</p>
+            </div>
+
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               <div className="rounded-md bg-surface-2 p-3">
                 <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">Gateway</p>
@@ -175,6 +395,26 @@ function DeskOperationsHub() {
                 <p className="mt-1 text-sm font-semibold text-text">
                   {operations.recommendedPlan.toUpperCase()}
                 </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-2">
+              <div>
+                <SectionTitle>도메인 격리 방식</SectionTitle>
+                <p className="rounded-md bg-surface-2 p-3 text-sm leading-6 text-text-muted">
+                  {detail.domainIsolation}
+                </p>
+              </div>
+              <div>
+                <SectionTitle>대표 사용처</SectionTitle>
+                <ul className="grid gap-2">
+                  {detail.bestFor.map((item) => (
+                    <li key={item} className="flex items-start gap-2 text-sm text-text-muted">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 
@@ -201,6 +441,45 @@ function DeskOperationsHub() {
                     </li>
                   ))}
                 </ul>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-2">
+              <div>
+                <SectionTitle>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Database className="size-3.5" aria-hidden /> 관리 데이터
+                  </span>
+                </SectionTitle>
+                <dl className="space-y-2">
+                  {detail.dataModel.slice(0, 4).map((item) => (
+                    <div key={item.name} className="rounded-md bg-surface-2 p-3">
+                      <dt className="text-sm font-semibold text-text">{item.name}</dt>
+                      <dd className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                        {item.description}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+              <div>
+                <SectionTitle>
+                  <span className="inline-flex items-center gap-1.5">
+                    <ListChecks className="size-3.5" aria-hidden /> 운영 런북
+                  </span>
+                </SectionTitle>
+                <ol className="space-y-2">
+                  {detail.adminGuide.map((item, index) => (
+                    <li key={item.title} className="rounded-md bg-surface-2 p-3">
+                      <p className="text-sm font-semibold text-text">
+                        {index + 1}. {item.title}
+                      </p>
+                      <p className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
+                        {item.description}
+                      </p>
+                    </li>
+                  ))}
+                </ol>
               </div>
             </div>
 
@@ -414,13 +693,16 @@ function SettingsForm({ tenant }: { tenant: TenantDto }) {
   })
 
   return (
-    <Card>
+    <Card id="settings">
       <CardHeader>
         <CardTitle>
           <span className="inline-flex items-center gap-1.5">
-            <Settings className="size-4" aria-hidden /> 설정
+            <Settings className="size-4" aria-hidden /> 회사·서비스 도메인 설정
           </span>
         </CardTitle>
+        <CardDescription>
+          가입회사 이름과 브라우저 SDK 호출을 허용할 서비스 도메인 origin을 관리합니다.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -439,9 +721,9 @@ function SettingsForm({ tenant }: { tenant: TenantDto }) {
             />
           </Field>
           <Field
-            label="CORS Origins"
+            label="서비스 도메인 Origins"
             htmlFor="set-cors"
-            hint="줄바꿈 또는 쉼표로 구분. 예: https://app.example.com (전체 허용은 *)"
+            hint="줄바꿈 또는 쉼표로 구분합니다. 운영에서는 실제 서비스 origin만 등록하세요. 예: https://app.example.com"
           >
             <Textarea
               id="set-cors"
@@ -453,6 +735,11 @@ function SettingsForm({ tenant }: { tenant: TenantDto }) {
           </Field>
           {save.isError ? <Banner tone="error">{(save.error as Error).message}</Banner> : null}
           {ok ? <Banner tone="success">설정이 저장되었습니다.</Banner> : null}
+          <div className="rounded-md bg-surface-2 px-3 py-2.5 text-[0.8125rem] leading-5 text-text-muted">
+            <strong className="text-text">격리 기준:</strong> 같은 가입회사 테넌트 안에서 여러
+            서비스 도메인을 운영할 수 있습니다. 등록되지 않은 origin의 브라우저 SDK 호출은 차단하고,
+            서버 운영 작업은 secret key가 있는 BFF/API에서만 수행하세요.
+          </div>
           <Button type="submit" loading={save.isPending} disabled={!name.trim()}>
             저장
           </Button>
@@ -610,6 +897,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-8">
         <ConsolePreviewNotice title="콘솔" />
+        <AdminCommandCenter />
+        <DomainIsolationPanel />
         <DeskOperationsHub />
       </div>
     )
@@ -635,10 +924,14 @@ export default function DashboardPage() {
         {tenant ? <PlanBadge plan={tenant.plan} /> : null}
       </header>
 
+      <AdminCommandCenter tenant={tenant} />
+
       <div className="grid gap-6 lg:grid-cols-2">
         <UsagePanel />
         <KeysPanel />
       </div>
+
+      <DomainIsolationPanel tenant={tenant} />
 
       <BillingPanel />
 
