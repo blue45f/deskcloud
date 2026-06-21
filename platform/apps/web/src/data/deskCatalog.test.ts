@@ -114,6 +114,15 @@ describe('DeskCloud catalog contracts', () => {
     expect(remoteSnippet).not.toContain('remote-devtools.vercel.app')
   })
 
+  it('keeps TermsDesk brokerage access pointed at the live TermsDesk runtime', () => {
+    const termsdesk = PRODUCT_DESKS.find((desk) => desk.id === 'termsdesk')
+
+    expect(termsdesk).toBeDefined()
+    expect(termsdesk?.liveUrl).toBe('https://3.107.235.143.nip.io')
+    expect(deskOperations(termsdesk!).gatewayPath).toBe('/terms')
+    expect(sdkSnippet(termsdesk!)).toContain("endpoint: 'https://3.107.235.143.nip.io'")
+  })
+
   it('keeps developer-tool Desks under the DeskCloud control plane', () => {
     const developerDeskIds = ['seo-gateway', 'remote-devtools'] as const
 

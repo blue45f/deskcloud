@@ -24,7 +24,7 @@ export class WorkspaceDesksController {
 
   @Get(':id')
   @ApiOperation({ summary: '단일 workspace Desk 통합 manifest' })
-  @ApiParam({ name: 'id', enum: ['aidigestdesk', 'seo-gateway', 'remote-devtools'] })
+  @ApiParam({ name: 'id', enum: ['seo-gateway', 'remote-devtools'] })
   get(@Param('id') id: string): WorkspaceDeskManifestItem {
     const item = workspaceDeskManifestById(id)
     if (!item) throw new NotFoundException(`Unknown workspace Desk: ${id}`)

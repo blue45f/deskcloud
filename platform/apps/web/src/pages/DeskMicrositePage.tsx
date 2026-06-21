@@ -85,6 +85,10 @@ export default function DeskMicrositePage() {
   const isLinkedDesk = integrationMode === 'linked'
   const isPackagedDesk = isWorkspaceDesk || isLinkedDesk
   const serviceEndpoint = isWorkspaceDesk ? operations.gatewayPath : (desk.liveUrl ?? endpoint)
+  const termsBrokerageUrl =
+    desk.id === 'termsdesk' && desk.liveUrl ? `${desk.liveUrl}/app/marketplace` : undefined
+  const termsExpertsUrl =
+    desk.id === 'termsdesk' && desk.liveUrl ? `${desk.liveUrl}/experts` : undefined
   const apiShapeCode =
     desk.id === 'seo-gateway'
       ? `# Admin API
@@ -145,6 +149,20 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
                 키 발급받기 <ArrowRight className="size-4" />
               </Link>
             </Button>
+            {termsBrokerageUrl ? (
+              <Button asChild variant="secondary">
+                <a href={termsBrokerageUrl} target="_blank" rel="noreferrer">
+                  의뢰 중계 열기 <ArrowRight className="size-4" />
+                </a>
+              </Button>
+            ) : null}
+            {termsExpertsUrl ? (
+              <Button asChild variant="ghost">
+                <a href={termsExpertsUrl} target="_blank" rel="noreferrer">
+                  전문가 디렉터리
+                </a>
+              </Button>
+            ) : null}
             <Button asChild variant="secondary">
               <Link to="/docs">통합 가이드</Link>
             </Button>
@@ -419,7 +437,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
                 : 'SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.'}
           </p>
           <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] text-text-muted">
-            {isNativeDesk ? `${operations.gatewayPath}/api` : serviceEndpoint}
+            {isNativeDesk && !desk.liveUrl ? `${operations.gatewayPath}/api` : serviceEndpoint}
           </p>
           <div className="mt-4">
             <CodeBlock code={apiShapeCode} language="bash" />

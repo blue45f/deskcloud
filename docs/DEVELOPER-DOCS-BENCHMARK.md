@@ -23,7 +23,7 @@ DeskCloud 문서는 아래 여섯 축을 모두 가져야 한다.
    운영 체크리스트로 둔다.
 5. **Service Reference** — 각 Desk의 gateway path, primary metric, recommended plan, data model,
    domain isolation을 같은 데이터 소스에서 보여준다.
-6. **Workspace Desk Boundary** — `seo-gateway`, `remote-devtools`, `aidigestdesk`는 별도 제품 URL이
+6. **Workspace Desk Boundary** — `seo-gateway`, `remote-devtools`는 별도 제품 URL이
    아니라 `workspace_integrated` manifest로 검증한다.
 
 ## Required API Reference Rows

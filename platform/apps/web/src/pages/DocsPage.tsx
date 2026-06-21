@@ -2,6 +2,7 @@ import {
   ArrowRight,
   BookOpen,
   Database,
+  ExternalLink,
   KeyRound,
   Package,
   Plug,
@@ -34,6 +35,7 @@ const NAV = [
   { id: 'concepts', label: '핵심 개념' },
   { id: 'quickstart', label: '빠른 시작' },
   { id: 'tutorials', label: '튜토리얼' },
+  { id: 'sample-sites', label: '샘플 사이트' },
   { id: 'react', label: 'React 통합' },
   { id: 'auth', label: '인증·키' },
   { id: 'api-reference', label: 'API Reference' },
@@ -67,6 +69,8 @@ function Section({
 const endpoint = apiEndpoint()
 
 const survey = PRODUCT_DESKS.find((d) => d.id === 'surveydesk') ?? PRODUCT_DESKS[0]!
+const termsdesk = PRODUCT_DESKS.find((d) => d.id === 'termsdesk')
+const termsdeskRuntime = termsdesk?.liveUrl ?? 'https://3.107.235.143.nip.io'
 
 const reactSnippet = `import { useEffect, useState } from 'react'
 import { createReviewClient, type PublicReviews } from '${SDK_PACKAGE}'
@@ -118,6 +122,15 @@ curl '${endpoint}/api/tenant' \\
 curl '${endpoint}/api/usage?period=current' \\
   -H 'authorization: Bearer sk_…'`
 
+const termsdeskBrokerageSnippet = `# TermsDesk 약관 의뢰 중계 런타임 확인
+open '${termsdeskRuntime}/app/marketplace'
+open '${termsdeskRuntime}/app/requests'
+open '${termsdeskRuntime}/app/moderation'
+
+# API는 인증 필요 라우트가 401을 반환하면 배포/라우팅은 살아있는 상태입니다.
+curl -i '${termsdeskRuntime}/api/marketplace'
+curl -i '${termsdeskRuntime}/api/public/providers'`
+
 const API_REFERENCE = [
   {
     method: 'GET',
@@ -159,7 +172,7 @@ const API_REFERENCE = [
     method: 'GET',
     path: '/api/workspace-desks',
     auth: 'public',
-    purpose: 'AIDigestDesk, SEOGatewayDesk, RemoteDevTools 통합 manifest 조회',
+    purpose: 'SEOGatewayDesk, RemoteDevTools 통합 manifest 조회',
   },
   {
     method: 'GET',
@@ -200,6 +213,44 @@ const TUTORIALS = [
       'SEOGatewayDesk와 RemoteDevTools가 별도 제품이 아니라 통합 manifest에 묶였는지 확인합니다.',
     steps: ['GET /api/workspace-desks', '콘솔 parity 확인', 'gateway path와 adminPath 대조'],
     href: '/dashboard?desk=seo-gateway',
+  },
+  {
+    title: 'TermsDesk 약관 의뢰 중계 접근',
+    summary:
+      'DeskPlatform 마이크로사이트에서 TermsDesk 런타임으로 이동해 의뢰자, 전문가, 운영자 큐를 확인합니다.',
+    steps: [
+      'TermsDesk 마이크로사이트 열기',
+      '의뢰 중계 열기',
+      'marketplace/requests/moderation 확인',
+    ],
+    href: '/desks/termsdesk',
+  },
+] as const
+
+const SAMPLE_SITES = [
+  {
+    title: 'DeskPlatform 통합 포털',
+    href: 'https://desk-platform.vercel.app',
+    kind: 'production',
+    description: '카탈로그, 문서, 운영 콘솔, Desk 마이크로사이트의 단일 진입점입니다.',
+  },
+  {
+    title: 'TermsDesk 의뢰 중계',
+    href: `${termsdeskRuntime}/app/marketplace`,
+    kind: 'production',
+    description: '약관 작성·검토·개정 의뢰 마켓플레이스와 운영 큐로 들어가는 실제 런타임입니다.',
+  },
+  {
+    title: 'TermsDesk 전문가 디렉터리',
+    href: `${termsdeskRuntime}/experts`,
+    kind: 'public',
+    description: '인증 없이 전문가 목록과 공개 프로필이 렌더되는 샘플 공개 사이트입니다.',
+  },
+  {
+    title: 'Workspace manifest API',
+    href: 'https://desk-platform.vercel.app/api/workspace-desks',
+    kind: 'api',
+    description: 'SEOGatewayDesk와 RemoteDevTools의 통합 운영 manifest를 확인합니다.',
   },
 ] as const
 
@@ -324,7 +375,7 @@ export default function DocsPage() {
               quickstart/tutorial 분리를 기준으로 구성합니다. 처음 붙이는 팀은 아래 순서대로
               진행하면 콘솔, SDK, workspace Desk까지 한 흐름으로 검증할 수 있습니다.
             </p>
-            <div className="grid gap-4 lg:grid-cols-3">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               {TUTORIALS.map((tutorial, index) => (
                 <article
                   key={tutorial.title}
@@ -352,6 +403,46 @@ export default function DocsPage() {
               ))}
             </div>
             <CodeBlock code={tenantQuickstartSnippet} language="bash" />
+          </Section>
+
+          <Section id="sample-sites" title="샘플 사이트와 운영 예제">
+            <p className="text-sm leading-6 text-text-muted">
+              문서만 읽는 흐름이 아니라, 실제 운영 표면을 열어 라우팅과 인증 경계를 확인할 수 있게
+              샘플 URL을 분리했습니다. TermsDesk는 현재 DeskCloud 소스에 통합되어 있지만 의뢰 중계
+              런타임은 별도 EC2/Vercel 계열 경계를 사용하므로, 마이크로사이트에서 실제 런타임으로
+              이동해 검증합니다.
+            </p>
+            <div className="grid gap-3 md:grid-cols-2">
+              {SAMPLE_SITES.map((sample) => (
+                <a
+                  key={sample.href}
+                  href={sample.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-2"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-mono text-[0.6875rem] text-accent-strong uppercase">
+                        {sample.kind}
+                      </p>
+                      <h3 className="mt-1 text-sm font-semibold text-text">{sample.title}</h3>
+                    </div>
+                    <ExternalLink
+                      className="mt-0.5 size-4 shrink-0 text-text-subtle transition-colors group-hover:text-accent-strong"
+                      aria-hidden
+                    />
+                  </div>
+                  <p className="mt-2 text-[0.8125rem] leading-5 text-text-muted">
+                    {sample.description}
+                  </p>
+                  <p className="mt-3 break-all font-mono text-[0.75rem] text-text-subtle">
+                    {sample.href}
+                  </p>
+                </a>
+              ))}
+            </div>
+            <CodeBlock code={termsdeskBrokerageSnippet} language="bash" />
           </Section>
 
           <Section id="react" title="React 통합">

@@ -1,6 +1,6 @@
 import type { Plan, UsageMetric } from './constants'
 
-export const WORKSPACE_DESK_IDS = ['aidigestdesk', 'seo-gateway', 'remote-devtools'] as const
+export const WORKSPACE_DESK_IDS = ['seo-gateway', 'remote-devtools'] as const
 export type WorkspaceDeskId = (typeof WORKSPACE_DESK_IDS)[number]
 
 export type WorkspaceDeskKind = 'content' | 'render_gateway' | 'debugging'
@@ -33,26 +33,6 @@ export interface WorkspaceDesksManifestDto {
 }
 
 export const WORKSPACE_DESK_MANIFEST: readonly WorkspaceDeskManifestItem[] = [
-  {
-    id: 'aidigestdesk',
-    name: 'AIDigestDesk',
-    kind: 'content',
-    integrationStatus: 'workspace_integrated',
-    workspacePath: 'desks/aidigestdesk',
-    integrationPackage: '@aidigestdesk/content',
-    sourceRepositoryUrl: 'https://github.com/blue45f/aidigestdesk',
-    liveUrl: null,
-    gatewayPath: '/aidigest',
-    adminPath: '/dashboard?desk=aidigestdesk',
-    micrositePath: '/desks/aidigestdesk',
-    primaryMetric: 'events',
-    recommendedPlan: 'pro',
-    controlPlane:
-      'DeskCloud tenant, Pages base path, source snapshot usage, editorial export audit',
-    dataPlane: 'desks/aidigestdesk Vite portal and @aidigestdesk/content package',
-    readinessSummary:
-      'AIDigestDesk는 공개 콘텐츠 포털과 편집 데이터플레인을 유지하면서 DeskCloud에서 서비스 도메인, 콘텐츠 운영 이벤트, export run을 통합 관리합니다.',
-  },
   {
     id: 'seo-gateway',
     name: 'SEOGatewayDesk',

@@ -12,7 +12,6 @@ describe('WorkspaceDesksController', () => {
     expect(manifest.sourceOfTruth).toBe('/Users/hjunkim/WebstormProjects/deskcloud')
     expect(manifest.controlPlane).toContain('DeskCloud')
     expect(manifest.items.map((item) => item.id).toSorted()).toEqual([
-      'aidigestdesk',
       'remote-devtools',
       'seo-gateway',
     ])
@@ -34,5 +33,6 @@ describe('WorkspaceDesksController', () => {
 
   it('rejects unknown workspace Desk ids', () => {
     expect(() => controller.get('remote-devtools-old')).toThrow(NotFoundException)
+    expect(() => controller.get('aidigestdesk')).toThrow(NotFoundException)
   })
 })

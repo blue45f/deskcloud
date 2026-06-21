@@ -23,7 +23,7 @@ describe('workspace Desk manifest', () => {
       expect(item.workspacePath).toBe(`desks/${item.id}`)
       expect(item.sourceRepositoryUrl).toMatch(/^https:\/\/github\.com\/blue45f\//)
       expect(item.liveUrl).toBeNull()
-      expect(item.gatewayPath).toBe(item.id === 'aidigestdesk' ? '/aidigest' : `/${item.id}`)
+      expect(item.gatewayPath).toBe(`/${item.id}`)
       expect(item.adminPath).toBe(`/dashboard?desk=${item.id}`)
       expect(item.micrositePath).toBe(`/desks/${item.id}`)
       expect(item.controlPlane).toContain('DeskCloud')

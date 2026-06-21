@@ -304,12 +304,6 @@ const WORKSPACE_DESK_BOUNDARY: Record<
     verification: readonly string[]
   }
 > = {
-  aidigestdesk: {
-    controlPlane: 'DeskCloud tenant, service origin, content usage, editorial exports',
-    dataPlane: 'Vite portal, GitHub Pages fallback, @aidigestdesk/content source snapshots',
-    adminSurface: 'Source monitor queue, update pipeline, newsletter/export runbook',
-    verification: ['workspace package', 'content snapshot', 'Pages base path', 'editorial export'],
-  },
   'seo-gateway': {
     controlPlane: 'DeskCloud tenant, service origin, usage, billing, plan limit',
     dataPlane: 'Fastify render gateway, Puppeteer pool, cache/SWR, SEO quality gates',

@@ -197,7 +197,6 @@ function requiredWorkspaceManifest(id: string) {
   return manifest
 }
 
-const AIDIGEST_WORKSPACE = requiredWorkspaceManifest('aidigestdesk')
 const SEO_GATEWAY_WORKSPACE = requiredWorkspaceManifest('seo-gateway')
 const REMOTE_DEVTOOLS_WORKSPACE = requiredWorkspaceManifest('remote-devtools')
 
@@ -298,13 +297,13 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
     operatorTasks: ['사용자 상태 확인', '세션 정책 변경', '로그인 실패 분석'],
   }),
   aidigestdesk: ops('aidigestdesk', {
-    gatewayPath: AIDIGEST_WORKSPACE.gatewayPath,
-    primaryMetric: AIDIGEST_WORKSPACE.primaryMetric,
+    gatewayPath: '/aidigest',
+    primaryMetric: 'events',
     billingDriver:
       '소스 스냅샷, 업데이트 후보, 뉴스레터 내보내기, 편집 워크벤치 작업을 이벤트로 집계합니다.',
     config: ['source schedule', 'content snapshot', 'editorial pipeline', 'Pages base path'],
     operatorTasks: ['공식 소스 스냅샷', '업데이트 후보 검수', '뉴스레터/런북 내보내기'],
-    recommendedPlan: AIDIGEST_WORKSPACE.recommendedPlan,
+    recommendedPlan: 'pro',
   }),
   filedesk: ops('filedesk', {
     gatewayPath: '/file',
@@ -378,25 +377,29 @@ function readiness(value: Partial<DeskReadiness>): DeskReadiness {
 
 export const DESK_READINESS: Readonly<Record<string, DeskReadiness>> = {
   aidigestdesk: readiness({
-    summary: AIDIGEST_WORKSPACE.readinessSummary,
-    controlPlane: AIDIGEST_WORKSPACE.controlPlane,
-    dataPlane: AIDIGEST_WORKSPACE.dataPlane,
+    summary:
+      'AIDigestDesk는 독립 콘텐츠 포털 성격이 강해 자체 운영 콘솔과 편집 흐름을 유지합니다. DeskCloud는 가입회사/빌링/서비스 도메인 상태와 사용량 지표만 공통으로 관측합니다.',
+    controlPlane: 'DeskCloud tenant 설정 + aidigestdesk 자체 포털 관리자 콘솔',
+    dataPlane:
+      'desks/aidigestdesk Vite 포털, @aidigestdesk/content 콘텐츠 파이프라인, 소스 스냅샷 큐',
     checks: [
       {
-        label: 'Pages base path',
-        description: 'Vercel 운영 URL과 GitHub Pages 보조 URL의 base path를 함께 검증합니다.',
-        status: 'ready',
+        label: '독립 콘솔 가동',
+        description:
+          'AIDigestDesk 내부 /admin 진입이 가능하고 에디터 승인 흐름이 정상 작동해야 합니다.',
+        status: 'watch',
       },
       {
         label: '소스 스냅샷 큐',
         description:
-          '공식 출처 해시 변화, 실패 상태, 업데이트 후보 생성을 운영 이벤트로 추적합니다.',
-        status: 'watch',
+          '공식 출처 해시 변화와 업데이트 후보 생성이 실패 없이 운영 지표에 반영되는지 확인합니다.',
+        status: 'ready',
       },
       {
-        label: '편집 내보내기',
-        description: '뉴스레터, CSV, 런북 export가 같은 테넌트 사용량으로 집계되는지 확인합니다.',
-        status: 'ready',
+        label: '뉴스레터/런북 내보내기',
+        description:
+          'export run 산출물이 운영 채널(메일/스토리지)로 정합성 있게 전달되는지 점검합니다.',
+        status: 'needs_config',
       },
     ],
   }),
@@ -1040,7 +1043,7 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
   }),
   aidigestdesk: details({
     summary:
-      'AIDigestDesk는 GPT, Claude, Gemini, Grok, Manus 같은 주요 AI/LLM 업데이트, 벤치마크, 기능 비교, 사용법, 한국어 강좌와 도서 정보를 큐레이션하는 콘텐츠 Desk입니다. apps/web 포털과 packages/content 데이터 계약, 편집실 운영 표면, 공식 소스 스냅샷, 이벤트 정합성 검증, 뉴스레터/CSV/런북 내보내기를 유지하면서 DeskCloud 콘솔에서는 가입회사·서비스 도메인·콘텐츠 운영 작업·사용량을 통합 관리합니다.',
+      'AIDigestDesk는 AI/LLM 업데이트와 벤치마크를 큐레이션하는 콘텐츠 Desk입니다. 앱과 패키지 레이어는 기존 운영 방식을 유지하며, 내부 /admin 경로로 소스 큐레이션, 후보 심사, export run 을 운영합니다. DeskCloud에서는 가입회사 키 발급, 사용량 집계, service origin 관리를 관측 레이어로 확인합니다.',
     bestFor: [
       'AI/LLM 업데이트 한국어 큐레이션',
       '공식 문서·벤치마크 소스 모니터링',
@@ -1084,12 +1087,12 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
       },
     ],
     integrationGuide: [
-      'apps/web 포털은 Vercel 운영 URL과 GitHub Pages 보조 URL을 모두 유지합니다.',
-      'packages/content의 catalog, sourceSnapshots, translatedNews 데이터를 빌드 산출물로 검증합니다.',
-      '운영 콘솔에서는 소스 스냅샷 실행, 업데이트 후보 상태, export run을 이벤트 사용량으로 추적합니다.',
+      'AIDigestDesk 내부 운영 콘솔에서 /admin 진입 경로가 정상 동작하는지 확인합니다.',
+      'packages/content의 catalog, sourceSnapshots, translatedNews 데이터 계약을 빌드 파이프라인에서 점검합니다.',
+      '내부 워크플로와 DeskCloud 서비스 origin/usage 지표의 정합성을 함께 모니터링합니다.',
     ],
     domainIsolation:
-      'AIDigestDesk는 공개 콘텐츠 포털이지만 DeskCloud에서는 서비스 도메인 allowlist와 Pages base path로 운영 경계를 기록합니다. 같은 회사가 내부 AI 포털과 공개 큐레이션 사이트를 함께 운영해도 소스 스냅샷, 편집 후보, 내보내기 이벤트를 도메인별로 분리해 감사할 수 있습니다.',
+      'AIDigestDesk는 공개 콘텐츠 포털 성격이므로 운영 경계는 서비스 도메인 기반 origin 허용과 내부 편집 워크플로 권한으로 분리합니다. 같은 회사에서 다수의 도메인을 쓰더라도 큐레이션 소스/후보 상태는 origin와 내부 권한으로 관리됩니다.',
   }),
   filedesk: details({
     summary:
@@ -1277,7 +1280,7 @@ const sourceQueue = getSourceSnapshotCandidates().slice(0, 10)
 console.log(modelProfiles.length, latestUpdates, sourceQueue)`
   }
 
-  if (desk.id === 'remote-devtools' || desk.integrationMode === 'linked') {
+  if (desk.id === 'remote-devtools') {
     const operations = deskOperations(desk)
     const base =
       desk.integrationMode === 'workspace'
@@ -1293,7 +1296,7 @@ console.log(modelProfiles.length, latestUpdates, sourceQueue)`
   }
 
   if (!desk.sdkFactory || !desk.sdkVar) return restSnippet('/api/billing/plans')
-  const endpoint = apiEndpoint()
+  const endpoint = desk.liveUrl ?? apiEndpoint()
   const usage = desk.sdkUsage ? `\n\n${desk.sdkUsage}` : ''
   return `import { ${desk.sdkFactory} } from '${SDK_PACKAGE}'
 
@@ -1337,6 +1340,7 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     sdkVar: 'terms',
     sdkUsage: "const policy = await terms.getCurrent({ slug: 'privacy' })",
     metrics: ['약관 버전', '동의 기록', '의뢰 중계', '실시간 알림'],
+    liveUrl: 'https://3.107.235.143.nip.io',
   },
   {
     id: 'surveydesk',
@@ -1504,10 +1508,9 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     tone: 'accent',
     status: 'live',
     metrics: ['소스 스냅샷', '업데이트 후보', '뉴스레터', '플레이북'],
-    integrationMode: 'workspace',
-    integrationPackage: AIDIGEST_WORKSPACE.integrationPackage,
-    workspacePath: AIDIGEST_WORKSPACE.workspacePath,
-    sourceRepositoryUrl: AIDIGEST_WORKSPACE.sourceRepositoryUrl,
+    integrationMode: 'linked',
+    integrationPackage: '@aidigestdesk/content',
+    sourceRepositoryUrl: 'https://github.com/blue45f/aidigestdesk',
   },
   {
     id: 'filedesk',
