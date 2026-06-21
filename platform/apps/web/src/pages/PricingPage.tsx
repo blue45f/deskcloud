@@ -1,13 +1,20 @@
 import { PLAN_LIMITS, PLANS, UNLIMITED, type PlanSummaryDto } from '@desk/shared/browser'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Check, Minus, Package } from 'lucide-react'
+import { ArrowRight, Check, LayoutGrid, Minus, Package } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Banner } from '@/components/ui/feedback'
+import {
+  PRODUCT_DESKS,
+  USAGE_METRIC_LABEL,
+  deskMicrositePath,
+  deskOperations,
+} from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
-import { fetchPlans } from '@/services/api'
+import { CONSOLE_API_READY, fetchPlans } from '@/services/api'
 import { cn } from '@/utils/cn'
 import { fmtNum, fmtPriceKrw, fmtStorage } from '@/utils/format'
 
@@ -139,9 +146,10 @@ export default function PricingPage() {
   const { data, isError } = useQuery({
     queryKey: ['plans'],
     queryFn: fetchPlans,
+    enabled: CONSOLE_API_READY,
   })
   // data 가 배열이 아니면(예: 정적 호스팅에서 /api 가 SPA HTML 로 폴백될 때) 정적 요금표로 안전 폴백.
-  const plans = Array.isArray(data) ? data : staticPlans()
+  const plans = CONSOLE_API_READY && Array.isArray(data) ? data : staticPlans()
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
@@ -158,7 +166,7 @@ export default function PricingPage() {
         </p>
       </header>
 
-      {isError ? (
+      {CONSOLE_API_READY && isError ? (
         <Banner tone="info" className="mx-auto mt-6 max-w-2xl text-center">
           실시간 요금을 불러오지 못해 표준 요금표를 표시합니다. 플랜·한도는 동일하며, 콘솔 연결 시
           단일 소스(@desk/billing)로 동기화됩니다.
@@ -169,6 +177,52 @@ export default function PricingPage() {
         {plans.map((p) => (
           <PlanCard key={p.plan} p={p} />
         ))}
+      </section>
+
+      <section className="mt-12" aria-label="Desk별 과금 기준">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <LayoutGrid className="size-4 text-accent-strong" aria-hidden />
+              <h2 className="text-lg font-semibold tracking-tight text-text">Desk별 과금 기준</h2>
+            </div>
+            <p className="mt-1 max-w-2xl text-sm text-text-muted">
+              플랜은 계정 단위로 공유되고, 각 Desk는 자기 도메인에 맞는 기본 메트릭으로 사용량을
+              집계합니다.
+            </p>
+          </div>
+          <Button asChild variant="ghost" size="sm">
+            <Link to="/catalog">
+              전체 카탈로그 <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {PRODUCT_DESKS.map((desk) => {
+            const operations = deskOperations(desk)
+            return (
+              <Link
+                key={desk.id}
+                to={deskMicrositePath(desk)}
+                className="flex min-h-28 items-start gap-3 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-2"
+              >
+                <DeskGlyph icon={desk.icon} tone={desk.tone} size="sm" />
+                <span className="min-w-0 flex-1">
+                  <span className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-semibold text-text">{desk.name}</span>
+                    <Badge tone="outline" size="sm">
+                      {USAGE_METRIC_LABEL[operations.primaryMetric]}
+                    </Badge>
+                  </span>
+                  <span className="mt-1 block text-[0.8125rem] text-pretty text-text-muted">
+                    {operations.billingDriver}
+                  </span>
+                </span>
+              </Link>
+            )
+          })}
+        </div>
       </section>
 
       {/* 번들 노트 */}

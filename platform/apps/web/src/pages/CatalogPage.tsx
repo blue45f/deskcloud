@@ -1,14 +1,16 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, CreditCard, Route } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
-import { Badge } from '@/components/ui/badge'
+import { Badge, PlanBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { CodeBlock } from '@/components/ui/code-block'
 import { InstallTabs } from '@/components/ui/install-tabs'
 import {
   DESK_CATALOG,
   PRODUCT_DESKS,
+  USAGE_METRIC_LABEL,
+  deskOperations,
   deskMicrositePath,
   sdkSnippet,
   type DeskEntry,
@@ -18,6 +20,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 function DeskCard({ desk }: { desk: DeskEntry }) {
   const destination = deskMicrositePath(desk)
   const destinationLabel = desk.isCore ? '문서 보기' : '마이크로사이트'
+  const operations = desk.isCore ? null : deskOperations(desk)
 
   return (
     <article className="flex flex-col rounded-xl border border-border bg-surface p-5">
@@ -50,6 +53,41 @@ function DeskCard({ desk }: { desk: DeskEntry }) {
           </li>
         ))}
       </ul>
+
+      {operations ? (
+        <div className="mt-4 grid gap-2 rounded-lg bg-surface-2 p-3 sm:grid-cols-3">
+          <div className="min-w-0">
+            <p className="flex items-center gap-1.5 text-[0.6875rem] font-semibold tracking-wide text-text-subtle uppercase">
+              <Route className="size-3.5" aria-hidden /> Gateway
+            </p>
+            <p className="mt-1 truncate font-mono text-[0.8125rem] text-text">
+              {operations.gatewayPath}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <p className="flex items-center gap-1.5 text-[0.6875rem] font-semibold tracking-wide text-text-subtle uppercase">
+              <CreditCard className="size-3.5" aria-hidden /> 과금
+            </p>
+            <p className="mt-1 truncate text-[0.8125rem] font-semibold text-text">
+              {USAGE_METRIC_LABEL[operations.primaryMetric]}
+            </p>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[0.6875rem] font-semibold tracking-wide text-text-subtle uppercase">
+              추천
+            </p>
+            <p className="mt-1">
+              <PlanBadge plan={operations.recommendedPlan} size="sm" />
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4 rounded-lg bg-surface-2 p-3">
+          <p className="text-[0.8125rem] text-text-muted">
+            계정, 테넌트, 사용량, 플랜을 공유하는 중앙 플랫폼 코어입니다.
+          </p>
+        </div>
+      )}
 
       <div className="mt-4 flex items-center justify-between gap-3">
         <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">SDK 예시</p>

@@ -1,13 +1,24 @@
-import { UNLIMITED } from '@desk/shared/browser'
+import { PLAN_LIMITS, UNLIMITED } from '@desk/shared/browser'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AlertTriangle, Check, KeyRound, RotateCw, Settings, TriangleAlert } from 'lucide-react'
+import {
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  KeyRound,
+  LayoutGrid,
+  RotateCw,
+  Settings,
+  TriangleAlert,
+} from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import type { TenantDto, TenantWithSecretDto, UsageMetric } from '@desk/shared/browser'
 
 import { useTheme } from '@/app/ThemeContext'
-import { PlanBadge, StatusBadge } from '@/components/ui/badge'
+import { ConsolePreviewNotice } from '@/components/ConsolePreviewNotice'
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
+import { Badge, PlanBadge, StatusBadge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -22,9 +33,16 @@ import {
 import { Banner, CopyButton, Spinner } from '@/components/ui/feedback'
 import { Field, Input, Textarea } from '@/components/ui/field'
 import { Meter } from '@/components/ui/meter'
+import {
+  PRODUCT_DESKS,
+  USAGE_METRIC_LABEL,
+  deskMicrositePath,
+  deskOperations,
+} from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { PoweredByDeskCloud } from '@/PoweredByDeskCloud'
 import {
+  CONSOLE_API_READY,
   cancelSubscription,
   fetchPlans,
   fetchSubscription,
@@ -37,13 +55,6 @@ import {
 import { cn } from '@/utils/cn'
 import { fmtNum, fmtPriceKrw, fmtStorage } from '@/utils/format'
 
-const METRIC_LABEL: Record<UsageMetric, string> = {
-  api_calls: 'API 호출',
-  events: '이벤트',
-  storage_mb: '저장(MiB)',
-  seats: '좌석',
-}
-
 function metricFormat(metric: UsageMetric): (n: number) => string {
   return metric === 'storage_mb' ? fmtStorage : fmtNum
 }
@@ -53,6 +64,164 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
     <h2 className="mb-3 text-xs font-semibold tracking-wide text-text-subtle uppercase">
       {children}
     </h2>
+  )
+}
+
+function DeskOperationsHub() {
+  const [params, setParams] = useSearchParams()
+  const fallbackDesk = PRODUCT_DESKS[0]
+
+  if (!fallbackDesk) {
+    return null
+  }
+
+  const selectedId = params.get('desk') ?? fallbackDesk.id
+  const selected = PRODUCT_DESKS.find((d) => d.id === selectedId) ?? fallbackDesk
+  const operations = deskOperations(selected)
+  const format = metricFormat(operations.primaryMetric)
+
+  const selectDesk = (id: string) => {
+    const next = new URLSearchParams(params)
+    next.set('desk', id)
+    setParams(next, { replace: true })
+  }
+
+  return (
+    <Card>
+      <CardHeader
+        action={
+          <Button asChild variant="secondary" size="sm">
+            <Link to={deskMicrositePath(selected)}>
+              마이크로사이트 <ArrowRight className="size-4" />
+            </Link>
+          </Button>
+        }
+      >
+        <CardTitle>
+          <span className="inline-flex items-center gap-1.5">
+            <LayoutGrid className="size-4" aria-hidden /> Desk 운영 허브
+          </span>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid gap-5 lg:grid-cols-[17rem_minmax(0,1fr)]">
+          <div
+            className="grid max-h-[28rem] gap-1 overflow-y-auto pr-1"
+            role="listbox"
+            aria-label="운영할 Desk 선택"
+          >
+            {PRODUCT_DESKS.map((desk) => {
+              const active = desk.id === selected.id
+              return (
+                <button
+                  key={desk.id}
+                  type="button"
+                  role="option"
+                  aria-selected={active}
+                  onClick={() => selectDesk(desk.id)}
+                  className={cn(
+                    'flex min-h-14 items-center gap-3 rounded-md border px-3 py-2 text-left transition-colors',
+                    active
+                      ? 'border-accent-strong bg-accent-soft text-accent-fg'
+                      : 'border-border bg-surface hover:border-border-strong hover:bg-surface-2'
+                  )}
+                >
+                  <DeskGlyph icon={desk.icon} tone={desk.tone} size="sm" />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">{desk.name}</span>
+                    <span className="mt-0.5 block truncate text-[0.75rem] opacity-80">
+                      {desk.tagline}
+                    </span>
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <DeskGlyph icon={selected.icon} tone={selected.tone} size="sm" />
+                  <h3 className="text-base font-semibold text-text">{selected.name}</h3>
+                  <Badge tone="success" size="sm" dot>
+                    Live
+                  </Badge>
+                </div>
+                <p className="mt-2 max-w-2xl text-sm text-pretty text-text-muted">
+                  {selected.what}
+                </p>
+              </div>
+              <PlanBadge plan={operations.recommendedPlan} size="sm" />
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <div className="rounded-md bg-surface-2 p-3">
+                <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">Gateway</p>
+                <p className="mt-1 font-mono text-sm text-text">{operations.gatewayPath}</p>
+              </div>
+              <div className="rounded-md bg-surface-2 p-3">
+                <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                  Primary metric
+                </p>
+                <p className="mt-1 text-sm font-semibold text-text">
+                  {USAGE_METRIC_LABEL[operations.primaryMetric]}
+                </p>
+              </div>
+              <div className="rounded-md bg-surface-2 p-3">
+                <p className="text-[0.6875rem] tracking-wide text-text-subtle uppercase">
+                  Recommended
+                </p>
+                <p className="mt-1 text-sm font-semibold text-text">
+                  {operations.recommendedPlan.toUpperCase()}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-5 lg:grid-cols-2">
+              <div>
+                <SectionTitle>필수 구성</SectionTitle>
+                <ul className="flex flex-wrap gap-1.5">
+                  {operations.config.map((item) => (
+                    <li key={item}>
+                      <Badge tone="outline" size="sm">
+                        {item}
+                      </Badge>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <SectionTitle>운영 작업</SectionTitle>
+                <ul className="space-y-1.5">
+                  {operations.operatorTasks.map((task) => (
+                    <li key={task} className="flex items-start gap-2 text-sm text-text-muted">
+                      <Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                      <span>{task}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-5 border-t border-border pt-4">
+              <SectionTitle>플랜 한도</SectionTitle>
+              <div className="grid gap-2 sm:grid-cols-4">
+                {(['free', 'pro', 'scale', 'enterprise'] as const).map((plan) => (
+                  <div key={plan} className="rounded-md bg-surface-2 p-3">
+                    <p className="text-xs font-semibold text-text">{plan.toUpperCase()}</p>
+                    <p className="mt-1 font-mono text-[0.8125rem] text-text-muted">
+                      {format(PLAN_LIMITS[plan][operations.primaryMetric])}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-xs text-text-subtle">{operations.billingDriver}</p>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -79,7 +248,7 @@ function UsagePanel() {
           data.metrics.map((m) => (
             <Meter
               key={m.metric}
-              label={METRIC_LABEL[m.metric]}
+              label={USAGE_METRIC_LABEL[m.metric]}
               used={m.used}
               limit={m.limit}
               format={metricFormat(m.metric)}
@@ -431,7 +600,20 @@ function BillingPanel() {
 
 export default function DashboardPage() {
   useDocumentTitle('콘솔')
-  const { data: tenant } = useQuery({ queryKey: ['tenant'], queryFn: fetchTenant })
+  const { data: tenant } = useQuery({
+    queryKey: ['tenant'],
+    queryFn: fetchTenant,
+    enabled: CONSOLE_API_READY,
+  })
+
+  if (!CONSOLE_API_READY) {
+    return (
+      <div className="space-y-8">
+        <ConsolePreviewNotice title="콘솔" />
+        <DeskOperationsHub />
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-8">
@@ -459,6 +641,8 @@ export default function DashboardPage() {
       </div>
 
       <BillingPanel />
+
+      <DeskOperationsHub />
 
       <SettingsPanel />
     </div>

@@ -12,14 +12,14 @@
   "scripts": {
     "build:libs": "pnpm --filter @desk/shared --filter @desk/core --filter @desk/billing run build",
     "dev": "pnpm run build:libs && pnpm -r --parallel --stream run dev",
-    "build": "pnpm -r run build",
-    "lint": "eslint .",
-    "lint:strict": "eslint . --max-warnings=0",
+    "build": "turbo run build",
+    "lint": "eslint . && turbo run lint",
+    "lint:strict": "eslint . --max-warnings=0 && turbo run lint",
     "lint:ci": "pnpm run lint:strict",
     "audit:security": "pnpm audit --audit-level high --ignore GHSA-2p57-rm9w-gvfp",
     "lint:security": "pnpm run lint:strict && pnpm run audit:security",
-    "typecheck": "pnpm run build:libs && pnpm -r run typecheck",
-    "test": "pnpm -r run test",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test --concurrency=1",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "verify": "pnpm run lint:ci && pnpm run typecheck && pnpm run test && pnpm run build",
@@ -39,6 +39,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
     "prettier": "^3.8.3",
+    "turbo": "^2.5.5",
     "typescript": "^6.0.3"
   },
   "lint-staged": {

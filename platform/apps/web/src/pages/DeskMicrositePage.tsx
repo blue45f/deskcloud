@@ -1,4 +1,15 @@
-import { ArrowLeft, ArrowRight, CheckCircle2, Copy, KeyRound, Package } from 'lucide-react'
+import { PLAN_LIMITS, PLANS, UNLIMITED, type Plan, type UsageMetric } from '@desk/shared/browser'
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  Copy,
+  CreditCard,
+  KeyRound,
+  Package,
+  Route,
+  Settings,
+} from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 
 import { DeskGlyph } from '@/components/feature/DeskGlyph'
@@ -9,14 +20,26 @@ import { InstallTabs } from '@/components/ui/install-tabs'
 import {
   PRODUCT_DESKS,
   SDK_PACKAGE,
+  USAGE_METRIC_LABEL,
   apiEndpoint,
+  deskOperations,
   deskMicrositePath,
   restSnippet,
   sdkSnippet,
 } from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
+import { fmtNum, fmtStorage } from '@/utils/format'
 
 const endpoint = apiEndpoint()
+
+function limitLabel(metric: UsageMetric, value: number): string {
+  if (value === UNLIMITED) return '무제한'
+  return metric === 'storage_mb' ? fmtStorage(value) : fmtNum(value)
+}
+
+function planLimit(plan: Plan, metric: UsageMetric): number {
+  return PLAN_LIMITS[plan][metric]
+}
 
 export default function DeskMicrositePage() {
   const { deskId } = useParams()
@@ -49,6 +72,7 @@ export default function DeskMicrositePage() {
   }
 
   const siblingDesks = PRODUCT_DESKS.filter((d) => d.id !== desk.id).slice(0, 4)
+  const operations = deskOperations(desk)
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -125,6 +149,15 @@ export default function DeskMicrositePage() {
                 </dd>
               </div>
             </div>
+            <div className="flex items-start gap-3">
+              <Route className="mt-0.5 size-4 shrink-0 text-accent-strong" aria-hidden />
+              <div>
+                <dt className="font-medium text-text">Gateway</dt>
+                <dd className="mt-0.5 font-mono text-[0.8125rem] text-text-muted">
+                  {operations.gatewayPath}
+                </dd>
+              </div>
+            </div>
           </dl>
         </aside>
       </header>
@@ -136,6 +169,76 @@ export default function DeskMicrositePage() {
             <p className="mt-2 text-sm font-semibold text-text">{metric}</p>
           </div>
         ))}
+      </section>
+
+      <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="rounded-xl border border-border bg-surface p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-text">운영 콘솔</h2>
+              <p className="mt-1 text-sm text-text-muted">
+                모든 Desk는 같은 계정, 키, 사용량, 빌링 화면에서 운영합니다.
+              </p>
+            </div>
+            <Button asChild size="sm">
+              <Link to={operations.adminPath}>
+                콘솔 열기 <ArrowRight className="size-4" />
+              </Link>
+            </Button>
+          </div>
+
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {operations.operatorTasks.map((task) => (
+              <div key={task} className="rounded-lg border border-border bg-surface-2 p-3">
+                <p className="text-[0.8125rem] font-medium text-text">{task}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-5">
+            <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+              필수 구성
+            </p>
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {operations.config.map((item) => (
+                <li key={item}>
+                  <Badge tone="outline" size="sm">
+                    {item}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <aside className="rounded-xl border border-border bg-surface p-5">
+          <div className="flex items-center gap-2">
+            <CreditCard className="size-4 text-accent-strong" aria-hidden />
+            <h2 className="text-lg font-semibold tracking-tight text-text">요금 영향</h2>
+          </div>
+          <p className="mt-2 text-sm text-text-muted">{operations.billingDriver}</p>
+          <div className="mt-4 rounded-lg border border-border bg-surface-2 p-3">
+            <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+              Primary metric
+            </p>
+            <p className="mt-1 text-sm font-semibold text-text">
+              {USAGE_METRIC_LABEL[operations.primaryMetric]}
+            </p>
+          </div>
+          <dl className="mt-4 divide-y divide-border text-sm">
+            {PLANS.map((plan) => (
+              <div key={plan} className="flex items-center justify-between gap-3 py-2 first:pt-0">
+                <dt className="font-medium text-text">{PLAN_LIMITS[plan].label}</dt>
+                <dd className="font-mono text-[0.8125rem] text-text-muted">
+                  {limitLabel(operations.primaryMetric, planLimit(plan, operations.primaryMetric))}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <Button asChild variant="secondary" size="sm" className="mt-4 w-full">
+            <Link to="/pricing">요금제 비교</Link>
+          </Button>
+        </aside>
       </section>
 
       <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
@@ -160,9 +263,15 @@ export default function DeskMicrositePage() {
         </div>
 
         <aside className="rounded-xl border border-border bg-surface p-5">
-          <h2 className="text-lg font-semibold tracking-tight text-text">API shape</h2>
+          <div className="flex items-center gap-2">
+            <Settings className="size-4 text-accent-strong" aria-hidden />
+            <h2 className="text-lg font-semibold tracking-tight text-text">API shape</h2>
+          </div>
           <p className="mt-1 text-sm text-text-muted">
             SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.
+          </p>
+          <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] text-text-muted">
+            {operations.gatewayPath}/api
           </p>
           <div className="mt-4">
             <CodeBlock code={restSnippet('/api/tenants')} language="bash" />

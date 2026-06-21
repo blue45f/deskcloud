@@ -18,6 +18,8 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+import type { Plan, UsageMetric } from '@desk/shared/browser'
+
 /**
  * DeskCloud 통합 디렉터리 — 모든 Desk SaaS 의 정적 카탈로그.
  *
@@ -53,6 +55,13 @@ export const PACKAGE_MANAGERS: readonly PackageManager[] = [
   { id: 'bun', label: 'bun', install: (pkg) => `bun add ${pkg}` },
 ]
 
+export const USAGE_METRIC_LABEL: Record<UsageMetric, string> = {
+  api_calls: 'API 호출',
+  events: '이벤트',
+  storage_mb: '저장량',
+  seats: '좌석',
+}
+
 export interface DeskEntry {
   /** 슬러그(라우팅·키). */
   id: string
@@ -84,9 +93,153 @@ export interface DeskEntry {
   isCore?: boolean
 }
 
+export interface DeskOperations {
+  /** 중앙 콘솔에서 해당 Desk 운영 표면으로 진입하는 경로. */
+  adminPath: string
+  /** 배포 게이트웨이 기준 REST/WS 베이스 경로. */
+  gatewayPath: string
+  /** 요금/한도 설명에서 우선 노출할 메트릭. */
+  primaryMetric: UsageMetric
+  /** 과금/한도 기준을 사람이 읽는 문장으로 표현. */
+  billingDriver: string
+  /** 실무자가 반드시 맞춰야 하는 구성값. */
+  config: readonly string[]
+  /** 운영자가 콘솔에서 반복적으로 수행하는 주요 작업. */
+  operatorTasks: readonly string[]
+  /** self-serve 고객에게 권장하는 시작 플랜. */
+  recommendedPlan: Plan
+}
+
 /** 포털 안에서 각 제품 Desk 를 소개하는 마이크로사이트 경로. */
 export function deskMicrositePath(desk: Pick<DeskEntry, 'id' | 'isCore'>): string {
   return desk.isCore ? '/docs' : `/desks/${desk.id}`
+}
+
+const OPS_BASE: Omit<DeskOperations, 'adminPath'> = {
+  gatewayPath: '/api',
+  primaryMetric: 'api_calls',
+  billingDriver: 'API 호출과 이벤트를 테넌트 월간 사용량으로 합산합니다.',
+  config: ['publishable key', 'secret key', 'CORS allowlist'],
+  operatorTasks: ['테넌트 키 발급', '사용량 확인', '플랜 변경'],
+  recommendedPlan: 'pro',
+}
+
+function ops(id: string, value: Partial<Omit<DeskOperations, 'adminPath'>>): DeskOperations {
+  return {
+    ...OPS_BASE,
+    ...value,
+    adminPath: `/dashboard?desk=${id}`,
+  }
+}
+
+export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
+  termsdesk: ops('termsdesk', {
+    gatewayPath: '/terms',
+    primaryMetric: 'events',
+    billingDriver: '정책 조회, 동의 영수증, 전문가 의뢰 흐름을 이벤트로 집계합니다.',
+    config: ['policy slugs', 'consent retention', 'expert routing', 'notification channels'],
+    operatorTasks: ['정책 버전 게시', '동의 영수증 감사', '전문가 의뢰 트리아지'],
+  }),
+  surveydesk: ops('surveydesk', {
+    gatewayPath: '/survey',
+    primaryMetric: 'events',
+    billingDriver: '응답 제출, NPS, 별점, 자유서술 수집량을 이벤트로 집계합니다.',
+    config: ['appId', 'active survey', 'question schema', 'origin allowlist'],
+    operatorTasks: ['설문 공개/비공개', '응답 CSV 내보내기', 'NPS/별점 분포 확인'],
+  }),
+  changelogdesk: ops('changelogdesk', {
+    gatewayPath: '/changelog',
+    primaryMetric: 'api_calls',
+    billingDriver: '변경 로그 조회, 미확인 배지 계산, 게시 API 호출을 합산합니다.',
+    config: ['release channels', 'audience rules', 'widget placement'],
+    operatorTasks: ['릴리스 노트 게시', '채널별 노출 확인', '미확인 배지 점검'],
+  }),
+  reviewdesk: ops('reviewdesk', {
+    gatewayPath: '/review',
+    primaryMetric: 'events',
+    billingDriver: '리뷰 작성, 평점 제출, 하이라이트 집계를 이벤트로 계산합니다.',
+    config: ['subject IDs', 'moderation rules', 'display policy'],
+    operatorTasks: ['리뷰 승인/숨김', '평점 분포 확인', '후기 하이라이트 선정'],
+  }),
+  mediadesk: ops('mediadesk', {
+    gatewayPath: '/media',
+    primaryMetric: 'storage_mb',
+    billingDriver: '원본 업로드, 변환 파생본, 공개 자산 저장량을 기준으로 합니다.',
+    config: ['storage visibility', 'transform presets', 'signed URL policy'],
+    operatorTasks: ['자산 정리', '변환 캐시 점검', '공개/비공개 정책 변경'],
+    recommendedPlan: 'scale',
+  }),
+  notifydesk: ops('notifydesk', {
+    gatewayPath: '/notify',
+    primaryMetric: 'events',
+    billingDriver: '이메일, 웹훅, 인앱 알림 발송 건수를 이벤트로 집계합니다.',
+    config: ['templates', 'recipient keys', 'channel fallback', 'webhook retries'],
+    operatorTasks: ['템플릿 발행', '발송 실패 재시도', '인앱 인박스 상태 확인'],
+  }),
+  moderationdesk: ops('moderationdesk', {
+    gatewayPath: '/moderation',
+    primaryMetric: 'api_calls',
+    billingDriver: '텍스트/이미지 검사, 신고 접수, 규칙 매칭 API 호출을 합산합니다.',
+    config: ['blocked terms', 'report categories', 'auto action rules'],
+    operatorTasks: ['신고 큐 처리', '규칙 업데이트', '자동 조치 로그 감사'],
+  }),
+  realtimedesk: ops('realtimedesk', {
+    gatewayPath: '/realtime',
+    primaryMetric: 'api_calls',
+    billingDriver: '채널 연결, presence, broadcast, REST 호출을 월간 사용량으로 합산합니다.',
+    config: ['channel namespace', 'presence TTL', 'socket.io path'],
+    operatorTasks: ['채널 상태 점검', '온라인 사용자 확인', 'WS 장애 확인'],
+    recommendedPlan: 'scale',
+  }),
+  searchdesk: ops('searchdesk', {
+    gatewayPath: '/search',
+    primaryMetric: 'api_calls',
+    billingDriver: '문서 색인, 검색 쿼리, 클릭/하이라이트 조회 호출을 합산합니다.',
+    config: ['index schema', 'ranking weights', 'facet fields', 'reindex policy'],
+    operatorTasks: ['문서 재색인', '쿼리 로그 분석', '랭킹/패싯 조정'],
+    recommendedPlan: 'scale',
+  }),
+  communitydesk: ops('communitydesk', {
+    gatewayPath: '/community',
+    primaryMetric: 'events',
+    billingDriver: '게시글, 댓글, 반응, 신고 이벤트를 테넌트별로 집계합니다.',
+    config: ['board slugs', 'member mapping', 'category policy', 'reaction rules'],
+    operatorTasks: ['게시글 고정/숨김', '댓글 검수', '카테고리 운영'],
+  }),
+  chatdesk: ops('chatdesk', {
+    gatewayPath: '/chat',
+    primaryMetric: 'events',
+    billingDriver: '대화 생성, 메시지 전송, 읽음 처리 이벤트를 합산합니다.',
+    config: ['conversation kind', 'member IDs', 'socket.io path', 'retention policy'],
+    operatorTasks: ['대화 상태 확인', '시스템 메시지 발송', '읽음/전송 실패 점검'],
+    recommendedPlan: 'scale',
+  }),
+  addesk: ops('addesk', {
+    gatewayPath: '/ad',
+    primaryMetric: 'events',
+    billingDriver: '광고 노출, 클릭, 슬롯 서빙 이벤트를 기준으로 합니다.',
+    config: ['slot IDs', 'campaign weights', 'creative assets', 'frequency caps'],
+    operatorTasks: ['캠페인 활성화', 'CTR 확인', '크리에이티브 교체'],
+  }),
+  authdesk: ops('authdesk', {
+    gatewayPath: '/authdesk',
+    primaryMetric: 'api_calls',
+    billingDriver: '가입, 로그인, 세션 검증, JWT 갱신 호출을 합산합니다.',
+    config: ['session TTL', 'password policy', 'allowed origins', 'JWT audience'],
+    operatorTasks: ['사용자 상태 확인', '세션 정책 변경', '로그인 실패 분석'],
+  }),
+  filedesk: ops('filedesk', {
+    gatewayPath: '/file',
+    primaryMetric: 'storage_mb',
+    billingDriver: '파일 업로드 저장량, 다운로드 서명 URL, 공개/비공개 파일 수를 함께 봅니다.',
+    config: ['bucket visibility', 'max file size', 'signed URL TTL', 'retention policy'],
+    operatorTasks: ['파일 삭제/복구', '서명 URL 점검', '스토리지 사용량 관리'],
+    recommendedPlan: 'scale',
+  }),
+}
+
+export function deskOperations(desk: Pick<DeskEntry, 'id'>): DeskOperations {
+  return DESK_OPERATIONS[desk.id] ?? ops(desk.id, {})
 }
 
 /** 통합 엔드포인트 — 빌드 타임 주입(VITE_API_BASE_URL), 없으면 데모 도메인. */

@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom'
 
+import { DeskGlyph } from '@/components/feature/DeskGlyph'
 import { Brand } from '@/components/layout/Brand'
+import { Badge, PlanBadge } from '@/components/ui/badge'
+import {
+  PRODUCT_DESKS,
+  USAGE_METRIC_LABEL,
+  deskMicrositePath,
+  deskOperations,
+} from '@/data/deskCatalog'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 
-const LINKS = [
+const MAIN_LINKS = [
   {
     label: '홈',
     to: '/',
@@ -87,12 +95,12 @@ export default function SitemapPage() {
           DeskCloud 사이트맵
         </h1>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">
-          공개 페이지, 콘솔 경로, 디자인 시스템까지 제품에서 제공하는 주요 경로를 한 화면에
-          정리했습니다.
+          공개 페이지, 콘솔 경로, 디자인 시스템, Desk별 마이크로사이트까지 제품에서 제공하는 주요
+          경로를 한 화면에 정리했습니다.
         </p>
 
         <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {LINKS.map((link) => (
+          {MAIN_LINKS.map((link) => (
             <Link
               key={link.to}
               to={link.to}
@@ -118,6 +126,71 @@ export default function SitemapPage() {
             </Link>
           ))}
         </div>
+
+        <section className="mt-12" aria-label="Desk 마이크로사이트">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <Badge tone="accent" size="sm">
+                Desk microsites
+              </Badge>
+              <h2 className="mt-3 text-lg font-semibold tracking-tight text-text">
+                제품 Desk 바로가기
+              </h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-text-muted">
+                각 Desk는 같은 계정과 요금제를 쓰되, 도메인별 운영·SDK·과금 기준을 별도 페이지에서
+                확인할 수 있습니다.
+              </p>
+            </div>
+            <Link
+              to="/catalog"
+              className="text-sm font-medium text-accent-strong transition-colors hover:text-accent"
+            >
+              전체 카탈로그 →
+            </Link>
+          </div>
+
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {PRODUCT_DESKS.map((desk) => {
+              const operations = deskOperations(desk)
+              const to = deskMicrositePath(desk)
+
+              return (
+                <Link
+                  key={desk.id}
+                  to={to}
+                  className="group rounded-lg border border-border bg-surface p-4 transition-colors hover:border-accent hover:bg-accent-soft/45"
+                >
+                  <span className="flex items-start gap-3">
+                    <DeskGlyph icon={desk.icon} tone={desk.tone} size="sm" />
+                    <span className="min-w-0 flex-1">
+                      <span className="flex flex-wrap items-center gap-2">
+                        <strong className="text-sm font-semibold text-text">{desk.name}</strong>
+                        <PlanBadge plan={operations.recommendedPlan} size="sm" />
+                      </span>
+                      <small className="mt-1 block text-xs leading-5 text-text-muted">
+                        {desk.tagline}
+                      </small>
+                    </span>
+                    <span
+                      aria-hidden
+                      className="text-accent-strong transition-transform group-hover:translate-x-0.5"
+                    >
+                      →
+                    </span>
+                  </span>
+                  <span className="mt-3 flex flex-wrap items-center gap-2">
+                    <Badge tone="outline" size="sm">
+                      {USAGE_METRIC_LABEL[operations.primaryMetric]}
+                    </Badge>
+                    <code className="rounded-md bg-surface-2 px-2 py-1 text-xs text-text-muted">
+                      {to}
+                    </code>
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
+        </section>
       </main>
     </div>
   )
