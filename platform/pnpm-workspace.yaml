@@ -10,3 +10,10 @@ onlyBuiltDependencies:
 ignoredBuiltDependencies:
   - '@firebase/util'
   - '@scarf/scarf'
+
+allowBuilds:
+  '@firebase/util': false
+  '@scarf/scarf': false
+  esbuild: true
+  protobufjs: true
+  unrs-resolver: true
