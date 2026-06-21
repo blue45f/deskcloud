@@ -74,6 +74,7 @@ DeskCloud 내부 workspace로 남아 있다. `spa-seo-gateway`, `remote-devtools
 | 공백/패치 검증        | `git diff --check`                                                       | 통과                       |
 | 운영 헬스체크         | `https://16.176.210.195.nip.io/platform/health`                          | 200                        |
 | 운영 manifest         | `https://desk-platform.vercel.app/api/workspace-desks`                   | 200                        |
+| 운영 manifest parity  | `pnpm run verify:prod-platform`                                          | 통과                       |
 | 대표 마이크로사이트   | `/desks/seo-gateway`, `/desks/remote-devtools`, `/desks/aidigestdesk`    | 200 및 렌더링 통과         |
 | 공개 링크 이동        | `/catalog`에서 대표 3개 Desk 마이크로사이트 클릭                         | 통과                       |
 | 모바일 렌더링         | 홈, 카탈로그, 대표 3개 Desk 마이크로사이트                               | 통과                       |
@@ -108,7 +109,11 @@ Browser plugin은 현재 세션에 제공되지 않아 Playwright + 로컬 Chrom
 ## 남은 인프라 리스크
 
 현재 운영 EC2의 `/opt/deskcloud`는 Git 저장소 체크아웃이 아니라 복사된 build context를
-사용한다. 이번 배포에서는 `/opt/deskcloud/repos/desk-platform`과 원격
-`docker-compose.yml`을 안전하게 패치했지만, 장기적으로는 EC2 배포 스택을 이 저장소의
-`deploy/stack` 기준으로 수렴시키는 것이 좋다. 이 작업은 다른 서비스 컨테이너까지
-영향을 줄 수 있으므로 별도 배포 윈도우에서 진행해야 한다.
+사용한다. 이번 배포에서는 `/opt/deskcloud/repos/desk-platform`의 shared workspace manifest를
+현재 통합본과 맞추고 `deskplatform` 컨테이너만 재빌드했다. 운영 manifest parity는
+`pnpm run verify:prod-platform`으로 검증한다. 이 명령은 source-of-truth의
+`WORKSPACE_DESK_IDS`와 운영 `/api/workspace-desks`를 비교하고, AIDigestDesk가 workspace
+Desk가 아니라 linked 독립 운영 항목으로 404를 반환하는지도 확인한다.
+
+장기적으로는 EC2 배포 스택을 이 저장소의 `deploy/stack` 기준으로 수렴시키는 것이 좋다.
+이 작업은 다른 서비스 컨테이너까지 영향이 있으므로 별도 배포 윈도우에서 진행해야 한다.
