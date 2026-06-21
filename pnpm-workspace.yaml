@@ -4,6 +4,10 @@
 # 여기로 병합했습니다. (하위 레포의 pnpm-workspace.yaml 은 install 시 무시됨 —
 # 정리는 아키텍처 플랜 기준 후속 단계에서.)
 packages:
+  # shared public packages — npm-published SDKs and cross-Desk tooling.
+  - "packages/*"
+  # infra — checked-in deployment harness for the whole DeskCloud stack.
+  - "deploy/stack"
   # platform — @desk/* 코어
   - "platform/apps/*"
   - "platform/packages/*"

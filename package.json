@@ -16,6 +16,11 @@
     "verify": "pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run test",
     "build:platform": "turbo run build --filter=\"./platform/*\"",
     "build:desks": "turbo run build --filter=\"./desks/**\"",
+    "build:sdk": "turbo run build --filter=\"@heejun/deskcloud\"",
+    "deploy": "pnpm --filter @deskcloud/deploy run deploy",
+    "deploy:no-build": "pnpm --filter @deskcloud/deploy run deploy:no-build",
+    "compose:config": "pnpm --filter @deskcloud/deploy run compose:config",
+    "compose:ps": "pnpm --filter @deskcloud/deploy run compose:ps",
     "prepare": "husky"
   },
   "lint-staged": {

@@ -1,0 +1,110 @@
+# ════════════════════════════════════════════════════════════════════════════
+#  DeskCloud 게이트웨이 — 단일 도메인 서브패스 라우팅
+#
+#  DESKCLOUD_DOMAIN 환경변수가 도메인이면 Caddy 가 자동 HTTPS(Let's Encrypt)를 발급한다.
+#  비우면 docker-compose 가 `:80` 을 넘겨 평문 HTTP 로 동작한다(로컬/IP 직접 접속).
+#
+#  라우팅 규약(서브패스):
+#    https://<host>/survey/...      → surveydesk    (REST: /api/*, health: /health)
+#    https://<host>/changelog/...   → changelogdesk
+#    ... (각 Desk 동일 패턴)
+#    https://<host>/realtime/...    → realtimedesk  (+ WebSocket /realtime/socket.io)
+#    https://<host>/chat/...        → chatdesk      (+ WebSocket /chat/socket.io)
+#    https://<host>/platform/...    → deskplatform
+#
+#  일반 Desk: `handle_path /<desk>/*` 가 `/<desk>` 프리픽스를 strip → 업스트림은
+#             글로벌 프리픽스 `/api` 와 `/health` 를 그대로 받는다.
+#  WS Desk(realtime/chat): socket.io path 를 서브패스(/realtime/socket.io, /chat/socket.io)로
+#             맞춰 두고, WS 경로는 strip 없이 통과(정확 매칭) — 트레일링 슬래시 mismatch 방지.
+#             REST 경로만 `/<desk>` 를 strip 해 업스트림 `/api`·`/health` 로 보낸다.
+#             reverse_proxy 는 Connection/Upgrade(WebSocket) 헤더를 자동 통과시킨다.
+# ════════════════════════════════════════════════════════════════════════════
+{
+	# ACME 이메일(도메인 사용 시 인증서 발급 알림). 비어 있어도 동작.
+	email {$ACME_EMAIL}
+}
+
+{$DESKCLOUD_DOMAIN::80} {
+	encode zstd gzip
+	header -Server
+
+	# 표준 보안 헤더 — 임베드 위젯 교차출처는 각 API 의 CORS(enableCors origin:true)가 담당.
+	header {
+		>X-Content-Type-Options nosniff
+		>Referrer-Policy strict-origin-when-cross-origin
+	}
+
+	# ── 루트 헬스 / 인덱스 ───────────────────────────────────────────────────
+	# 게이트웨이 자체 생존 확인용(업스트림 무관). `curl <host>/` → 200.
+	handle / {
+		respond "DeskCloud gateway OK" 200
+	}
+
+	# ── 일반 Desk (REST 전용) — `/<desk>` strip → 업스트림 /api·/health ───────
+	handle_path /survey/* {
+		reverse_proxy surveydesk:4000
+	}
+	handle_path /ad/* {
+		reverse_proxy addesk:4000
+	}
+	handle_path /authdesk/* {
+		reverse_proxy authdesk:4000
+	}
+	handle_path /file/* {
+		reverse_proxy filedesk:4000
+	}
+	handle_path /changelog/* {
+		reverse_proxy changelogdesk:4000
+	}
+	handle_path /review/* {
+		reverse_proxy reviewdesk:4000
+	}
+	handle_path /media/* {
+		reverse_proxy mediadesk:4000
+	}
+	handle_path /notify/* {
+		reverse_proxy notifydesk:4000
+	}
+	handle_path /moderation/* {
+		reverse_proxy moderationdesk:4000
+	}
+	handle_path /search/* {
+		reverse_proxy searchdesk:4000
+	}
+	handle_path /community/* {
+		reverse_proxy communitydesk:4000
+	}
+	handle_path /platform/* {
+		reverse_proxy deskplatform:4000
+	}
+
+	# ── RealtimeDesk (WebSocket + REST) ──────────────────────────────────────
+	#  WS 핸드셰이크(/realtime/socket.io*)는 strip 없이 통과 → 업스트림 socket.io
+	#  path(REALTIME_PATH=/realtime/socket.io)와 정확 매칭. 나머지(REST)는 strip.
+	handle /realtime/* {
+		@ws path /realtime/socket.io*
+		reverse_proxy @ws realtimedesk:4000
+
+		uri strip_prefix /realtime
+		reverse_proxy realtimedesk:4000
+	}
+
+	# ── ChatDesk (WebSocket + REST) ──────────────────────────────────────────
+	handle /chat/* {
+		@ws path /chat/socket.io*
+		reverse_proxy @ws chatdesk:4000
+
+		uri strip_prefix /chat
+		reverse_proxy chatdesk:4000
+	}
+
+	# ── (예시) 새 Desk 추가 시 위 패턴을 복사해 라우팅 한 줄 추가 ──────────────
+	# handle_path /foo/* {
+	# 	reverse_proxy foodesk:4000
+	# }
+
+	# 매칭되지 않는 경로
+	handle {
+		respond "DeskCloud: unknown route" 404
+	}
+}

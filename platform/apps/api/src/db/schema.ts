@@ -122,3 +122,25 @@ export const inquiries = pgTable(
     index('idx_inquiries_app_created').on(t.appId, t.createdAt),
   ]
 )
+
+/**
+ * 일별 방문 집계(daily_visits) — 형제 앱이 공개 핑 API 로 누적하는 트래픽 버킷.
+ * 테넌트가 아니라 `appId`(형제 앱 식별자) + `day`('YYYY-MM-DD', UTC)로 묶인다.
+ * visits=총 방문(pageview), uniques=고유 방문자(브라우저 최초 방문). (appId, day) 유니크.
+ */
+export const dailyVisits = pgTable(
+  'daily_visits',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    appId: text('app_id').notNull(),
+    day: text('day').notNull(),
+    /** 누적값 — 큰 수 대비 bigint(JS number 로 매핑). */
+    visits: bigint('visits', { mode: 'number' }).notNull().default(0),
+    uniques: bigint('uniques', { mode: 'number' }).notNull().default(0),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    unique('daily_visits_app_day_uq').on(t.appId, t.day),
+    index('idx_daily_visits_app').on(t.appId),
+  ]
+)

@@ -1,0 +1,411 @@
+# ════════════════════════════════════════════════════════════════════════════
+#  DeskCloud — 통합 운영 스택 (one-command deploy)
+#  모든 Desk SaaS API + Caddy 게이트웨이를 단일 도커 호스트에서 오케스트레이션.
+#
+#    cp .env.example .env   # gen-env.sh 로 강한 ADMIN_TOKEN 자동 생성 가능
+#    docker compose up -d --build
+#
+#  - 각 Desk API 는 컨테이너 내부에서 PORT=4000 으로 통일(외부 노출 X, expose 만).
+#  - 기본 DB 는 PGlite 임베드(외부 DB 불필요) — 각 서비스 전용 영구 볼륨에 저장.
+#    DATABASE_URL 을 .env 에 채우면 해당 Desk 만 PostgreSQL/Neon 으로 전환.
+#  - Caddy 가 단일 도메인 서브패스(/survey, /changelog …)로 리버스 프록시.
+#    realtime/chat 은 WebSocket 업그레이드 + 정확 경로 매칭으로 통과시킨다.
+#
+#  빌드 컨텍스트는 이 모노레포 루트(../..)이며 공통 deploy/api.Dockerfile 사용.
+#  → 이 compose 는 ~/WebstormProjects/deskcloud/deploy/stack 안에서 실행해야 한다.
+# ════════════════════════════════════════════════════════════════════════════
+name: deskcloud
+
+# 모든 Desk API 가 공유하는 기본값(YAML 앵커) — 중복 제거.
+x-desk-api: &desk-api
+  restart: unless-stopped
+  mem_limit: ${DESK_API_MEM_LIMIT:-8g}
+  expose:
+    - "4000"
+  networks:
+    - deskcloud
+  # 컨테이너는 항상 PORT=4000. PGLITE_DIR 은 Dockerfile 기본값(/data/pglite).
+  # depends_on 없음 — 각 API 는 독립(임베드 DB), 게이트웨이만 이들을 바라본다.
+
+services:
+  # ── SurveyDesk — 멀티테넌트 설문·피드백 수집 ──────────────────────────────
+  surveydesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@surveydesk/api"
+        APP_DIR: desks/surveydesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      SURVEYDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${SURVEYDESK_ADMIN_TOKEN:?set SURVEYDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${SURVEYDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - surveydesk_data:/data
+
+  # ── AdDesk — 멀티테넌트 광고 슬롯·캠페인 서빙 ─────────────────────────────
+  addesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@addesk/api"
+        APP_DIR: desks/addesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      ADDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${ADDESK_ADMIN_TOKEN:?set ADDESK_ADMIN_TOKEN in .env}
+      KEY_PEPPER: ${ADDESK_KEY_PEPPER:-dev-pepper-change-me}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${ADDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - addesk_data:/data
+
+  # ── AuthDesk — 멀티테넌트 end-user 인증 ────────────────────────────────────
+  authdesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@authdesk/api"
+        APP_DIR: desks/authdesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      AUTHDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${AUTHDESK_ADMIN_TOKEN:?set AUTHDESK_ADMIN_TOKEN in .env}
+      AUTHDESK_JWT_SECRET: ${AUTHDESK_JWT_SECRET:-dev-jwt-secret-change-me}
+      AUTHDESK_KEY_PEPPER: ${AUTHDESK_KEY_PEPPER:-dev-pepper-change-me}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${AUTHDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - authdesk_data:/data
+
+  # ── FileDesk — 멀티테넌트 파일 업로드·레지스트리 ──────────────────────────
+  filedesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@filedesk/api"
+        APP_DIR: desks/filedesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      FILEDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${FILEDESK_ADMIN_TOKEN:?set FILEDESK_ADMIN_TOKEN in .env}
+      DESK_KEY_PEPPER: ${FILEDESK_KEY_PEPPER:-dev-pepper-change-me}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${FILEDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - filedesk_data:/data
+
+  # ── ChangelogDesk — 외부 온보딩형 체인지로그/릴리스 노트 ───────────────────
+  changelogdesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@changelogdesk/api"
+        APP_DIR: desks/changelogdesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      CHANGELOGDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${CHANGELOGDESK_ADMIN_TOKEN:?set CHANGELOGDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${CHANGELOGDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - changelogdesk_data:/data
+
+  # ── ReviewDesk — 외부 온보딩형 리뷰/평점 ──────────────────────────────────
+  reviewdesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@reviewdesk/api"
+        APP_DIR: desks/reviewdesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      REVIEWDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${REVIEWDESK_ADMIN_TOKEN:?set REVIEWDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${REVIEWDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - reviewdesk_data:/data
+
+  # ── MediaDesk — 외부 온보딩형 미디어/업로드 (sharp 선택 의존) ──────────────
+  mediadesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@mediadesk/api"
+        APP_DIR: desks/mediadesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      MEDIADESK_MODE: self-hosted
+      ADMIN_TOKEN: ${MEDIADESK_ADMIN_TOKEN:?set MEDIADESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${MEDIADESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - mediadesk_data:/data
+
+  # ── NotifyDesk — 외부 온보딩형 알림/공지 ──────────────────────────────────
+  notifydesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@notifydesk/api"
+        APP_DIR: desks/notifydesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      NOTIFYDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${NOTIFYDESK_ADMIN_TOKEN:?set NOTIFYDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${NOTIFYDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - notifydesk_data:/data
+
+  # ── ModerationDesk — 외부 온보딩형 콘텐츠 모더레이션 ──────────────────────
+  moderationdesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@moderationdesk/api"
+        APP_DIR: desks/moderationdesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      MODERATIONDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${MODERATIONDESK_ADMIN_TOKEN:?set MODERATIONDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${MODERATIONDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - moderationdesk_data:/data
+
+  # ── RealtimeDesk — 실시간 pub/sub + presence (socket.io WebSocket) ────────
+  #  WS 정확 경로 매칭: 게이트웨이가 /realtime 서브패스를 strip 하지 않고 통과시키므로
+  #  컨테이너의 socket.io path 를 서브패스로 맞춘다(REALTIME_PATH=/realtime/socket.io).
+  realtimedesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@realtimedesk/api"
+        APP_DIR: desks/realtimedesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      REALTIMEDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${REALTIMEDESK_ADMIN_TOKEN:?set REALTIMEDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      REALTIME_PATH: /realtime/socket.io
+      DATABASE_URL: ${REALTIMEDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - realtimedesk_data:/data
+
+  # ── SearchDesk — 외부 온보딩형 검색 ──────────────────────────────────────
+  searchdesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@searchdesk/api"
+        APP_DIR: desks/searchdesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      SEARCHDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${SEARCHDESK_ADMIN_TOKEN:?set SEARCHDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${SEARCHDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - searchdesk_data:/data
+
+  # ── CommunityDesk — 멀티테넌트 게시판·카페 ────────────────────────────────
+  communitydesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@communitydesk/api"
+        APP_DIR: desks/communitydesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      COMMUNITYDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${COMMUNITYDESK_ADMIN_TOKEN:?set COMMUNITYDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      DATABASE_URL: ${COMMUNITYDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - communitydesk_data:/data
+
+  # ── ChatDesk — 멀티테넌트 메시징(DM+그룹) (socket.io WebSocket) ───────────
+  #  WS 정확 경로 매칭: 게이트웨이가 /chat 서브패스를 strip 하지 않고 통과시키므로
+  #  컨테이너의 socket.io path 를 서브패스로 맞춘다(CHAT_PATH=/chat/socket.io).
+  chatdesk:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@chatdesk/api"
+        APP_DIR: desks/chatdesk/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      CHATDESK_MODE: self-hosted
+      ADMIN_TOKEN: ${CHATDESK_ADMIN_TOKEN:?set CHATDESK_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      CHAT_PATH: /chat/socket.io
+      DATABASE_URL: ${CHATDESK_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - chatdesk_data:/data
+
+  # ── @desk/platform — 중앙 계정/빌링 코어(BM) ─────────────────────────────
+  deskplatform:
+    <<: *desk-api
+    build:
+      context: ../..
+      dockerfile: deploy/api.Dockerfile
+      args:
+        PACKAGE: "@desk/api"
+        APP_DIR: platform/apps/api
+    environment:
+      NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=512}
+      PORT: "4000"
+      DESK_MODE: self-hosted
+      ADMIN_TOKEN: ${DESKPLATFORM_ADMIN_TOKEN:?set DESKPLATFORM_ADMIN_TOKEN in .env}
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+      # 빌링 어댑터는 TEST/STUB 전용 — 실제 자금 이동 없음.
+      DESK_BILLING_PROVIDER: ${DESK_BILLING_PROVIDER:-stub}
+      DATABASE_URL: ${DESKPLATFORM_DATABASE_URL:-}
+      PGLITE_DIR: /data/pglite
+      TZ: ${TZ:-Asia/Seoul}
+    volumes:
+      - deskplatform_data:/data
+
+  # ── (예시) 아직 빌드 중인 새 Desk 를 나중에 추가하는 템플릿 ─────────────────
+  #  새 Desk 의 apps/api 가 준비되면 아래 블록을 복사·주석 해제하고,
+  #  Caddyfile 에 라우팅을, .env 에 <FOODESK>_ADMIN_TOKEN 을 추가한다.
+  #
+  # foodesk:
+  #   <<: *desk-api
+  #   build:
+  #     context: ../..
+  #     dockerfile: deploy/api.Dockerfile
+  #   environment:
+  #     PORT: '4000'
+  #     FOODESK_MODE: self-hosted
+  #     ADMIN_TOKEN: ${FOODESK_ADMIN_TOKEN:?set FOODESK_ADMIN_TOKEN in .env}
+  #     WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost}
+  #     DATABASE_URL: ${FOODESK_DATABASE_URL:-}
+  #     PGLITE_DIR: /data/pglite
+  #     TZ: ${TZ:-Asia/Seoul}
+  #   volumes:
+  #     - foodesk_data:/data
+
+  # ── Caddy 게이트웨이 — 단일 도메인 서브패스 리버스 프록시 + WS 업그레이드 ───
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    networks:
+      - deskcloud
+    depends_on:
+      - surveydesk
+      - addesk
+      - authdesk
+      - filedesk
+      - changelogdesk
+      - reviewdesk
+      - mediadesk
+      - notifydesk
+      - moderationdesk
+      - realtimedesk
+      - searchdesk
+      - communitydesk
+      - chatdesk
+      - deskplatform
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    environment:
+      # 도메인 설정 시 Caddy 자동 HTTPS(Let's Encrypt). 비우면 :80 으로 동작.
+      DESKCLOUD_DOMAIN: ${DESKCLOUD_DOMAIN:-:80}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+networks:
+  deskcloud:
+    driver: bridge
+
+volumes:
+  surveydesk_data:
+  addesk_data:
+  authdesk_data:
+  filedesk_data:
+  changelogdesk_data:
+  reviewdesk_data:
+  mediadesk_data:
+  notifydesk_data:
+  moderationdesk_data:
+  realtimedesk_data:
+  searchdesk_data:
+  communitydesk_data:
+  chatdesk_data:
+  deskplatform_data:
+  # foodesk_data:   # 새 Desk 추가 시 함께 해제
+  caddy_data:
+  caddy_config:

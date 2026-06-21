@@ -10,6 +10,7 @@ import { CoreModule } from './core/core.module'
 import { HealthModule } from './health/health.module'
 import { InquiriesModule } from './inquiries/inquiries.module'
 import { TenantsModule } from './tenants/tenants.module'
+import { VisitsModule } from './visits/visits.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TenantsModule } from './tenants/tenants.module'
     TenantsModule,
     BillingModule,
     InquiriesModule,
+    VisitsModule,
     HealthModule,
   ],
   providers: [

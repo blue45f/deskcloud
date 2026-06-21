@@ -104,3 +104,17 @@ export const updateInquiryStatusSchema = z.object({
   status: z.enum(INQUIRY_STATUSES),
 })
 export type UpdateInquiryStatusInput = z.infer<typeof updateInquiryStatusSchema>
+
+/**
+ * 방문 핑 입력 — 형제 앱이 첫 로드 시 공개 API 로 그대로 POST 한다(SDK 불필요).
+ * 본문은 전부 선택: `newVisitor` 가 true 면 고유 방문자도 +1 한다(브라우저 최초 방문).
+ * 클라이언트가 일별·세션별 디바운스를 책임지고, 서버는 IP 스로틀로 폭주만 막는다.
+ */
+export const visitPingSchema = z
+  .object({
+    /** 이 브라우저의 최초 방문이면 true — 고유 방문자(uniques)도 함께 증가. */
+    newVisitor: z.boolean().optional(),
+  })
+  .optional()
+  .default({})
+export type VisitPingInput = z.infer<typeof visitPingSchema>

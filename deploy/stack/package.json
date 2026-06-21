@@ -1,0 +1,20 @@
+{
+  "name": "@deskcloud/deploy",
+  "private": true,
+  "version": "1.0.0",
+  "description": "DeskCloud monorepo deployment harness",
+  "packageManager": "pnpm@11.4.0",
+  "scripts": {
+    "build": "true",
+    "typecheck": "true",
+    "lint": "true",
+    "test": "true",
+    "deploy": "bash ./deploy.sh",
+    "deploy:no-build": "bash ./deploy.sh --no-build",
+    "compose:config": "docker compose config --quiet",
+    "compose:build": "docker compose build",
+    "compose:up": "bash ./deploy.sh",
+    "compose:ps": "docker compose ps",
+    "compose:logs": "docker compose logs -f"
+  }
+}

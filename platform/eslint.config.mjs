@@ -25,7 +25,7 @@ export default defineConfig(
   ]),
 
   // 공유 베이스(TS + import 위생 + 커스텀 규칙 + prettier 충돌 비활성).
-  base({ files: ['**/*.{ts,tsx}'] }),
+  base({ files: ['**/*.{ts,tsx}'], tsconfigRootDir: import.meta.dirname }),
 
   // apps/web — React 19 + Vite + RC + jsx-a11y.
   react({ files: ['apps/web/**/*.{ts,tsx}'] }),

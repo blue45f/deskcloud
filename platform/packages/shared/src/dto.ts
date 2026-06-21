@@ -84,3 +84,22 @@ export interface InquiryListDto<T extends InquiryDto = InquiryDto> {
   limit: number
   offset: number
 }
+
+/**
+ * 방문/트래픽 집계 응답 — 형제 앱이 공개 API 로 읽는 실데이터(서버 누적).
+ * 일별 버킷(daily_visits)을 합산해 오늘/전체를 모두 돌려준다. 키 인증 없이 읽힌다.
+ */
+export interface VisitStatsDto {
+  /** 집계 대상 앱 식별자(예: 'aidigestdesk'). */
+  appId: string
+  /** 집계 기준 일자('YYYY-MM-DD', UTC). */
+  day: string
+  /** 오늘 총 방문(pageview) 수. */
+  todayVisits: number
+  /** 오늘 고유 방문자(브라우저 최초 방문) 수. */
+  todayUniques: number
+  /** 누적 총 방문(pageview) 수. */
+  totalVisits: number
+  /** 누적 고유 방문자 수. */
+  totalUniques: number
+}

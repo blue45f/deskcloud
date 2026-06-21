@@ -1,0 +1,14 @@
+# Belt-and-suspenders: the "files" field already restricts the published tarball
+# to dist + README + package.json. This excludes source/config if "files" is removed.
+src
+node_modules
+.env*
+*.tsbuildinfo
+*.log
+.DS_Store
+.turbo
+coverage
+tsconfig.json
+tsup.config.ts
+pnpm-lock.yaml
+.gitignore

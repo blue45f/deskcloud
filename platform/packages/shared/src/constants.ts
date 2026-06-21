@@ -60,3 +60,12 @@ export const INQUIRY_STATUS_LABELS: Readonly<Record<InquiryStatus, string>> = {
 
 /** 공개 게시판 목록 최대 페이지 크기(서버 캡). */
 export const INQUIRY_LIST_MAX_LIMIT = 50
+
+/**
+ * 방문 핑 1회당 최대 증가량 — 봇이 큰 값을 보내도 서버가 1로 캡한다.
+ * 클라이언트는 항상 1을 의미하지만, 계약상 명시적 상한을 둔다.
+ */
+export const VISITS_PING_MAX = 1
+
+/** 일자 형식 — 방문 집계 버킷 키('YYYY-MM-DD', UTC). */
+export const VISIT_DAY_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/
