@@ -23,7 +23,7 @@ function DeskCard({ desk }: { desk: DeskEntry }) {
   const operations = desk.isCore ? null : deskOperations(desk)
 
   return (
-    <article className="flex flex-col rounded-xl border border-border bg-surface p-5">
+    <article className="min-w-0 flex flex-col rounded-xl border border-border bg-surface p-5">
       <div className="flex items-start gap-3">
         <DeskGlyph icon={desk.icon} tone={desk.tone} size="lg" />
         <div className="min-w-0 flex-1">
@@ -155,7 +155,7 @@ export default function CatalogPage() {
         <h2 className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
           제품 Desk
         </h2>
-        <div className="mt-3 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {PRODUCT_DESKS.map((d) => (
             <DeskCard key={d.id} desk={d} />
           ))}

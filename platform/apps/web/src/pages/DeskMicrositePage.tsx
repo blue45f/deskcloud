@@ -121,7 +121,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
         </Button>
       </div>
 
-      <header className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+      <header className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <Badge tone="success" size="sm" dot>
@@ -169,7 +169,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
           </div>
         </div>
 
-        <aside className="rounded-xl border border-border bg-surface p-5">
+        <aside className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
             Integration
           </p>
@@ -216,17 +216,20 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
         </aside>
       </header>
 
-      <section className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" aria-label="핵심 지표">
+      <section
+        className="mt-12 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        aria-label="핵심 지표"
+      >
         {desk.metrics.map((metric) => (
-          <div key={metric} className="rounded-lg border border-border bg-surface p-4">
+          <div key={metric} className="min-w-0 rounded-lg border border-border bg-surface p-4">
             <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">Metric</p>
             <p className="mt-2 text-sm font-semibold text-text">{metric}</p>
           </div>
         ))}
       </section>
 
-      <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="rounded-xl border border-border bg-surface p-5">
+      <section className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-2">
             <ListChecks className="size-4 text-accent-strong" aria-hidden />
             <h2 className="text-lg font-semibold tracking-tight text-text">서비스 상세</h2>
@@ -236,7 +239,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
             <p className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
               대표 사용처
             </p>
-            <ul className="mt-2 grid gap-2 sm:grid-cols-3">
+            <ul className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {detail.bestFor.map((item) => (
                 <li key={item} className="rounded-md bg-surface-2 px-3 py-2 text-sm text-text">
                   {item}
@@ -246,7 +249,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
           </div>
         </div>
 
-        <aside className="rounded-xl border border-border bg-surface p-5">
+        <aside className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-2">
             <ShieldCheck className="size-4 text-accent-strong" aria-hidden />
             <h2 className="text-lg font-semibold tracking-tight text-text">도메인 격리</h2>
@@ -258,15 +261,15 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
         </aside>
       </section>
 
-      <section className="mt-12 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-xl border border-border bg-surface p-5">
+      <section className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-2">
             <Database className="size-4 text-accent-strong" aria-hidden />
             <h2 className="text-lg font-semibold tracking-tight text-text">관리 데이터 모델</h2>
           </div>
-          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+          <dl className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
             {detail.dataModel.map((item) => (
-              <div key={item.name} className="rounded-lg bg-surface-2 p-3">
+              <div key={item.name} className="min-w-0 rounded-lg bg-surface-2 p-3">
                 <dt className="text-sm font-semibold text-text">{item.name}</dt>
                 <dd className="mt-1 text-[0.8125rem] leading-5 text-text-muted">
                   {item.description}
@@ -276,7 +279,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
           </dl>
         </div>
 
-        <div className="rounded-xl border border-border bg-surface p-5">
+        <div className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-2">
             <ListChecks className="size-4 text-accent-strong" aria-hidden />
             <h2 className="text-lg font-semibold tracking-tight text-text">운영 런북</h2>
@@ -296,10 +299,10 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
         </div>
       </section>
 
-      <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="rounded-xl border border-border bg-surface p-5">
+      <section className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0">
               <h2 className="text-lg font-semibold tracking-tight text-text">운영 콘솔</h2>
               <p className="mt-1 text-sm text-text-muted">
                 모든 Desk는 같은 계정, 키, 사용량, 빌링 화면에서 운영합니다.
@@ -312,9 +315,9 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
             </Button>
           </div>
 
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {operations.operatorTasks.map((task) => (
-              <div key={task} className="rounded-lg border border-border bg-surface-2 p-3">
+              <div key={task} className="min-w-0 rounded-lg border border-border bg-surface-2 p-3">
                 <p className="text-[0.8125rem] font-medium text-text">{task}</p>
               </div>
             ))}
@@ -336,7 +339,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
           </div>
         </div>
 
-        <aside className="rounded-xl border border-border bg-surface p-5">
+        <aside className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-2">
             <CreditCard className="size-4 text-accent-strong" aria-hidden />
             <h2 className="text-lg font-semibold tracking-tight text-text">요금 영향</h2>
@@ -366,11 +369,11 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
         </aside>
       </section>
 
-      <section className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+      <section className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
         <div className="min-w-0 rounded-xl border border-border bg-surface p-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight text-text">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-lg font-semibold tracking-tight break-words text-text">
                 {isWorkspaceDesk
                   ? '워크스페이스 quickstart'
                   : isLinkedDesk
@@ -390,7 +393,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
             </Badge>
           </div>
           {isPackagedDesk ? (
-            <div className="mt-4 grid gap-2 rounded-lg border border-dashed border-border bg-surface-2 p-3 text-[0.8125rem] text-text-muted">
+            <div className="mt-4 grid grid-cols-1 gap-2 rounded-lg border border-dashed border-border bg-surface-2 p-3 text-[0.8125rem] text-text-muted">
               <p>
                 {isWorkspaceDesk ? 'workspace 경로는' : '운영 URL은'}{' '}
                 <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-text">
@@ -424,7 +427,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
           </div>
         </div>
 
-        <aside className="rounded-xl border border-border bg-surface p-5">
+        <aside className="min-w-0 rounded-xl border border-border bg-surface p-5">
           <div className="flex items-center gap-2">
             <Settings className="size-4 text-accent-strong" aria-hidden />
             <h2 className="text-lg font-semibold tracking-tight text-text">API shape</h2>
@@ -436,7 +439,7 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
                 ? 'DeskCloud 통합 라우트 아래에서 Internal API, SDK 번들, WebSocket gateway를 운영합니다.'
                 : 'SDK 없이 호출할 때도 동일한 endpoint와 publishable key를 씁니다.'}
           </p>
-          <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] text-text-muted">
+          <p className="mt-3 rounded-md bg-surface-2 px-3 py-2 font-mono text-[0.8125rem] break-all text-text-muted">
             {isNativeDesk && !desk.liveUrl ? `${operations.gatewayPath}/api` : serviceEndpoint}
           </p>
           <div className="mt-4">
@@ -459,12 +462,12 @@ curl '${serviceEndpoint}/sdk/index.umd.js'`
             </Link>
           </Button>
         </div>
-        <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {siblingDesks.map((d) => (
             <li key={d.id}>
               <Link
                 to={deskMicrositePath(d)}
-                className="flex h-full items-start gap-3 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-2"
+                className="flex h-full min-w-0 items-start gap-3 rounded-lg border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-2"
               >
                 <DeskGlyph icon={d.icon} tone={d.tone} size="sm" />
                 <span className="min-w-0">
