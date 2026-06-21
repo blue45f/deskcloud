@@ -89,4 +89,26 @@ describe('DeskCloud catalog contracts', () => {
     expect(remoteSnippet).toContain('RemoteDebugSdk')
     expect(remoteSnippet).not.toContain('remote-devtools.vercel.app')
   })
+
+  it('keeps developer-tool Desks under the DeskCloud control plane', () => {
+    const developerDeskIds = ['seo-gateway', 'remote-devtools'] as const
+
+    for (const id of developerDeskIds) {
+      const desk = PRODUCT_DESKS.find((candidate) => candidate.id === id)
+
+      expect(desk).toBeDefined()
+      expect(desk?.integrationMode).toBe('workspace')
+      expect(desk?.workspacePath).toBe(`desks/${id}`)
+      expect(desk?.liveUrl).toBeUndefined()
+
+      const operations = deskOperations(desk!)
+      const details = deskDetails(desk!)
+
+      expect(operations.adminPath).toBe(`/dashboard?desk=${id}`)
+      expect(operations.gatewayPath).toBe(`/${id}`)
+      expect(details.summary).toContain('DeskCloud')
+      expect(details.summary).toContain('콘솔')
+      expect(details.integrationGuide.join('\n')).toContain('DeskCloud')
+    }
+  })
 })

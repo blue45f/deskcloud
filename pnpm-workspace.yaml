@@ -73,6 +73,8 @@ overrides:
   uuid: ">=11.1.1"
   # ESLint 코어는 ajv@^6 draft-04 메타스키마에 의존 → eslint 하위에서만 6.x 로 복원
   eslint>ajv: "^6.12.6"
+  # schema-utils v3 + ajv-keywords v3 는 ajv v6 format registry 에 의존
+  schema-utils@3>ajv: "^6.12.6"
   # jsx-a11y 는 minimatch v3 default 시그니처 의존 → jsx-a11y 하위에서만 3.x 로 복원
   eslint-plugin-jsx-a11y>minimatch: "^3.1.2"
 

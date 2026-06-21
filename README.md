@@ -38,7 +38,9 @@ provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 
 플랜: 아키텍처 와이어링 = `docs/INTEGRATION-PLAN.md` · 모노레포 구축/마이그레이션 =
 `docs/MONOREPO-CONSOLIDATION-PLAN.md` · 운영 콘솔 기준 =
-`docs/ADMIN-CONSOLE-OPERATIONS.md` · 플랫폼 DB 구조 = `platform/docs/DATA_MODEL.md`.
+`docs/ADMIN-CONSOLE-OPERATIONS.md` · 개발자 도구형 Desk 통합 운영 =
+`docs/DEVELOPER-DESKS-INTEGRATED-OPERATIONS.md` · 플랫폼 DB 구조 =
+`platform/docs/DATA_MODEL.md`.
 
 ## 개발
 
@@ -46,11 +48,10 @@ provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 pnpm install
 pnpm build && pnpm typecheck && pnpm lint && pnpm test   # Turborepo (test는 직렬)
 pnpm build:sdk                                           # @heejun/deskcloud SDK
+pnpm run verify:developer-desks                          # SEOGatewayDesk + RemoteDevTools
 pnpm compose:config                                      # deploy/stack compose 검증
 pnpm deploy:no-build                                     # deploy/stack 기존 이미지 재기동+헬스체크
 ```
 
 **상태**: 물리 통합(17 Desk + platform + SDK + deploy stack) 완료. `deploy/stack/.env`는 Git 추적
 밖에 두고, 기존 sibling 저장소는 검증 후 archive 보관 경로로 이동합니다.
-
-push/원격 생성은 명시 요청 시에만.
