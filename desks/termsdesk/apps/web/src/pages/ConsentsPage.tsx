@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { EmptyState, HashTag, Skeleton } from '@/components/ui/feedback'
 import { Input, Select } from '@/components/ui/field'
 import { Table, TBody, TD, TH, THead, TR } from '@/components/ui/table'
+import { apiUrl } from '@/config/urls'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useConsents } from '@/services/consents'
 import { usePolicies } from '@/services/policies'
@@ -34,7 +35,7 @@ export default function ConsentsPage() {
     method: method || undefined,
   })
 
-  const exportHref = `/api/export/consents.csv${
+  const exportHref = `${apiUrl('export/consents.csv')}${
     policySlug || subjectRef
       ? `?${new URLSearchParams({ ...(policySlug ? { policySlug } : {}), ...(subjectRef ? { subjectRef } : {}) }).toString()}`
       : ''

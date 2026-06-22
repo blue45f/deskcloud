@@ -17,6 +17,8 @@ import { brokerageKeys } from './brokerage'
 import { notificationKeys } from './notifications'
 import { RealtimeSocketContext } from './realtime-context'
 
+import { appPath } from '@/config/urls'
+
 function appendNotification(
   current: NotificationListDto | undefined,
   notification: NotificationDto
@@ -92,8 +94,13 @@ export function RealtimeProvider({ children, userId }: { children: ReactNode; us
       }
       if (!active) return
 
+      const socketPath =
+        typeof window !== 'undefined' && issued.origin === globalThis.location.origin
+          ? appPath(issued.path)
+          : issued.path
+
       const next = io(issued.origin, {
-        path: issued.path,
+        path: socketPath,
         auth: { token: issued.token },
         transports: ['websocket', 'polling'],
         withCredentials: true,

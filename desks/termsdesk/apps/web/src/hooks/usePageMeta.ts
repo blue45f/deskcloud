@@ -1,7 +1,8 @@
 import { useEffect } from 'react'
 
+import { publicSiteUrl } from '@/config/urls'
+
 const SUFFIX = 'TermsDesk'
-const SITE_URL = 'https://termsdesk.vercel.app'
 
 /** index.html 의 정적 기본값(크롤러용). 언마운트/미지정 시 이 값으로 복원. */
 const DEFAULTS = {
@@ -51,7 +52,7 @@ export function usePageMeta({ title, description, path }: PageMeta = {}): void {
     const docTitle = title ? `${title} · ${SUFFIX}` : SUFFIX
     const ogTitle = title ? `${title} · ${SUFFIX}` : DEFAULTS.title
     const desc = description ?? DEFAULTS.description
-    const url = `${SITE_URL}${path ?? globalThis.location.pathname}`
+    const url = publicSiteUrl(path ?? globalThis.location.pathname)
 
     document.title = docTitle
     setMetaTag('property', 'og:title', ogTitle)
@@ -67,11 +68,11 @@ export function usePageMeta({ title, description, path }: PageMeta = {}): void {
       document.title = DEFAULTS.title
       setMetaTag('property', 'og:title', `${DEFAULTS.title} — 약관 버전 관리·변조 방지 게시`)
       setMetaTag('property', 'og:description', DEFAULTS.description)
-      setMetaTag('property', 'og:url', `${SITE_URL}/`)
+      setMetaTag('property', 'og:url', publicSiteUrl('/'))
       setMetaTag('name', 'twitter:title', `${DEFAULTS.title} — 약관 버전 관리·변조 방지 게시`)
       setMetaTag('name', 'twitter:description', DEFAULTS.description)
       setMetaTag('name', 'description', DEFAULTS.description)
-      setCanonical(`${SITE_URL}/`)
+      setCanonical(publicSiteUrl('/'))
     }
   }, [title, description, path])
 }

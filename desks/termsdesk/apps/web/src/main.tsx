@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
 import AppProviders from '@/app/AppProviders'
+import { appPath } from '@/config/urls'
 import '@/styles/index.css'
 
 const root = document.getElementById('root')
@@ -13,5 +14,5 @@ createRoot(root).render(
   </StrictMode>
 )
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').catch(() => {})
+  navigator.serviceWorker.register(appPath('/sw.js')).catch(() => {})
 }

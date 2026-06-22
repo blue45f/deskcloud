@@ -20,6 +20,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { CopyButton } from '@/components/ui/feedback'
 import { Field, Select } from '@/components/ui/field'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { API_BASE_URL, PUBLIC_SITE_URL, apiUrl } from '@/config/urls'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useSession } from '@/services/auth'
 import { usePolicies } from '@/services/policies'
@@ -123,8 +124,8 @@ export default function IntegrationGuidePage() {
   const activeSlug = slug || published[0]?.slug || 'terms-of-service'
   const activeName = published.find((p) => p.slug === activeSlug)?.name ?? '이용약관'
   const org = session.data?.org.slug ?? '_'
-  const base =
-    typeof window !== 'undefined' ? globalThis.location.origin : 'https://terms.your-company.com'
+  const base = PUBLIC_SITE_URL
+  const apiBase = API_BASE_URL.startsWith('http') ? API_BASE_URL : PUBLIC_SITE_URL
   const guideDemoChecks = useMemo(
     () => [
       {
@@ -166,10 +167,12 @@ export default function IntegrationGuidePage() {
   if (sAlign !== 'left') styleParams.set('align', sAlign)
   if (sWidth !== 'normal') styleParams.set('width', sWidth)
   const styleQs = styleParams.toString()
-  const styledHtmlPath = `/api/public/${org}/policies/${activeSlug}/html${
+  const styledHtmlPath = `${apiUrl(`public/${org}/policies/${activeSlug}/html`)}${
     styleQs ? `?${styleQs}` : ''
   }`
-  const styledHtmlUrl = `${base}${styledHtmlPath}`
+  const styledHtmlUrl = `${base}/api/public/${org}/policies/${activeSlug}/html${
+    styleQs ? `?${styleQs}` : ''
+  }`
 
   const styledIframeSnippet = `<iframe
   src="${styledHtmlUrl}"
@@ -337,7 +340,7 @@ curl -X POST "${base}/api/v1/consents" \\
 import { ConsentGate } from '@termsdesk/sdk/react'
 
 const client = createTermsDeskClient({
-  baseUrl: '${base}',
+  baseUrl: '${apiBase}',
   apiKey: 'tdk_...', // publishable 키
 })
 
@@ -552,7 +555,7 @@ if (policy.reconsentRequired) {
             <iframe
               key={`${org}/${activeSlug}`}
               title="약관 미리보기"
-              src={`/api/public/${org}/policies/${activeSlug}/html`}
+              src={apiUrl(`public/${org}/policies/${activeSlug}/html`)}
               loading="lazy"
               className="h-[22rem] w-full rounded-lg border border-border bg-surface-2/30"
             />

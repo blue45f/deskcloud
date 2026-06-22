@@ -3,6 +3,7 @@ import { CalendarPlus } from 'lucide-react'
 import type { PolicyDto, PolicyVersionSummaryDto } from '@termsdesk/shared'
 
 import { Button } from '@/components/ui/button'
+import { publicSiteUrl } from '@/config/urls'
 import { useSession } from '@/services/auth'
 import { downloadIcs } from '@/utils/buildIcs'
 
@@ -42,7 +43,7 @@ export function AddToCalendarButton({
         description: notes.join('\n'),
         startAt,
         endAt: new Date(startAt.getTime() + HOUR_MS),
-        url: `${globalThis.location.origin}/p/${orgSlug}/${policy.slug}?version=${version.versionLabel}`,
+        url: publicSiteUrl(`/p/${orgSlug}/${policy.slug}?version=${version.versionLabel}`),
       },
       `termsdesk-${policy.slug}-${version.versionLabel}.ics`
     )

@@ -16,6 +16,9 @@ const defaultRouteTargets = [
   "/login",
   "/signup",
   "/admin/inquiries",
+  "/termsdesk/",
+  "/termsdesk/experts",
+  "/termsdesk/app/marketplace",
   "/desks/termsdesk",
   "/desks/surveydesk",
   "/desks/changelogdesk",
@@ -64,7 +67,8 @@ const includeTermsDeskChecks = boolFlag(
 );
 
 const termsdeskRuntimeDefault =
-  process.env.TERMSDESK_RUNTIME_BASE ?? "https://termsdesk.vercel.app";
+  process.env.TERMSDESK_RUNTIME_BASE ??
+  "https://desk-platform.vercel.app/termsdesk";
 
 const commandNames = {
   all: includeTermsDeskChecks
@@ -577,8 +581,11 @@ async function verifyTermsDeskFlow(browser) {
       );
     }
 
-    const runtimeApi = await appPage.evaluate(async () => {
-      const response = await fetch("/api/marketplace").catch(() => null);
+    const runtimeApi = await appPage.evaluate(async (host) => {
+      const apiBase = new URL(host).pathname.replace(/\/$/, "");
+      const response = await fetch(`${apiBase}/api/marketplace`).catch(
+        () => null,
+      );
       if (!response || !response.ok) {
         return { ok: false, status: response?.status ?? 0, count: null };
       }
@@ -588,7 +595,7 @@ async function verifyTermsDeskFlow(browser) {
         status: response.status,
         count: Array.isArray(json?.items) ? json.items.length : null,
       };
-    });
+    }, runtimeHost);
 
     const body = await safeText(appPage, "body");
     if (!body || /404|페이지를 찾을 수 없음/.test(body)) {
@@ -682,8 +689,11 @@ async function verifyTermsDeskFlow(browser) {
       result.issues.push(`direct marketplace reopen failed: ${error.message}`);
     }
 
-    const marketplaceApi = await directPage.evaluate(async () => {
-      const response = await fetch("/api/marketplace").catch(() => null);
+    const marketplaceApi = await directPage.evaluate(async (host) => {
+      const apiBase = new URL(host).pathname.replace(/\/$/, "");
+      const response = await fetch(`${apiBase}/api/marketplace`).catch(
+        () => null,
+      );
       if (!response || !response.ok) {
         return { ok: false, status: response?.status ?? 0, count: null };
       }
@@ -693,7 +703,7 @@ async function verifyTermsDeskFlow(browser) {
         status: response.status,
         count: Array.isArray(json?.items) ? json.items.length : null,
       };
-    });
+    }, runtimeHost);
 
     const body = await safeText(directPage, "body");
     if (!body || /404|페이지를 찾을 수 없음/.test(body)) {

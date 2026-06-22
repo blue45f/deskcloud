@@ -26,6 +26,7 @@ import { useTheme } from '@/app/ThemeContext'
 import { Brand } from '@/components/layout/Brand'
 import { Badge, StatusPill } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { apiUrl } from '@/config/urls'
 import { usePageMeta } from '@/hooks/usePageMeta'
 import { useDemoLogin } from '@/services/auth'
 
@@ -388,7 +389,7 @@ export default function LandingPage() {
               JSON · 해시 검증
             </p>
             <pre className="mt-1.5 overflow-x-auto rounded-lg bg-surface-2/60 p-3 font-mono text-xs leading-relaxed text-text-muted">
-              {'$ curl /api/public/acme/policies/terms-of-service\n'}
+              {`$ curl ${apiUrl('public/acme/policies/terms-of-service')}\n`}
               {'{ "versionLabel": "v2", "contentHash": "67dfa58fad42…", "body": "…" }\n\n'}
               {'$ curl …/policies/terms-of-service/verify?hash=67dfa58fad42…\n'}
               <span className="text-success">{'{ "verified": true, "versionLabel": "v2" }'}</span>
@@ -397,7 +398,7 @@ export default function LandingPage() {
               팝업 위젯 — 스크립트 한 줄
             </p>
             <pre className="mt-1.5 overflow-x-auto rounded-lg bg-surface-2/60 p-3 font-mono text-xs leading-relaxed text-text-muted">
-              {'<script src="/api/public/embed.js" data-org="acme" defer></script>\n'}
+              {`<script src="${apiUrl('public/embed.js')}" data-org="acme" defer></script>\n`}
               {'<a href="#" data-termsdesk-policy="terms-of-service">이용약관</a>'}
             </pre>
             <p className="mt-3 text-xs text-text-subtle">

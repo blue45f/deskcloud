@@ -4,8 +4,11 @@ import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 
+const basePath = process.env.VITE_TERMSDESK_BASE_PATH ?? process.env.VITE_BASE_PATH ?? '/'
+
 // React Compiler (포트폴리오 표준): @vitejs/plugin-react + @rolldown/plugin-babel reactCompilerPreset().
 export default defineConfig({
+  base: basePath,
   plugins: [react(), babel({ presets: [reactCompilerPreset()] }), tailwindcss()],
   resolve: {
     alias: {

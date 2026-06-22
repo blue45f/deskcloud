@@ -56,8 +56,10 @@ describe('SupportPage 메타 (공개 공유 라우트)', () => {
     expect(metaContent('property', 'og:description')).toBe(
       'Termsdesk 사이트 문의·제휴·버그 신고를 접수하고 처리 현황을 확인합니다.'
     )
-    expect(metaContent('property', 'og:url')).toBe('https://termsdesk.vercel.app/support/termsdesk')
-    expect(canonicalHref()).toBe('https://termsdesk.vercel.app/support/termsdesk')
+    expect(metaContent('property', 'og:url')).toBe(
+      'https://desk-platform.vercel.app/termsdesk/support/termsdesk'
+    )
+    expect(canonicalHref()).toBe('https://desk-platform.vercel.app/termsdesk/support/termsdesk')
   })
 
   it('언마운트 시 정적 기본값으로 복원해 다음 라우트로 메타가 새지 않는다', async () => {
@@ -68,7 +70,7 @@ describe('SupportPage 메타 (공개 공유 라우트)', () => {
     unmount()
 
     expect(document.title).toBe('TermsDesk')
-    expect(metaContent('property', 'og:url')).toBe('https://termsdesk.vercel.app/')
-    expect(canonicalHref()).toBe('https://termsdesk.vercel.app/')
+    expect(metaContent('property', 'og:url')).toBe('https://desk-platform.vercel.app/termsdesk/')
+    expect(canonicalHref()).toBe('https://desk-platform.vercel.app/termsdesk/')
   })
 })

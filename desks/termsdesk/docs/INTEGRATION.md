@@ -24,16 +24,16 @@ TermsDesk에서 **게시(발행)** 한 약관을 실제 사이트·앱에 연동
 
 ### 포트폴리오 형제 프로젝트용 공개 정본
 
-`termsdesk.vercel.app` 배포본은 형제 프로젝트 전체를 위한 공개 정본 카탈로그를 내장합니다. 각
+`desk-platform.vercel.app/termsdesk` 배포본은 형제 프로젝트 전체를 위한 공개 정본 카탈로그를 내장합니다. 각
 프로젝트는 자체 약관 페이지를 복제하지 않고 아래 URL을 푸터, 회원가입, 결제, 설정 화면에서 그대로
 참조합니다.
 
-| 문서             | URL 형식                                                       |
-| ---------------- | -------------------------------------------------------------- |
-| 이용약관         | `https://termsdesk.vercel.app/p/:projectSlug/terms-of-service` |
-| 개인정보처리방침 | `https://termsdesk.vercel.app/p/:projectSlug/privacy-policy`   |
-| 환불·취소 정책   | `https://termsdesk.vercel.app/p/:projectSlug/refund-policy`    |
-| 지원 보드        | `https://termsdesk.vercel.app/support/:projectSlug`            |
+| 문서             | URL 형식                                                                     |
+| ---------------- | ---------------------------------------------------------------------------- |
+| 이용약관         | `https://desk-platform.vercel.app/termsdesk/p/:projectSlug/terms-of-service` |
+| 개인정보처리방침 | `https://desk-platform.vercel.app/termsdesk/p/:projectSlug/privacy-policy`   |
+| 환불·취소 정책   | `https://desk-platform.vercel.app/termsdesk/p/:projectSlug/refund-policy`    |
+| 지원 보드        | `https://desk-platform.vercel.app/termsdesk/support/:projectSlug`            |
 
 등록된 `projectSlug`: `promptmarket`, `family-care-platform`, `offhours`, `pettography`,
 `proto-live`, `remote-devtools`, `resume`, `rotifolk`, `spa-seo-gateway`,
@@ -48,7 +48,7 @@ TermsDesk에서 **게시(발행)** 한 약관을 실제 사이트·앱에 연동
 무인증 공개 API만 호출하면 되고, TermsDesk는 본문·회신 이메일을 공개 목록에 되돌려주지 않습니다.
 
 ```http
-POST https://termsdesk.vercel.app/api/public/:projectSlug/inquiries
+POST https://desk-platform.vercel.app/termsdesk/api/public/:projectSlug/inquiries
 Content-Type: application/json
 Accept: application/json
 ```

@@ -1,5 +1,11 @@
 const CACHE_PREFIX = 'termsdesk-pwa-'
 const CACHE_NAME = `${CACHE_PREFIX}v2`
+const SCOPE_PATH = new URL(
+  globalThis.registration?.scope ?? '/',
+  globalThis.location.origin
+).pathname.replace(/\/$/, '')
+const scopePath = SCOPE_PATH === '/' ? '' : SCOPE_PATH
+const scopedPath = (path) => `${scopePath}${path}`
 
 globalThis.addEventListener('install', () => {
   globalThis.skipWaiting()
@@ -34,7 +40,9 @@ globalThis.addEventListener('fetch', (event) => {
             .catch(() => {})
           return response
         })
-        .catch(() => caches.match(request).then((cached) => cached || caches.match('/')))
+        .catch(() =>
+          caches.match(request).then((cached) => cached || caches.match(scopedPath('/')))
+        )
     )
     return
   }
@@ -45,7 +53,7 @@ globalThis.addEventListener('fetch', (event) => {
   if (
     request.method === 'GET' &&
     url.origin === globalThis.location.origin &&
-    url.pathname.startsWith('/assets/')
+    url.pathname.startsWith(scopedPath('/assets/'))
   ) {
     event.respondWith(
       caches.match(request).then(

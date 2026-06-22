@@ -430,7 +430,7 @@ function DashboardMockup() {
             <span className="size-2.5 rounded-full bg-[#febc2e]" />
             <span className="size-2.5 rounded-full bg-[#28c840]" />
             <span className="ml-3 text-[11px] font-mono text-fg-faint">
-              remote-devtools.vercel.app/dashboard
+              desk-platform.vercel.app/remote-devtools/dashboard
             </span>
             <span className="ml-auto text-[10px] text-fg-faint">{t('landing.mockDemoMode')}</span>
           </div>

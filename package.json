@@ -28,6 +28,7 @@
     "verify:production:full": "DESKCLOUD_VERIFY_TERMSDESK=1 pnpm run verify:production && pnpm run verify:termsdesk",
     "verify:local-stack": "pnpm compose:config && pnpm deploy:no-build",
     "verify:live": "pnpm run verify:production:full",
+    "build:platform-web-with-termsdesk": "pnpm --filter @desk/web... build && VITE_TERMSDESK_BASE_PATH=/termsdesk/ pnpm --filter @termsdesk/web... build && node scripts/embed-termsdesk-web.mjs",
     "dev:seo-gateway": "pnpm --filter @spa-seo-gateway/gateway run dev",
     "dev:remote-devtools:internal": "pnpm --filter @desk/remote-devtools run start:internal:dev",
     "dev:remote-devtools:external": "pnpm --filter @desk/remote-devtools run start:external:dev",

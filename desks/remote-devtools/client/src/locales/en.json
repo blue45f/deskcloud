@@ -151,7 +151,7 @@
     "githubIssues": "GitHub issues",
     "noMatchesSuffix": ".",
     "faqDemoFreeQ": "Is the public demo really free?",
-    "faqDemoFreeA": "Yes — the demo at remote-devtools.vercel.app is fully free, no signup. It runs entirely in your browser with seed data; nothing leaves the page.",
+    "faqDemoFreeA": "Yes — the demo at desk-platform.vercel.app/remote-devtools is fully free, no signup. It runs entirely in your browser with seed data; nothing leaves the page.",
     "faqSelfVsStarterQ": "What's the difference between self-hosted and Starter?",
     "faqSelfVsStarterA": "Self-hosted is the full open-source release on your own infrastructure — Postgres, S3, Jira, Slack integrations all work. Starter is the same product hosted by us with managed Postgres and 30-day session retention.",
     "faqLaunchQ": "When will Starter and Pro launch?",

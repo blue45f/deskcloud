@@ -9,7 +9,7 @@ import { desc, eq, inArray, sql } from 'drizzle-orm'
 import { DatabaseService } from '../db/database.service'
 import { organizations, providerProfiles, providerReviews, serviceRequests } from '../db/schema'
 
-import type { SitemapEntry } from './portfolio-legal'
+import { TERMSDESK_PUBLIC_BASE_URL, type SitemapEntry } from './portfolio-legal'
 
 type ProviderRow = typeof providerProfiles.$inferSelect
 type ReviewRow = typeof providerReviews.$inferSelect
@@ -21,8 +21,6 @@ interface RatingAgg {
 
 const EMPTY_RATING: RatingAgg = { avgRating: null, reviewCount: 0 }
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const TERMSDESK_PUBLIC_BASE_URL = 'https://termsdesk.vercel.app'
-
 const splitCsv = (value: string): string[] =>
   value
     .split(',')

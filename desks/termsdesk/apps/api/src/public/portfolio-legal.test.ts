@@ -6,6 +6,7 @@ import {
   getPortfolioProject,
   PORTFOLIO_PROJECTS,
   renderPortfolioPolicy,
+  TERMSDESK_PUBLIC_BASE_URL,
 } from './portfolio-legal'
 
 describe('portfolio legal catalog', () => {
@@ -25,15 +26,15 @@ describe('portfolio legal catalog', () => {
   it('exposes support board URLs for every registered sibling project', () => {
     const project = getPortfolioProject('termsdesk')
 
-    expect(project?.supportUrl).toBe('https://termsdesk.vercel.app/support/termsdesk')
+    expect(project?.supportUrl).toBe(`${TERMSDESK_PUBLIC_BASE_URL}/support/termsdesk`)
   })
 
   it('exposes expected public document URLs per project', () => {
     const project = getPortfolioProject('proto-live')
 
     expect(project).toBeDefined()
-    expect(project?.supportUrl).toBe('https://termsdesk.vercel.app/support/proto-live')
-    expect(project?.supportUrl).toBe(`https://termsdesk.vercel.app/support/${project?.slug}`)
+    expect(project?.supportUrl).toBe(`${TERMSDESK_PUBLIC_BASE_URL}/support/proto-live`)
+    expect(project?.supportUrl).toBe(`${TERMSDESK_PUBLIC_BASE_URL}/support/${project?.slug}`)
   })
 
   it('returns undefined for unknown project or policy slugs', () => {
@@ -49,10 +50,10 @@ describe('portfolio legal catalog', () => {
     expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>')
     expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
     expect(xml.match(/<loc>/g)).toHaveLength(expectedUrls)
-    expect(xml).toContain('<loc>https://termsdesk.vercel.app/</loc>')
-    expect(xml).toContain('<loc>https://termsdesk.vercel.app/p/promptmarket/terms-of-service</loc>')
-    expect(xml).toContain('<loc>https://termsdesk.vercel.app/p/offhours/refund-policy</loc>')
-    expect(xml).toContain('<loc>https://termsdesk.vercel.app/support/termsdesk</loc>')
+    expect(xml).toContain(`<loc>${TERMSDESK_PUBLIC_BASE_URL}/</loc>`)
+    expect(xml).toContain(`<loc>${TERMSDESK_PUBLIC_BASE_URL}/p/promptmarket/terms-of-service</loc>`)
+    expect(xml).toContain(`<loc>${TERMSDESK_PUBLIC_BASE_URL}/p/offhours/refund-policy</loc>`)
+    expect(xml).toContain(`<loc>${TERMSDESK_PUBLIC_BASE_URL}/support/termsdesk</loc>`)
     expect(xml).toContain('<lastmod>2026-06-08</lastmod>')
   })
 
@@ -63,16 +64,18 @@ describe('portfolio legal catalog', () => {
 
       expect(terms).toBeDefined()
       expect(privacy).toBeDefined()
-      expect(project.supportUrl).toMatch(/^https:\/\/termsdesk\.vercel\.app\/support\/[a-z0-9-]+$/)
+      expect(project.supportUrl).toMatch(
+        /^https:\/\/desk-platform\.vercel\.app\/termsdesk\/support\/[a-z0-9-]+$/
+      )
 
-      const termsDoc = `https://termsdesk.vercel.app/p/${project.slug}/terms-of-service`
-      const privacyDoc = `https://termsdesk.vercel.app/p/${project.slug}/privacy-policy`
+      const termsDoc = `${TERMSDESK_PUBLIC_BASE_URL}/p/${project.slug}/terms-of-service`
+      const privacyDoc = `${TERMSDESK_PUBLIC_BASE_URL}/p/${project.slug}/privacy-policy`
 
       expect(termsDoc).toMatch(
-        /^https:\/\/termsdesk\.vercel\.app\/p\/[a-z0-9-]+\/terms-of-service$/
+        /^https:\/\/desk-platform\.vercel\.app\/termsdesk\/p\/[a-z0-9-]+\/terms-of-service$/
       )
       expect(privacyDoc).toMatch(
-        /^https:\/\/termsdesk\.vercel\.app\/p\/[a-z0-9-]+\/privacy-policy$/
+        /^https:\/\/desk-platform\.vercel\.app\/termsdesk\/p\/[a-z0-9-]+\/privacy-policy$/
       )
 
       const rendered = await renderPortfolioPolicy(project.slug, 'terms-of-service', {

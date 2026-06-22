@@ -2,7 +2,7 @@ import { PRODUCT_DESKS } from './deskCatalog'
 
 const termsdesk = PRODUCT_DESKS.find((desk) => desk.id === 'termsdesk')
 
-export const TERMSDESK_RUNTIME = termsdesk?.liveUrl ?? 'https://termsdesk.vercel.app'
+export const TERMSDESK_RUNTIME = termsdesk?.liveUrl ?? 'https://desk-platform.vercel.app/termsdesk'
 
 export const TUTORIALS = [
   {

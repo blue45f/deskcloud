@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState, HashTag, Skeleton } from '@/components/ui/feedback'
 import { Switch } from '@/components/ui/switch'
 import { Tooltip } from '@/components/ui/tooltip'
+import { apiUrl } from '@/config/urls'
 import { useDocumentTitle } from '@/hooks/useDocumentTitle'
 import { useSession } from '@/services/auth'
 import { usePolicy, useUpdatePolicy, useVersion, useVersions } from '@/services/policies'
@@ -143,7 +144,7 @@ export default function PolicyDetailPage() {
           <>
             <PublicPageLink policy={p} />
             <Button variant="secondary" size="sm" asChild>
-              <a href={`/api/export/policies/${p.id}/versions.csv`} download>
+              <a href={apiUrl(`export/policies/${p.id}/versions.csv`)} download>
                 <Download className="size-4" />
                 CSV
               </a>

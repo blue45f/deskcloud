@@ -45,7 +45,7 @@ pnpm run verify       # format:check + lint:ci(--max-warnings=0) + typecheck + t
   ```
 - 검증(재기동 ~50초 후. 12초는 부족→502 잠깐):
   ```bash
-  curl -s https://termsdesk.vercel.app/api/marketplace -o /dev/null -w '%{http_code}\n'   # 401 = 라우트 있음(정상). 404면 미배포
+  curl -s https://desk-platform.vercel.app/termsdesk/api/marketplace -o /dev/null -w '%{http_code}\n'   # 401 = 라우트 있음(정상). 404면 미배포
   ssh ... 'sudo docker logs --tail 15 termsdesk-api-1 | grep 마이그레이션'                 # 새 마이그레이션 적용 확인
   ```
 - 데모 데이터: 라이브 데모 마켓이 비면 데모 로그인 후 `POST /api/auth/demo` 재호출(ensureDemoOrg가 seedDemoBrokerage 멱등 실행).

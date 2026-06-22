@@ -1,6 +1,8 @@
 import ky from 'ky'
 
-const BASE = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ?? ''
+import { apiUrl } from '@/config/urls'
+
+export { apiUrl } from '@/config/urls'
 
 const client = ky.create({
   credentials: 'include',
@@ -61,10 +63,6 @@ async function formReq<T>(method: string, path: string, body: FormData): Promise
     throw new ApiError(String(message), res.status, data)
   }
   return data as T
-}
-
-export function apiUrl(path: string): string {
-  return `${BASE}/api/${path.replace(/^\//, '')}`
 }
 
 export const api = {

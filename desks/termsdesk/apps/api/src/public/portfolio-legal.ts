@@ -6,7 +6,7 @@ import {
   unresolvedTemplateVars,
 } from '@termsdesk/shared'
 
-const TERMSDESK_PUBLIC_BASE_URL = 'https://termsdesk.vercel.app'
+export const TERMSDESK_PUBLIC_BASE_URL = 'https://desk-platform.vercel.app/termsdesk'
 const PUBLISHED_AT = '2026-06-08T00:00:00.000Z'
 
 export interface SitemapEntry {
@@ -191,7 +191,7 @@ const seeds: ProjectSeed[] = [
   {
     slug: 'remote-devtools',
     name: 'Remote DevTools',
-    logoUrl: 'https://remote-devtools.vercel.app/favicon-192.png',
+    logoUrl: 'https://desk-platform.vercel.app/remote-devtools/favicon-192.png',
     description: '웹 원격 디버깅·세션 재현 플랫폼',
     serviceScope:
       '웹 세션 녹화, 원격 디버깅, 콘솔·네트워크 이벤트 재현, 버그 티켓용 요약 기능을 제공합니다.',

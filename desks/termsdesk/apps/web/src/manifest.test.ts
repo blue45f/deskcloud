@@ -23,7 +23,7 @@ const iconFiles = import.meta.glob<string>('../public/icon-*.png', {
 
 /** PNG 시그니처와 IHDR(항상 첫 청크)을 직접 파싱해 실물 픽셀 크기를 읽는다 — 디코더 의존성 없음. */
 function readPngSize(src: string): { width: number; height: number } {
-  const dataUrl = iconFiles[`../public${src}`]
+  const dataUrl = iconFiles[`../public/${src.replace(/^\//, '')}`]
   expect(dataUrl, `public${src} 실물 파일 누락`).toBeDefined()
   const binary = atob(dataUrl.slice(dataUrl.indexOf(',') + 1))
   const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
@@ -34,10 +34,10 @@ function readPngSize(src: string): { width: number; height: number } {
 }
 
 describe('manifest.webmanifest (PWA 설치성)', () => {
-  it('id 가 "/" 로 고정돼 scope/start_url 이 바뀌어도 설치 정체성이 유지된다', () => {
-    expect(manifest.id).toBe('/')
-    expect(manifest.start_url).toBe('/')
-    expect(manifest.scope).toBe('/')
+  it('id/scope/start_url 이 DeskPlatform 하위 TermsDesk 설치 경계를 가리킨다', () => {
+    expect(manifest.id).toBe('/termsdesk/')
+    expect(manifest.start_url).toBe('.')
+    expect(manifest.scope).toBe('.')
   })
 
   it('스플래시 색이 기본 라이트 테마 첫 페인트와 일치한다 (ThemeProvider 기본값 light)', () => {

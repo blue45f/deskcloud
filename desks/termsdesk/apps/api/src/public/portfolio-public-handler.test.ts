@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { TERMSDESK_PUBLIC_BASE_URL } from './portfolio-legal'
 import { resolvePortfolioPublicRequest } from './portfolio-public-handler'
 
 function searchParams(query = ''): URLSearchParams {
@@ -80,11 +81,11 @@ describe('portfolio public Vercel handler', () => {
 
     expect(result?.status).toBe(200)
     expect(result?.headers['Content-Type']).toBe('application/xml; charset=utf-8')
-    expect(result?.body).toContain('<loc>https://termsdesk.vercel.app/</loc>')
+    expect(result?.body).toContain(`<loc>${TERMSDESK_PUBLIC_BASE_URL}/</loc>`)
     expect(result?.body).toContain(
-      '<loc>https://termsdesk.vercel.app/p/promptmarket/terms-of-service</loc>'
+      `<loc>${TERMSDESK_PUBLIC_BASE_URL}/p/promptmarket/terms-of-service</loc>`
     )
-    expect(result?.body).toContain('<loc>https://termsdesk.vercel.app/support/termsdesk</loc>')
+    expect(result?.body).toContain(`<loc>${TERMSDESK_PUBLIC_BASE_URL}/support/termsdesk</loc>`)
   })
 
   it('leaves non-policy public API requests for the existing upstream API', async () => {

@@ -38,7 +38,16 @@ export type DeskStatus = 'live'
 /** 공식 SDK npm 패키지 이름(설치 한 번으로 전체 패밀리). */
 export const SDK_PACKAGE = '@heejun/deskcloud'
 
-/** TermsDesk 공개 진입 도메인. EC2/nip.io origin은 백엔드 경계로만 숨긴다. */
+const deskcloudPublicUrlFromEnv = (import.meta.env.VITE_DESKCLOUD_PUBLIC_URL as string | undefined)
+  ?.trim()
+  .replace(/\/$/, '')
+
+export const DESKCLOUD_PUBLIC_URL =
+  deskcloudPublicUrlFromEnv && deskcloudPublicUrlFromEnv.length > 0
+    ? deskcloudPublicUrlFromEnv
+    : 'https://desk-platform.vercel.app'
+
+/** TermsDesk 공개 진입 경로. EC2/nip.io origin은 Vercel rewrite 뒤 백엔드 경계로만 숨긴다. */
 const termsdeskPublicUrlFromEnv = (import.meta.env.VITE_TERMSDESK_PUBLIC_URL as string | undefined)
   ?.trim()
   .replace(/\/$/, '')
@@ -46,7 +55,7 @@ const termsdeskPublicUrlFromEnv = (import.meta.env.VITE_TERMSDESK_PUBLIC_URL as 
 export const TERMSDESK_PUBLIC_URL =
   termsdeskPublicUrlFromEnv && termsdeskPublicUrlFromEnv.length > 0
     ? termsdeskPublicUrlFromEnv
-    : 'https://termsdesk.vercel.app'
+    : `${DESKCLOUD_PUBLIC_URL}/termsdesk`
 
 /** SDK 서버(sk_) 어드민 클라이언트가 사는 서브패스 import. */
 export const SDK_SERVER_IMPORT = `${SDK_PACKAGE}/server`
@@ -1196,8 +1205,8 @@ app.get('/render', async (req, reply) => {
     const operations = deskOperations(desk)
     const base =
       desk.integrationMode === 'workspace'
-        ? `${apiEndpoint()}${operations.gatewayPath}`
-        : (desk.liveUrl ?? 'https://remote-devtools.vercel.app')
+        ? `${DESKCLOUD_PUBLIC_URL}${operations.gatewayPath}`
+        : (desk.liveUrl ?? `${DESKCLOUD_PUBLIC_URL}${operations.gatewayPath}`)
     const src = `${base}/sdk/index.umd.js`
     return `<script>
   function handleRemoteDebugSdkLoad() {

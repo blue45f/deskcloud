@@ -10,7 +10,6 @@ import {
   DESK_OPERATIONS,
   DESK_READINESS,
   PRODUCT_DESKS,
-  apiEndpoint,
   deskDetails,
   deskMicrositePath,
   deskOperations,
@@ -112,7 +111,9 @@ describe('DeskCloud catalog contracts', () => {
     expect(seoSnippet).toContain('Fastify')
 
     expect(remoteDevtools?.name).toBe('RemoteDevTools')
-    expect(remoteSnippet).toContain(`${apiEndpoint()}/remote-devtools/sdk/index.umd.js`)
+    expect(remoteSnippet).toContain(
+      'https://desk-platform.vercel.app/remote-devtools/sdk/index.umd.js'
+    )
     expect(remoteSnippet).toContain('RemoteDebugSdk')
     expect(remoteSnippet).not.toContain('remote-devtools.vercel.app')
   })
@@ -121,9 +122,11 @@ describe('DeskCloud catalog contracts', () => {
     const termsdesk = PRODUCT_DESKS.find((desk) => desk.id === 'termsdesk')
 
     expect(termsdesk).toBeDefined()
-    expect(termsdesk?.liveUrl).toBe('https://termsdesk.vercel.app')
+    expect(termsdesk?.liveUrl).toBe('https://desk-platform.vercel.app/termsdesk')
     expect(deskOperations(termsdesk!).gatewayPath).toBe('/terms')
-    expect(sdkSnippet(termsdesk!)).toContain("endpoint: 'https://termsdesk.vercel.app'")
+    expect(sdkSnippet(termsdesk!)).toContain(
+      "endpoint: 'https://desk-platform.vercel.app/termsdesk'"
+    )
   })
 
   it('keeps developer-tool Desks under the DeskCloud control plane', () => {

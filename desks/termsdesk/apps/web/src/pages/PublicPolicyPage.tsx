@@ -15,6 +15,7 @@ import { OrgIcon } from '@/components/common/OrgIcon'
 import { SealMark } from '@/components/layout/Brand'
 import { Badge } from '@/components/ui/badge'
 import { Spinner } from '@/components/ui/feedback'
+import { apiUrl, publicSiteUrl } from '@/config/urls'
 import { usePageMeta } from '@/hooks/usePageMeta'
 import { downloadIcs } from '@/utils/buildIcs'
 import { cn } from '@/utils/cn'
@@ -99,7 +100,7 @@ export default function PublicPolicyPage() {
     setLoading(true)
     setError(null)
     setVerifyResult(null)
-    fetch(`/api/public/${orgSlug}/policies/${slug}${qs ? `?${qs}` : ''}`, {
+    fetch(`${apiUrl(`public/${orgSlug}/policies/${slug}`)}${qs ? `?${qs}` : ''}`, {
       headers: { accept: 'application/json' },
       signal: ctrl.signal,
     })
@@ -142,7 +143,7 @@ export default function PublicPolicyPage() {
     setVerifying(true)
     try {
       const res = await fetch(
-        `/api/public/${orgSlug}/policies/${slug}/verify?version=${encodeURIComponent(
+        `${apiUrl(`public/${orgSlug}/policies/${slug}/verify`)}?version=${encodeURIComponent(
           data.versionLabel
         )}`,
         { headers: { accept: 'application/json' } }
@@ -185,7 +186,7 @@ export default function PublicPolicyPage() {
         description: notes.join('\n'),
         startAt,
         endAt: new Date(startAt.getTime() + HOUR_MS),
-        url: `${globalThis.location.origin}/p/${orgSlug}/${data.policySlug}?version=${data.versionLabel}`,
+        url: publicSiteUrl(`/p/${orgSlug}/${data.policySlug}?version=${data.versionLabel}`),
       },
       `termsdesk-${data.policySlug}-${data.versionLabel}.ics`
     )

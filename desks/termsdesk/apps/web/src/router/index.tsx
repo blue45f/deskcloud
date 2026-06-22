@@ -6,6 +6,7 @@ import RequireAuth from '@/app/RequireAuth'
 import RootLayout from '@/app/RootLayout'
 import Loading from '@/components/common/Loading'
 import RouteError from '@/components/common/RouteError'
+import { APP_BASE_PATH } from '@/config/urls'
 
 const CHUNK_RETRY_KEY = 'termsdesk-chunk-retry'
 
@@ -35,64 +36,67 @@ const lazyRetry =
     }
   }
 
-export const router = createBrowserRouter([
-  {
-    path: '/',
-    Component: RootLayout,
-    ErrorBoundary: RouteError,
-    HydrateFallback: Loading,
-    children: [
-      { index: true, lazy: lazyRetry(() => import('@/pages/LandingPage')) },
-      // 라이브 디자인 시스템(스타일 가이드) — 공개, 인증 불필요. 푸터에서만 노출.
-      { path: 'design', lazy: lazyRetry(() => import('@/pages/DesignPage')) },
-      { path: 'sitemap', lazy: lazyRetry(() => import('@/pages/SitemapPage')) },
-      { path: 'login', lazy: lazyRetry(() => import('@/pages/LoginPage')) },
-      { path: 'register', lazy: lazyRetry(() => import('@/pages/RegisterPage')) },
-      // 공개(인증 없음) 약관 페이지 — 푸터 링크/팝업/iframe 대상.
-      { path: 'p/:orgSlug/:slug', lazy: lazyRetry(() => import('@/pages/PublicPolicyPage')) },
-      { path: 'experts', lazy: lazyRetry(() => import('@/pages/PublicExpertsPage')) },
-      { path: 'experts/:id', lazy: lazyRetry(() => import('@/pages/PublicExpertProfilePage')) },
-      { path: 'support/:projectSlug', lazy: lazyRetry(() => import('@/pages/SupportPage')) },
-      {
-        path: 'app',
-        Component: RequireAuth,
-        children: [
-          { index: true, lazy: lazyRetry(() => import('@/pages/DashboardPage')) },
-          { path: 'policies', lazy: lazyRetry(() => import('@/pages/PoliciesPage')) },
-          { path: 'policies/:slug', lazy: lazyRetry(() => import('@/pages/PolicyDetailPage')) },
-          {
-            path: 'policies/:slug/versions/new',
-            lazy: lazyRetry(() => import('@/pages/VersionEditorPage')),
-          },
-          {
-            path: 'versions/:versionId',
-            lazy: lazyRetry(() => import('@/pages/VersionDetailPage')),
-          },
-          {
-            path: 'versions/:versionId/edit',
-            lazy: lazyRetry(() => import('@/pages/VersionEditorPage')),
-          },
-          { path: 'consents', lazy: lazyRetry(() => import('@/pages/ConsentsPage')) },
-          {
-            path: 'consents/:subjectRef',
-            lazy: lazyRetry(() => import('@/pages/SubjectHistoryPage')),
-          },
-          { path: 'inquiries', lazy: lazyRetry(() => import('@/pages/InquiriesPage')) },
-          // 약관 의뢰 중계(브로커리지) — 의뢰자/전문가/운영자 흐름.
-          { path: 'requests', lazy: lazyRetry(() => import('@/pages/RequestsPage')) },
-          { path: 'requests/:id', lazy: lazyRetry(() => import('@/pages/RequestDetailPage')) },
-          { path: 'marketplace', lazy: lazyRetry(() => import('@/pages/MarketplacePage')) },
-          { path: 'expert', lazy: lazyRetry(() => import('@/pages/ExpertProfilePage')) },
-          { path: 'moderation', lazy: lazyRetry(() => import('@/pages/ModerationPage')) },
-          { path: 'audit', lazy: lazyRetry(() => import('@/pages/AuditPage')) },
-          { path: 'api-keys', lazy: lazyRetry(() => import('@/pages/ApiKeysPage')) },
-          { path: 'demo', lazy: lazyRetry(() => import('@/pages/DemoPage')) },
-          { path: 'guide', lazy: lazyRetry(() => import('@/pages/IntegrationGuidePage')) },
-          { path: 'admin', lazy: lazyRetry(() => import('@/pages/AdminPage')) },
-          { path: 'settings', lazy: lazyRetry(() => import('@/pages/SettingsPage')) },
-        ],
-      },
-      { path: '*', lazy: lazyRetry(() => import('@/pages/NotFoundPage')) },
-    ],
-  },
-])
+export const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      Component: RootLayout,
+      ErrorBoundary: RouteError,
+      HydrateFallback: Loading,
+      children: [
+        { index: true, lazy: lazyRetry(() => import('@/pages/LandingPage')) },
+        // 라이브 디자인 시스템(스타일 가이드) — 공개, 인증 불필요. 푸터에서만 노출.
+        { path: 'design', lazy: lazyRetry(() => import('@/pages/DesignPage')) },
+        { path: 'sitemap', lazy: lazyRetry(() => import('@/pages/SitemapPage')) },
+        { path: 'login', lazy: lazyRetry(() => import('@/pages/LoginPage')) },
+        { path: 'register', lazy: lazyRetry(() => import('@/pages/RegisterPage')) },
+        // 공개(인증 없음) 약관 페이지 — 푸터 링크/팝업/iframe 대상.
+        { path: 'p/:orgSlug/:slug', lazy: lazyRetry(() => import('@/pages/PublicPolicyPage')) },
+        { path: 'experts', lazy: lazyRetry(() => import('@/pages/PublicExpertsPage')) },
+        { path: 'experts/:id', lazy: lazyRetry(() => import('@/pages/PublicExpertProfilePage')) },
+        { path: 'support/:projectSlug', lazy: lazyRetry(() => import('@/pages/SupportPage')) },
+        {
+          path: 'app',
+          Component: RequireAuth,
+          children: [
+            { index: true, lazy: lazyRetry(() => import('@/pages/DashboardPage')) },
+            { path: 'policies', lazy: lazyRetry(() => import('@/pages/PoliciesPage')) },
+            { path: 'policies/:slug', lazy: lazyRetry(() => import('@/pages/PolicyDetailPage')) },
+            {
+              path: 'policies/:slug/versions/new',
+              lazy: lazyRetry(() => import('@/pages/VersionEditorPage')),
+            },
+            {
+              path: 'versions/:versionId',
+              lazy: lazyRetry(() => import('@/pages/VersionDetailPage')),
+            },
+            {
+              path: 'versions/:versionId/edit',
+              lazy: lazyRetry(() => import('@/pages/VersionEditorPage')),
+            },
+            { path: 'consents', lazy: lazyRetry(() => import('@/pages/ConsentsPage')) },
+            {
+              path: 'consents/:subjectRef',
+              lazy: lazyRetry(() => import('@/pages/SubjectHistoryPage')),
+            },
+            { path: 'inquiries', lazy: lazyRetry(() => import('@/pages/InquiriesPage')) },
+            // 약관 의뢰 중계(브로커리지) — 의뢰자/전문가/운영자 흐름.
+            { path: 'requests', lazy: lazyRetry(() => import('@/pages/RequestsPage')) },
+            { path: 'requests/:id', lazy: lazyRetry(() => import('@/pages/RequestDetailPage')) },
+            { path: 'marketplace', lazy: lazyRetry(() => import('@/pages/MarketplacePage')) },
+            { path: 'expert', lazy: lazyRetry(() => import('@/pages/ExpertProfilePage')) },
+            { path: 'moderation', lazy: lazyRetry(() => import('@/pages/ModerationPage')) },
+            { path: 'audit', lazy: lazyRetry(() => import('@/pages/AuditPage')) },
+            { path: 'api-keys', lazy: lazyRetry(() => import('@/pages/ApiKeysPage')) },
+            { path: 'demo', lazy: lazyRetry(() => import('@/pages/DemoPage')) },
+            { path: 'guide', lazy: lazyRetry(() => import('@/pages/IntegrationGuidePage')) },
+            { path: 'admin', lazy: lazyRetry(() => import('@/pages/AdminPage')) },
+            { path: 'settings', lazy: lazyRetry(() => import('@/pages/SettingsPage')) },
+          ],
+        },
+        { path: '*', lazy: lazyRetry(() => import('@/pages/NotFoundPage')) },
+      ],
+    },
+  ],
+  { basename: APP_BASE_PATH || undefined }
+)
