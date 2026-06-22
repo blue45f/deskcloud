@@ -1,8 +1,0 @@
-node_modules
-dist
-.tmp
-*.tsbuildinfo
-apps/web/playwright-report
-apps/web/test-results
-
-apps/toss

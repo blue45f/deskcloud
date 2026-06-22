@@ -16,7 +16,7 @@ dev   http://localhost:6090        # 로컬 desk-platform api
 ## 2. appId 규칙
 
 `appId`는 형제 앱의 슬러그(소문자 `[a-z0-9-]`, 1~64자). 레포 이름을 그대로 사용한다.
-예: `rotifolk`, `offhours`, `pettography`, `quote-match`, `aidigestdesk`, `webtoon-index`,
+예: `rotifolk`, `offhours`, `pettography`, `quote-match`, `webtoon-index`,
 `promptmarket`, `proto-live`, `resume`, `picky`, `heejun`, `spa-seo-gateway`,
 `family-care`, `remote-devtools`, `multi-environment-setting`,
 그리고 각 Desk 서비스(`searchdesk`, `surveydesk`, `chatdesk`, ...).
