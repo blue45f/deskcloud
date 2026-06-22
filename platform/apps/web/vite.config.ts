@@ -17,7 +17,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 //   - registerType:'autoUpdate' + injectRegister:'auto' — SW 등록 코드를 자동 주입하고
 //     새 빌드가 뜨면 사용자 개입 없이 갱신(앱셸형 SPA 에 적합).
 //   - workbox.navigateFallback:'/index.html' — SPA 라우트(react-router) 가 오프라인에서도
-//     앱셸로 폴백되게(단, /api 프록시 경로는 denylist 로 제외).
+//     앱셸로 폴백되게(단, /api 와 같은 프록시/분리 런타임 경로는 denylist 로 제외).
 //   - 매니페스트 색상은 styles/index.css 의 oklch 토큰을 sRGB 로 변환한 값(매니페스트는
 //     oklch 미지원). 잉크(#1c1f28)로 splash/테마를 아이콘 배경과 일치시킨다.
 //   - devOptions.enabled:false — dev 서버에선 SW 비활성(HMR·캐시 혼선 방지).
@@ -36,8 +36,13 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
         // SPA 앱셸 폴백 — 오프라인에서도 라우트가 index.html 로 해석되게.
         navigateFallback: '/index.html',
-        // 단, API 프록시(/api/*)는 앱셸로 폴백하면 안 되므로 제외.
-        navigateFallbackDenylist: [/^\/api\//],
+        // 단, API 프록시와 같은 도메인에 붙인 sibling runtime 은 platform 앱셸로 가로채면 안 된다.
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          /^\/termsdesk(?:\/|$)/,
+          /^\/remote-devtools(?:\/|$)/,
+          /^\/seo-gateway(?:\/|$)/,
+        ],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
       },
