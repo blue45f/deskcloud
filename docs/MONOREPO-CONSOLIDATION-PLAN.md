@@ -27,7 +27,7 @@ The decisive cut:
 - `platform/` — the `@desk/*` provider (the _only_ true tight-coupling anchor). **[done, reconcile]**
 - `desks/seo-gateway/` — deep platform wiring, already absorbed. **[done]**
 - `desks/remote-devtools/` — CDP/rrweb developer-tool Desk, absorbed as workspace package `@desk/remote-devtools`. **[done, heavy asset documented]**
-- The **14 homogeneous backend Desks** + `aidigestdesk` — same `apps/{api,web}` + Nest + Drizzle + PGlite shape; cheap to absorb, and they are where "one billing / one admin / one design" delivers value.
+- The **14 homogeneous backend Desks** (including `termsdesk`) — same `apps/{api,web}` + Nest + Drizzle + PGlite shape; cheap to absorb, and they are where "one billing / one admin / one design" delivers value.
 
 **OUT (stay sibling repos, consume `@desk/*` / `@heejun/*` via published packages):**
 
@@ -198,7 +198,7 @@ The original asserted "monorepo is source-of-truth immediately, NOT a read-only 
 - **Batch 0 (linchpin, before any Desk):** reconcile `desk-platform` drift into `platform/`. Desks must resolve `@desk/*` from the workspace (or published caret), not in-src copies. Import 14 broken `@desk/*` references if you skip this.
 - **Batch 1 — Desks w/o SDK pkg (5):** `addesk, authdesk, filedesk, reviewdesk, surveydesk`. Establishes the glob + shared→widget build order.
 - **Batch 2 — Desks w/ SDK pkg (8):** `chatdesk, communitydesk, mediadesk, moderationdesk, notifydesk, searchdesk, changelogdesk`, and **`realtimedesk` last** (WS `/socket.io` exact-match path trap, proven in remote-devtools).
-- **Batch 3 — special shape, solo:** `aidigestdesk` (no `apps/api`; `apps/toss` + `packages/content`; Vercel + GH Pages) then **`termsdesk` absolutely last** (prod-live, Vercel-web/EC2-api split, Sonar, own SDK), with live deploy-parity verification.
+- **Batch 3 — special shape:** `termsdesk` (prod-live, Vercel-web/EC2-api split, Sonar, own SDK), with live deploy-parity verification.
 - **Batch 4 — alignment (post-absorption, not absorption):** route `@desk/*` everywhere, roll `@heejun/web-config-preset` across all Desks (currently 0 consume it), catalog-pin them.
 
 _(remote-devtools removed from all batches — it's OUT per §4.3.)_
@@ -276,7 +276,7 @@ Single root husky: `commit-msg` (commitlint, **body ≤100** — hard fleet gate
 
 - **Frontends → Vercel, one project per Desk web app.** `rootDirectory=desks/<name>/apps/web`, `turbo-ignore` affected-only build. **Mandatory:** the Vercel **100-deploy/24h team-wide** cap means a single monorepo push must not trigger all Desk projects. **[CRITIQUE note]** this is a self-inflicted risk of co-location — `turbo-ignore` must be correct _every_ push; treat a misconfigured ignored-build-step as a budget-nuke incident.
 - **Backends → central `deskcloud-deploy` compose + Caddy on EC2** (termsdesk co-host, $0 extra). The live `docker-compose.yml` builds 11 services from `../<repo>` sibling paths — **that file is the real cutover surface.** Switch each `build.context` from `../<x>` to `./desks/<x>`, **one service per PR, old context kept as a commented fallback line for instant revert [CHANGED BY CRITIQUE: migration-safety]**. Build images via `turbo prune --docker --scope=@desk/<x>-api` (lockfile slice only). The single central Caddyfile _fixes_ the known vhost-clobber hazard by owning all vhosts in one place.
-- **aidigestdesk:** preserve GH Pages (`VITE_BASE_PATH=/aidigestdesk/`, `deploy-pages.yml`) — the one non-Vercel frontend, handled solo in Batch 3.
+- **aidigestdesk:** 운영 사유로 모노레포 경계에서 제외. 기존 GH Pages 경로/파이프라인은 별도 운영 축으로 유지.
 - **Don't decommission an original's deploy/CI workflow until that Desk is cut over AND its gate parity is green in the monorepo.**
 
 ---
@@ -294,7 +294,7 @@ The wiring plan's P0–P5 cannot start billing/admin/design work on a Desk until
 | §5 Batch 0 (platform drift reconcile)                           | **P1**         | `@desk/*` provider correct = floor under wiring's "single architecture/billing/admin"   |
 | §5 Batches 1–2 (mirror-import Desks)                            | **P1→P2**      | Bulk absorption; wiring layers per-Desk after                                           |
 | §5.4 deploy-parity + cutover                                    | **P2**         | Per-Desk, as wiring cuts each Desk over                                                 |
-| §5 Batch 3 (aidigest, termsdesk)                                | **P2→P3**      | Highest blast radius; termsdesk last                                                    |
+| §5 Batch 3 (termsdesk)                                          | **P2→P3**      | Highest blast radius; termsdesk last                                                    |
 | §6.2 phase-B turbo-affected switch + Batch 4 routing            | **P3+**        | Affected CI only after `@desk/*` routed; overlaps wiring standardization                |
 
 ---
@@ -311,4 +311,4 @@ The wiring plan's P0–P5 cannot start billing/admin/design work on a Desk until
 
 ### Net
 
-Stage 0 (2-repo unification) + §4.3 history purge are the true "monorepo works" milestone. Absorbing the 14 homogeneous Desks is mechanically cheap (~79M, near-clones, no inter-coupling). The genuinely hard items are exactly two: the **remote-devtools/devtools-frontend quarantine** (the real teleport fix — done as commit zero, not blob-strip) and **termsdesk** (live prod, absorbed last with deploy-parity). The plan's mechanics were right; the critiques corrected its **scope** (exclude the two cost-divergent outliers), its **size diagnosis** (299MB vendored fork, not history churn), its **safety ordering** (mirror-first, parity-before-archive, history-rewrite-as-commit-zero), and its **CI correctness** (affected-filtering only after `@desk/*` routing).
+Stage 0 (2-repo unification) + §4.3 history purge are the true "monorepo works" milestone. Absorbing the 14 homogeneous Desks is mechanically cheap (~79M, near-clones, no inter-coupling). The genuinely hard items are exactly one: **termsdesk** (live prod, absorbed last with deploy-parity). The plan's mechanics were right; the critiques corrected its **scope** (exclude aidigestdesk as non-SaaS operator service), its **size diagnosis** (299MB vendored fork, not history churn), its **safety ordering** (mirror-first, parity-before-archive, history-rewrite-as-commit-zero), and its **CI correctness** (affected-filtering only after `@desk/*` routing).

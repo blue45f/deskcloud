@@ -8,13 +8,12 @@ DeskCloud SaaS 패밀리를 하나의 pnpm 모노레포로 통합한 저장소. 
 | 경로                      | 출처 (origin)                                                   | 역할                                                                                                      |
 | ------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `platform/`               | [desk-platform](https://github.com/blue45f/desk-platform)       | `@desk/platform` 멀티테넌트 + 빌링 코어 (`packages/{shared,core,billing}` · `apps/{api,web}` · `vendor/`) |
-| `desks/<name>/`           | 각 Desk origin 레포                                             | **흡수된 17 Desk** (아래)                                                                                 |
+| `desks/<name>/`           | 각 Desk origin 레포                                             | **통합된 16 Desk** (아래)                                                                                 |
 | `packages/deskcloud-sdk/` | [deskcloud-sdk](https://github.com/blue45f/deskcloud-sdk)       | 공개 npm SDK `@heejun/deskcloud` (`pk_` browser client + `sk_` server/admin client)                       |
 | `deploy/stack/`           | [deskcloud-deploy](https://github.com/blue45f/deskcloud-deploy) | 14개 API + Caddy 통합 배포 하네스(docker compose, Caddyfile, deploy/gen-env scripts)                      |
 
-흡수된 Desk(17): `seo-gateway`(`SEOGatewayDesk`, Fastify 렌더) · `remote-devtools`(`RemoteDevTools`, CDP/세션 리플레이) · `addesk` · `authdesk` · `changelogdesk` · `chatdesk` · `communitydesk` ·
-`filedesk` · `mediadesk` · `moderationdesk` · `notifydesk` · `realtimedesk` · `reviewdesk` · `searchdesk` · `surveydesk` ·
-`aidigestdesk`(api 없음·GH Pages) · `termsdesk`(가장 성숙·Vercel+EC2). 대부분 NestJS+Drizzle+PGlite / Vite+React 동질 스택.
+흡수된 Desk(16): `seo-gateway`(`SEOGatewayDesk`, Fastify 렌더) · `remote-devtools`(`RemoteDevTools`, CDP/세션 리플레이) · `addesk` · `authdesk` · `changelogdesk` · `chatdesk` · `communitydesk` ·
+`filedesk` · `mediadesk` · `moderationdesk` · `notifydesk` · `realtimedesk` · `reviewdesk` · `searchdesk` · `surveydesk` · `termsdesk`(가장 성숙·Vercel+EC2). 대부분 NestJS+Drizzle+PGlite / Vite+React 동질 스택.
 provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 
 ### 통합 경계
@@ -26,8 +25,9 @@ provenance는 `MIGRATION.lock` + 각 origin 레포 `pre-monorepo` 태그.
 - **IN** — `seo-gateway`와 `remote-devtools`는 개발자 도구형 Desk로 deskcloud workspace 안에서
   통합 운영합니다. `remote-devtools/devtools-frontend`는 299MB 벤더 프론트엔드라 큰 자산으로
   명시 보관하지만, 소스/콘솔/문서/요금 메타데이터는 모노레포에서 함께 검증합니다.
-- **OUT** — `@heejun/web-config-preset`(DeskCloud보다 넓은 소비자). OUT 레포는 `@desk/*` /
-  `@heejun/deskcloud` 를 발행 caret 로 소비합니다.
+- **OUT** — `@heejun/web-config-preset`(DeskCloud보다 넓은 소비자), `aidigestdesk`(일반 서비스 성격). OUT 레포/서비스는 `@desk/*` 또는 `@heejun/deskcloud` 를 발행 caret로 소비합니다.
+
+  `aidigestdesk`는 SaaS 운영 경로가 아니라 독립 서비스 성격으로, 모노레포 내부 런타임 통합은 제외했습니다.
 
 ## 통합 목표 (방향)
 
@@ -54,5 +54,5 @@ pnpm compose:config                                      # deploy/stack compose 
 pnpm deploy:no-build                                     # deploy/stack 기존 이미지 재기동+헬스체크
 ```
 
-**상태**: 물리 통합(17 Desk + platform + SDK + deploy stack) 완료. `deploy/stack/.env`는 Git 추적
+**상태**: 물리 통합(16 Desk + platform + SDK + deploy stack) 완료. `deploy/stack/.env`는 Git 추적
 밖에 두고, 기존 sibling 저장소는 검증 후 archive 보관 경로로 이동합니다.

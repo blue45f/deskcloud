@@ -6,6 +6,7 @@
     "remote-devtools": "299MB 벤더 Chromium 포크 — 격리(filter-repo invert-paths). sibling 유지.",
     "deskcloud-sdk": "발행 @heejun/deskcloud — published artifact, sibling 유지.",
     "deskcloud-deploy": "배포 하네스(compose+Caddy+secrets) — sibling 유지.",
+    "aidigestdesk": "일반 운영형 서비스로 판단되어 monorepo 통합 경계에서 제외. 독립 런타임/운영 경로는 별도 관리.",
     "@heejun/web-config-preset": "DeskCloud 외 더 넓은 소비자 — external 유지."
   },
   "imported": [
@@ -24,7 +25,6 @@
     { "name": "searchdesk",     "prefix": "desks/searchdesk",      "originSha": "6be5e4aa640e", "origin": "https://github.com/blue45f/searchdesk.git",     "method": "subtree-squash" },
     { "name": "changelogdesk",  "prefix": "desks/changelogdesk",   "originSha": "787bec376a73", "origin": "https://github.com/blue45f/changelogdesk.git",  "method": "subtree-squash" },
     { "name": "realtimedesk",   "prefix": "desks/realtimedesk",    "originSha": "67e3146658db", "origin": "https://github.com/blue45f/realtimedesk.git",   "method": "subtree-squash" },
-    { "name": "aidigestdesk",   "prefix": "desks/aidigestdesk",    "originSha": "20097f5df10e", "origin": "https://github.com/blue45f/aidigestdesk.git",   "method": "subtree-squash" },
     { "name": "termsdesk",      "prefix": "desks/termsdesk",       "originSha": "65f592e1f41e", "origin": "https://github.com/blue45f/termsdesk.git",      "method": "subtree-squash+sync" }
   ]
 }
