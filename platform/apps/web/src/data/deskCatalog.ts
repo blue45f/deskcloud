@@ -38,6 +38,16 @@ export type DeskStatus = 'live'
 /** 공식 SDK npm 패키지 이름(설치 한 번으로 전체 패밀리). */
 export const SDK_PACKAGE = '@heejun/deskcloud'
 
+/** TermsDesk 공개 진입 도메인. EC2/nip.io origin은 백엔드 경계로만 숨긴다. */
+const termsdeskPublicUrlFromEnv = (import.meta.env.VITE_TERMSDESK_PUBLIC_URL as string | undefined)
+  ?.trim()
+  .replace(/\/$/, '')
+
+export const TERMSDESK_PUBLIC_URL =
+  termsdeskPublicUrlFromEnv && termsdeskPublicUrlFromEnv.length > 0
+    ? termsdeskPublicUrlFromEnv
+    : 'https://termsdesk.vercel.app'
+
 /** SDK 서버(sk_) 어드민 클라이언트가 사는 서브패스 import. */
 export const SDK_SERVER_IMPORT = `${SDK_PACKAGE}/server`
 
@@ -1242,7 +1252,7 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     sdkVar: 'terms',
     sdkUsage: "const policy = await terms.getCurrent({ slug: 'privacy' })",
     metrics: ['약관 버전', '동의 기록', '의뢰 중계', '실시간 알림'],
-    liveUrl: 'https://3.107.235.143.nip.io',
+    liveUrl: TERMSDESK_PUBLIC_URL,
   },
   {
     id: 'surveydesk',

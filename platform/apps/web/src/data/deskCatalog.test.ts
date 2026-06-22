@@ -121,9 +121,9 @@ describe('DeskCloud catalog contracts', () => {
     const termsdesk = PRODUCT_DESKS.find((desk) => desk.id === 'termsdesk')
 
     expect(termsdesk).toBeDefined()
-    expect(termsdesk?.liveUrl).toBe('https://3.107.235.143.nip.io')
+    expect(termsdesk?.liveUrl).toBe('https://termsdesk.vercel.app')
     expect(deskOperations(termsdesk!).gatewayPath).toBe('/terms')
-    expect(sdkSnippet(termsdesk!)).toContain("endpoint: 'https://3.107.235.143.nip.io'")
+    expect(sdkSnippet(termsdesk!)).toContain("endpoint: 'https://termsdesk.vercel.app'")
   })
 
   it('keeps developer-tool Desks under the DeskCloud control plane', () => {

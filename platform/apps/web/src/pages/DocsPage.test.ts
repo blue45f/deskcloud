@@ -31,8 +31,8 @@ describe('DocsPage content contracts', () => {
     expect(SAMPLE_SITES.map((sample) => sample.href)).toEqual(
       expect.arrayContaining([
         'https://desk-platform.vercel.app',
-        'https://3.107.235.143.nip.io/app/marketplace',
-        'https://3.107.235.143.nip.io/experts',
+        'https://termsdesk.vercel.app/app/marketplace',
+        'https://termsdesk.vercel.app/experts',
         'https://desk-platform.vercel.app/api/workspace-desks',
       ])
     )

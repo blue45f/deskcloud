@@ -64,7 +64,7 @@ const includeTermsDeskChecks = boolFlag(
 );
 
 const termsdeskRuntimeDefault =
-  process.env.TERMSDESK_RUNTIME_BASE ?? "https://3.107.235.143.nip.io";
+  process.env.TERMSDESK_RUNTIME_BASE ?? "https://termsdesk.vercel.app";
 
 const commandNames = {
   all: includeTermsDeskChecks

@@ -92,7 +92,7 @@ describe('platform integration verification audit', () => {
       audit.executionTracks.find((track) => track.id === 'workspace-control-plane')?.targetCount
     ).toBe(2)
     expect(audit.executionTracks.find((track) => track.id === 'termsdesk-runtime')?.command).toBe(
-      'curl -I https://3.107.235.143.nip.io/app/marketplace'
+      'curl -I https://termsdesk.vercel.app/app/marketplace'
     )
     expect(
       audit.executionTracks.find((track) => track.id === 'admin-boundaries')?.evidence
@@ -105,9 +105,9 @@ describe('platform integration verification audit', () => {
     const seoGateway = audit.deskChecks.find((check) => check.id === 'seo-gateway')
     const remoteDevtools = audit.deskChecks.find((check) => check.id === 'remote-devtools')
 
-    expect(audit.termsDeskBrokerageUrl).toBe('https://3.107.235.143.nip.io/app/marketplace')
-    expect(audit.termsDeskExpertsUrl).toBe('https://3.107.235.143.nip.io/experts')
-    expect(termsdesk?.runtimeBoundary).toBe('external runtime:https://3.107.235.143.nip.io')
+    expect(audit.termsDeskBrokerageUrl).toBe('https://termsdesk.vercel.app/app/marketplace')
+    expect(audit.termsDeskExpertsUrl).toBe('https://termsdesk.vercel.app/experts')
+    expect(termsdesk?.runtimeBoundary).toBe('external runtime:https://termsdesk.vercel.app')
 
     expect(audit.deskChecks.map((check) => check.id)).not.toContain('aidigestdesk')
     expect(audit.linkedDeskIds).toEqual([])

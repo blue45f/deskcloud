@@ -44,6 +44,10 @@ function f(path: string, init: RequestInit = {}): Promise<Response> {
   })
 }
 
+async function drain(res: Response): Promise<void> {
+  await res.arrayBuffer()
+}
+
 describe('gateway security headers — baseline (every route)', () => {
   it('GET /health carries nosniff + referrer-policy + dns-prefetch-control', async () => {
     const res = await f('/health')
@@ -51,6 +55,7 @@ describe('gateway security headers — baseline (every route)', () => {
     expect(res.headers.get('x-content-type-options')).toBe('nosniff')
     expect(res.headers.get('referrer-policy')).toBe('strict-origin-when-cross-origin')
     expect(res.headers.get('x-dns-prefetch-control')).toBe('off')
+    await drain(res)
   })
 
   it('GET /metrics keeps Prometheus content-type AND gains nosniff', async () => {
@@ -59,6 +64,7 @@ describe('gateway security headers — baseline (every route)', () => {
     // Security header is additive — it must not clobber the exposition type.
     expect(res.headers.get('content-type') ?? '').toMatch(/text\/plain/)
     expect(res.headers.get('x-content-type-options')).toBe('nosniff')
+    await drain(res)
   })
 })
 
@@ -72,6 +78,7 @@ describe('gateway security headers — admin surface (frame + CORP)', () => {
     expect(res.headers.get('cross-origin-resource-policy')).toBe('same-origin')
     // Baseline headers still present on admin routes too.
     expect(res.headers.get('x-content-type-options')).toBe('nosniff')
+    await drain(res)
   })
 
   it('GET /health (non-admin) does NOT set the admin-only frame guard', async () => {
@@ -79,5 +86,6 @@ describe('gateway security headers — admin surface (frame + CORP)', () => {
     expect(res.status).toBe(200)
     expect(res.headers.get('x-frame-options')).toBeNull()
     expect(res.headers.get('cross-origin-resource-policy')).toBeNull()
+    await drain(res)
   })
 })
