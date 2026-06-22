@@ -58,11 +58,21 @@ id|label|role|scope+scope|token;id|label|role|scope|token
 운영 검증 시 토큰 원문은 출력하지 않고 상태만 확인합니다.
 
 ```bash
-node scripts-or-oneoff.js
-# expected:
-# owner list: 200
-# operator list: 200
-# support patch: 200
-# auditor list: 200
-# auditor patch: 403
+pnpm run verify:dashboard
+```
+
+권장 API 확인은 실제 운영 토큰을 `.local/admin-accounts.md`에서 읽어 아래처럼 수행한다.
+
+```bash
+curl -H "X-Admin-Token: $ADMIN_TOKEN" \
+  https://desk-platform.vercel.app/api/v1/apps/termsdesk/inquiries/admin
+curl -H "X-Admin-Token: $ADMIN_TOKEN" \
+  https://desk-platform.vercel.app/api/v1/apps/seo-gateway/inquiries/admin
+
+# 상태 변경은 아래 형태. :id는 admin 조회 응답에서 추출
+curl -X PATCH \
+  -H "X-Admin-Token: $ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"status":"in_progress"}' \
+  https://desk-platform.vercel.app/api/v1/apps/termsdesk/inquiries/admin/$INQUIRY_ID/status
 ```

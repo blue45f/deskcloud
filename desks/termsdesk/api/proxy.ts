@@ -39,7 +39,7 @@ function apiPathFromRequest(req: VercelRequestLike): string[] {
   if (Array.isArray(param)) return param.flatMap((part) => part.split('/')).filter(Boolean)
   if (typeof param === 'string') return param.split('/').filter(Boolean)
 
-  const pathname = new URL(req.url ?? '/', 'https://termsdesk.vercel.app').pathname
+  const pathname = new URL(req.url ?? '/', 'https://3.107.235.143.nip.io').pathname
   return pathname
     .replace(/^\/api\/?/, '')
     .split('/')
@@ -47,7 +47,7 @@ function apiPathFromRequest(req: VercelRequestLike): string[] {
 }
 
 function queryFromRequest(req: VercelRequestLike): URLSearchParams {
-  const params = new URL(req.url ?? '/', 'https://termsdesk.vercel.app').searchParams
+  const params = new URL(req.url ?? '/', 'https://3.107.235.143.nip.io').searchParams
   params.delete('path')
   return params
 }

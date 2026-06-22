@@ -64,6 +64,7 @@ pnpm --filter @desk/web typecheck
 pnpm --filter @desk/web build
 pnpm exec eslint apps/web/src/pages/DocsPage.tsx apps/web/src/pages/DashboardPage.tsx
 curl -L https://desk-platform.vercel.app/api/workspace-desks
+pnpm run verify:production
 ```
 
 운영 배포 후에는 `desk-platform.vercel.app`의 새 번들에 `workspace_integrated`,

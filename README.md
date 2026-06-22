@@ -50,6 +50,8 @@ pnpm install
 pnpm build && pnpm typecheck && pnpm lint && pnpm test   # Turborepo (test는 직렬)
 pnpm build:sdk                                           # @heejun/deskcloud SDK
 pnpm run verify:developer-desks                          # SEOGatewayDesk + RemoteDevTools
+pnpm run verify:production                               # 통합 운영점검( manifest/parity + 라우트 + Dashboard )
+pnpm run verify:production:full                          # TermsDesk 런타임 포함 통합 운영점검
 pnpm compose:config                                      # deploy/stack compose 검증
 pnpm deploy:no-build                                     # deploy/stack 기존 이미지 재기동+헬스체크
 ```
