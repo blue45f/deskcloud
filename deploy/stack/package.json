@@ -5,7 +5,6 @@
   "description": "DeskCloud monorepo deployment harness",
   "packageManager": "pnpm@11.4.0",
   "scripts": {
-    "build": "true",
     "typecheck": "true",
     "lint": "true",
     "test": "true",

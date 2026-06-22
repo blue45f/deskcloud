@@ -4,21 +4,20 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [
-        "dist/**",
-        ".next/**",
-        "storybook-static/**",
-        "public/**",
+        "**/dist/**",
+        "**/.next/**",
+        "**/storybook-static/**",
         "!**/node_modules/**"
       ]
     },
     "typecheck": {
       "dependsOn": ["^build"],
-      "outputs": ["*.tsbuildinfo"]
+      "outputs": []
     },
     "lint": {},
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
+      "outputs": []
     },
     "dev": {
       "cache": false,
