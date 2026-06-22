@@ -57,6 +57,46 @@ describe('platform integration verification audit', () => {
         '/admin/inquiries',
       ])
     )
+    expect(REQUIRED_VERIFICATION_AREAS).toContain('운영 증거 트랙')
+  })
+
+  it('exposes executable evidence tracks for full integration verification', () => {
+    const audit = buildPlatformIntegrationAudit()
+
+    expect(audit.executionTrackCount).toBe(5)
+    expect(audit.executionTargetCount).toBe(
+      audit.executionTracks.reduce((sum, track) => sum + track.targetCount, 0)
+    )
+    expect(audit.executionTracks.map((track) => track.id)).toEqual([
+      'static-contracts',
+      'rendered-routes',
+      'workspace-control-plane',
+      'termsdesk-runtime',
+      'admin-boundaries',
+    ])
+
+    for (const track of audit.executionTracks) {
+      expect(track.targetCount).toBeGreaterThan(0)
+      expect(track.command.length).toBeGreaterThan(10)
+      expect(track.evidence.length).toBeGreaterThan(10)
+      expect(track.command).not.toMatch(/(?:pk|sk)_[a-z0-9]+/i)
+    }
+
+    expect(audit.executionTracks.find((track) => track.id === 'rendered-routes')?.targetCount).toBe(
+      PUBLIC_SMOKE_ROUTES.length + PRODUCT_DESKS.length
+    )
+    expect(
+      audit.executionTracks.find((track) => track.id === 'workspace-control-plane')?.command
+    ).toBe('pnpm run verify:prod-platform')
+    expect(
+      audit.executionTracks.find((track) => track.id === 'workspace-control-plane')?.targetCount
+    ).toBe(2)
+    expect(audit.executionTracks.find((track) => track.id === 'termsdesk-runtime')?.command).toBe(
+      'curl -I https://3.107.235.143.nip.io/app/marketplace'
+    )
+    expect(
+      audit.executionTracks.find((track) => track.id === 'admin-boundaries')?.evidence
+    ).toContain('X-Admin-Token')
   })
 
   it('keeps special integration boundaries explicit for TermsDesk, AIDigestDesk, and workspace Desks', () => {

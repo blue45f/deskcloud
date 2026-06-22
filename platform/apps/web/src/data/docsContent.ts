@@ -172,6 +172,14 @@ export const FULL_VERIFICATION_MATRIX = [
     command: 'pnpm --filter @desk/web typecheck',
   },
   {
+    area: '운영 증거 트랙',
+    entry: '/dashboard#integration-verification',
+    expected:
+      '정적 계약, 렌더드 라우트, workspace manifest, TermsDesk 런타임, 어드민 경계를 같은 패널에서 확인합니다.',
+    proof: 'integrationVerification contract test + rendered dashboard smoke',
+    command: 'pnpm --filter @desk/web test -- integrationVerification',
+  },
+  {
     area: '문의 관리 보드',
     entry: '/admin/inquiries',
     expected: 'X-Admin-Token 기반 문의 운영 보드가 상태/origin 필터를 제공합니다.',

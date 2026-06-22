@@ -13,6 +13,7 @@ import {
   RotateCw,
   Settings,
   ShieldCheck,
+  SquareTerminal,
   TriangleAlert,
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
@@ -660,6 +661,59 @@ function IntegrationVerificationPanel({ tenant }: { tenant?: TenantDto }) {
             {audit.micrositeRouteCount}개 라우트입니다.
           </Banner>
         )}
+
+        <div>
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 className="text-xs font-semibold tracking-wide text-text-subtle uppercase">
+              실행 증거 트랙
+            </h2>
+            <Badge tone="accent" size="sm">
+              {audit.executionTrackCount} tracks · {audit.executionTargetCount} targets
+            </Badge>
+          </div>
+          <div className="grid gap-3 md:grid-cols-2 2xl:grid-cols-5">
+            {audit.executionTracks.map((track) => (
+              <div key={track.id} className="rounded-md border border-border bg-surface p-3">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="inline-flex min-w-0 items-center gap-1.5 text-sm font-semibold text-text">
+                    <SquareTerminal className="size-4 shrink-0 text-accent-strong" aria-hidden />
+                    <span className="truncate">{track.title}</span>
+                  </p>
+                  <Badge tone="outline" size="sm">
+                    {track.targetCount}
+                  </Badge>
+                </div>
+                <p className="mt-2 text-[0.8125rem] leading-5 text-text-muted">{track.scope}</p>
+                <dl className="mt-3 space-y-2 text-[0.75rem]">
+                  <div>
+                    <dt className="font-semibold tracking-wide text-text-subtle uppercase">
+                      Command
+                    </dt>
+                    <dd>
+                      <code className="mt-1 block rounded bg-surface-2 px-2 py-1.5 font-mono leading-5 break-words text-text-muted">
+                        {track.command}
+                      </code>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="font-semibold tracking-wide text-text-subtle uppercase">
+                      Evidence
+                    </dt>
+                    <dd className="mt-1 leading-5 text-text-muted">{track.evidence}</dd>
+                  </div>
+                </dl>
+                <div className="mt-3 flex flex-wrap gap-1.5 border-t border-border pt-3">
+                  <Badge tone="neutral" size="sm">
+                    {track.owner}
+                  </Badge>
+                  <Badge tone="info" size="sm">
+                    {track.cadence}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div>

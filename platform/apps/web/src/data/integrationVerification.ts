@@ -10,6 +10,24 @@ import { FULL_VERIFICATION_MATRIX, TERMSDESK_RUNTIME } from './docsContent'
 
 export type IntegrationContractStatus = 'verified' | 'failed'
 
+export type VerificationExecutionTrackId =
+  | 'static-contracts'
+  | 'rendered-routes'
+  | 'workspace-control-plane'
+  | 'termsdesk-runtime'
+  | 'admin-boundaries'
+
+export interface VerificationExecutionTrack {
+  id: VerificationExecutionTrackId
+  title: string
+  scope: string
+  targetCount: number
+  command: string
+  evidence: string
+  owner: string
+  cadence: string
+}
+
 export interface DeskIntegrationVerification {
   id: string
   name: string
@@ -44,6 +62,9 @@ export interface PlatformIntegrationAudit {
   linkedDeskIds: readonly string[]
   termsDeskBrokerageUrl: string
   termsDeskExpertsUrl: string
+  executionTrackCount: number
+  executionTargetCount: number
+  executionTracks: readonly VerificationExecutionTrack[]
   deskChecks: readonly DeskIntegrationVerification[]
 }
 
@@ -55,6 +76,7 @@ export const REQUIRED_VERIFICATION_AREAS = [
   'TermsDesk 의뢰 중계',
   'Workspace manifest API',
   '운영 콘솔',
+  '운영 증거 트랙',
   '문의 관리 보드',
   '디자인 시스템',
   '통합 빌드/테스트',
@@ -76,6 +98,7 @@ export function buildPlatformIntegrationAudit(
   desks: readonly DeskEntry[] = PRODUCT_DESKS
 ): PlatformIntegrationAudit {
   const deskChecks = desks.map(buildDeskIntegrationVerification)
+  const executionTracks = buildVerificationExecutionTracks(deskChecks)
   const matrixAreas = new Set(FULL_VERIFICATION_MATRIX.map((item) => item.area))
   const missingRequiredAreas = REQUIRED_VERIFICATION_AREAS.filter((area) => !matrixAreas.has(area))
   const failedDeskIssues = deskChecks.flatMap((check) =>
@@ -107,6 +130,9 @@ export function buildPlatformIntegrationAudit(
     linkedDeskIds: deskChecks.filter((check) => check.mode === 'linked').map((check) => check.id),
     termsDeskBrokerageUrl: `${TERMSDESK_RUNTIME}/app/marketplace`,
     termsDeskExpertsUrl: `${TERMSDESK_RUNTIME}/experts`,
+    executionTrackCount: executionTracks.length,
+    executionTargetCount: executionTracks.reduce((sum, track) => sum + track.targetCount, 0),
+    executionTracks,
     deskChecks,
   }
 }
@@ -210,4 +236,64 @@ function runtimeBoundaryLabel(desk: DeskEntry): string {
   if (desk.integrationMode === 'workspace') return `workspace:${desk.workspacePath}`
   if (desk.integrationMode === 'linked') return `linked:${desk.sourceRepositoryUrl}`
   return 'DeskCloud native SDK/API'
+}
+
+function buildVerificationExecutionTracks(
+  deskChecks: readonly DeskIntegrationVerification[]
+): readonly VerificationExecutionTrack[] {
+  const workspaceDeskCount = deskChecks.filter((check) => check.mode === 'workspace').length
+
+  return [
+    {
+      id: 'static-contracts',
+      title: '정적 계약',
+      scope: 'PRODUCT_DESKS, 마이크로사이트, 운영 허브, gateway, runbook, 문서 매트릭스',
+      targetCount: deskChecks.length + REQUIRED_VERIFICATION_AREAS.length,
+      command: 'pnpm --filter @desk/web test -- integrationVerification',
+      evidence: 'desk contract test, route catalog test, matrix coverage test',
+      owner: 'platform web',
+      cadence: 'PR gate',
+    },
+    {
+      id: 'rendered-routes',
+      title: '렌더드 라우트',
+      scope: '공개 라우트, 모든 Desk 마이크로사이트, desktop/mobile layout, console errors',
+      targetCount: PUBLIC_SMOKE_ROUTES.length + deskChecks.length,
+      command: 'Playwright smoke: public routes + /desks/* on desktop/mobile',
+      evidence: 'HTTP 200, page identity, console warning/error 0, screenshot evidence',
+      owner: 'frontend QA',
+      cadence: '배포 전/후',
+    },
+    {
+      id: 'workspace-control-plane',
+      title: 'Workspace control-plane',
+      scope: 'SEOGatewayDesk, RemoteDevTools manifest, source path, adminPath, liveUrl null',
+      targetCount: workspaceDeskCount,
+      command: 'pnpm run verify:prod-platform',
+      evidence: 'manifest list, per-id GET, aidigestdesk excluded 404, no standalone liveUrl',
+      owner: 'developer desks',
+      cadence: '배포 후',
+    },
+    {
+      id: 'termsdesk-runtime',
+      title: 'TermsDesk 런타임',
+      scope: '약관 의뢰 marketplace, 전문가 디렉터리, 보호 API 인증 경계, demo flow',
+      targetCount: 4,
+      command: `curl -I ${TERMSDESK_RUNTIME}/app/marketplace`,
+      evidence: 'marketplace 200, experts 200, protected API 401, demo brokerage session',
+      owner: 'termsdesk',
+      cadence: '운영 배포 후',
+    },
+    {
+      id: 'admin-boundaries',
+      title: '어드민 경계',
+      scope: 'tenant session, service origin allowlist, usage/billing, X-Admin-Token inquiries',
+      targetCount: 4,
+      command: 'dashboard session smoke + admin inquiries token smoke',
+      evidence:
+        'Bearer session required, X-Admin-Token inquiries, origin filter, usage/billing API',
+      owner: 'platform API',
+      cadence: '보안 변경 시',
+    },
+  ] as const
 }
