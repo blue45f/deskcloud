@@ -1,13 +1,22 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { SessionPreviewCard } from './SessionPreviewCard';
 
 import { renderWithProviders } from '@/test/utils';
 
-beforeEach(() => {
-  localStorage.setItem('demo-mode', '1');
+vi.mock('@/lib/api', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/api')>('@/lib/api');
+  return {
+    ...actual,
+    apiFetch: vi.fn(async () => ({
+      head: '',
+      body: '<main>Preview</main>',
+      width: 1280,
+      height: 800,
+    })),
+  };
 });
 
 describe('SessionPreviewCard', () => {
