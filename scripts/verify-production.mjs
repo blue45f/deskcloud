@@ -947,13 +947,14 @@ function safePath(route) {
 async function launchBrowser(playwright) {
   const headless = process.env.DESKCLOUD_HEADLESS !== "0";
   const forceChromium = process.env.DESKCLOUD_FORCE_CHROMIUM === "1";
+  const browserChannel = process.env.DESKCLOUD_BROWSER_CHANNEL;
   const useSystemChrome = !forceChromium && (await exists(chromePath));
   const launchOptions = { headless };
 
   if (useSystemChrome) {
     launchOptions.executablePath = chromePath;
-  } else {
-    launchOptions.channel = "chromium";
+  } else if (browserChannel) {
+    launchOptions.channel = browserChannel;
   }
 
   return playwright.chromium.launch(launchOptions);

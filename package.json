@@ -26,6 +26,8 @@
     "verify:termsdesk": "node scripts/verify-production.mjs termsdesk",
     "verify:production": "pnpm run verify:prod-platform && pnpm run verify:prod-routes && pnpm run verify:dashboard",
     "verify:production:full": "DESKCLOUD_VERIFY_TERMSDESK=1 pnpm run verify:production && pnpm run verify:termsdesk",
+    "verify:local-stack": "pnpm compose:config && pnpm deploy:no-build",
+    "verify:live": "pnpm run verify:production:full",
     "dev:seo-gateway": "pnpm --filter @spa-seo-gateway/gateway run dev",
     "dev:remote-devtools:internal": "pnpm --filter @desk/remote-devtools run start:internal:dev",
     "dev:remote-devtools:external": "pnpm --filter @desk/remote-devtools run start:external:dev",

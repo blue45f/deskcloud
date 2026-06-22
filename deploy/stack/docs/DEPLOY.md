@@ -40,6 +40,14 @@ cd ~/WebstormProjects/deskcloud/deploy/stack
 ./gen-env.sh && docker compose up -d --build
 ```
 
+모노레포 루트에서는 같은 동작을 아래 스크립트로 실행한다.
+
+```bash
+pnpm deploy                  # build + up + 전체 gateway health
+pnpm run verify:local-stack  # compose config + no-build 재기동 + health
+pnpm run verify:live         # 운영 웹/라우트/대시보드/TermsDesk 검증
+```
+
 `deploy.sh` 는 서비스별 순차 build/up, 컨테이너 내부 `/health` 준비 대기, 게이트웨이(`<host>/`)
 기동 대기, 14개 API 서비스의 `/<desk>/health` 200 확인을 수행합니다(PGlite 마이그레이션·시드까지
 시간이 걸릴 수 있어 재시도 포함). `./deploy.sh --no-build` 는 빌드 생략,

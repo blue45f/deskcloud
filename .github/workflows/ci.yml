@@ -9,6 +9,12 @@
 name: CI
 on:
   workflow_dispatch:
+    inputs:
+      production_checks:
+        description: Run live DeskCloud production verification
+        required: false
+        default: false
+        type: boolean
   push:
     paths-ignore: ["**/*.md", "docs/**"]
   pull_request:
@@ -36,3 +42,20 @@ jobs:
       - run: pnpm run typecheck
       - run: pnpm run build
       - run: pnpm run test
+
+  production-verify:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.production_checks }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @desk/remote-devtools-client exec playwright install --with-deps chromium
+      - run: pnpm run verify:live

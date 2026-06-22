@@ -52,9 +52,13 @@ pnpm build:sdk                                           # @heejun/deskcloud SDK
 pnpm run verify:developer-desks                          # SEOGatewayDesk + RemoteDevTools
 pnpm run verify:production                               # 통합 운영점검( manifest/parity + 라우트 + Dashboard )
 pnpm run verify:production:full                          # TermsDesk 런타임 포함 통합 운영점검
+pnpm run verify:live                                     # verify:production:full 별칭
 pnpm compose:config                                      # deploy/stack compose 검증
+pnpm run verify:local-stack                              # compose 검증 + 기존 이미지 재기동 + 헬스체크
 pnpm deploy:no-build                                     # deploy/stack 기존 이미지 재기동+헬스체크
 ```
 
-**상태**: 물리 통합(16 Desk + platform + SDK + deploy stack) 완료. `deploy/stack/.env`는 Git 추적
-밖에 두고, 기존 sibling 저장소는 검증 후 archive 보관 경로로 이동합니다.
+**상태**: 물리 통합(16 Desk + platform + SDK + deploy stack) 완료. `aidigestdesk`는 일반 서비스
+성격으로 workspace/runtime 통합에서 제외했습니다. 2026-06-22 기준 루트 검증, 로컬 compose
+배포 헬스체크, 운영 라우트/대시보드/TermsDesk 검증이 통과했습니다. `deploy/stack/.env`는 Git 추적
+밖에 두고, sibling 원본 archive는 별도 soak 이후에만 진행합니다.

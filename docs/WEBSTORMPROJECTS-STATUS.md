@@ -63,21 +63,22 @@ DeskCloud 내부 workspace로 남아 있다. `spa-seo-gateway`, `remote-devtools
 
 2026-06-22 KST 기준으로 다음 검증을 완료했다.
 
-| 구분                  | 명령/대상                                                                | 결과                                                                  |
-| --------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------- |
-| 전체 모노레포 검증    | `pnpm run verify`                                                        | 통과, 119 tasks successful                                            |
-| 운영 통합 검증        | `pnpm run verify:production`                                             | 정비 완료(운영 점검 스크립트 정착, TermsDesk 런타임 점검은 별도 실행) |
-| 개발자 Desk 집중 검증 | `pnpm run verify:developer-desks`                                        | 통과                                                                  |
-| 보안 감사             | `pnpm --dir platform run audit:security`                                 | 통과                                                                  |
-| Compose 설정          | `pnpm compose:config`                                                    | 통과                                                                  |
-| 공백/패치 검증        | `git diff --check`                                                       | 통과                                                                  |
-| 운영 헬스체크         | `https://16.176.210.195.nip.io/platform/health`                          | 200                                                                   |
-| 운영 manifest         | `https://desk-platform.vercel.app/api/workspace-desks`                   | 200                                                                   |
-| 운영 manifest parity  | `pnpm run verify:prod-platform`                                          | 통과                                                                  |
-| 대표 마이크로사이트   | `/desks/seo-gateway`, `/desks/remote-devtools`                           | 200 및 렌더링 통과                                                    |
-| 공개 링크 이동        | `/catalog`에서 대표 2개 Desk 마이크로사이트 클릭                         | 통과                                                                  |
-| 모바일 렌더링         | 홈, 카탈로그, 대표 2개 Desk 마이크로사이트                               | 통과                                                                  |
-| Admin 계정 smoke      | owner/operator/support/auditor 권한, invalid token, originHost 필터 검증 | 통과                                                                  |
+| 구분                  | 명령/대상                                                                | 결과                                                |
+| --------------------- | ------------------------------------------------------------------------ | --------------------------------------------------- |
+| 전체 모노레포 검증    | `pnpm run verify`                                                        | 통과, 119 tasks successful                          |
+| 운영 통합 검증        | `pnpm run verify:production:full`                                        | 통과(route 52/52, dashboard 3/3, termsdesk 2/2)     |
+| 개발자 Desk 집중 검증 | `pnpm run verify:developer-desks`                                        | 통과                                                |
+| 보안 감사             | `pnpm --dir platform run audit:security`                                 | 통과                                                |
+| Compose 설정          | `pnpm compose:config`                                                    | 통과                                                |
+| 로컬 통합 배포        | `pnpm deploy`                                                            | 통과(14개 API + Caddy 순차 기동, 전체 `/health` OK) |
+| 공백/패치 검증        | `git diff --check`                                                       | 통과                                                |
+| 운영 헬스체크         | `https://16.176.210.195.nip.io/platform/health`                          | 200                                                 |
+| 운영 manifest         | `https://desk-platform.vercel.app/api/workspace-desks`                   | 200                                                 |
+| 운영 manifest parity  | `pnpm run verify:prod-platform`                                          | 통과                                                |
+| 대표 마이크로사이트   | `/desks/seo-gateway`, `/desks/remote-devtools`                           | 200 및 렌더링 통과                                  |
+| 공개 링크 이동        | `/catalog`에서 대표 2개 Desk 마이크로사이트 클릭                         | 통과                                                |
+| 모바일 렌더링         | 홈, 카탈로그, 대표 2개 Desk 마이크로사이트                               | 통과                                                |
+| Admin 계정 smoke      | owner/operator/support/auditor 권한, invalid token, originHost 필터 검증 | 통과                                                |
 
 Browser plugin은 현재 세션에 제공되지 않아 Playwright + 로컬 Chrome으로 브라우저
 검증을 수행했다. 검증 스크린샷은 Git 제외 경로 `.local/verification/`에 저장했다.
@@ -114,5 +115,7 @@ Browser plugin은 현재 세션에 제공되지 않아 Playwright + 로컬 Chrom
 `WORKSPACE_DESK_IDS`와 운영 `/api/workspace-desks`를 비교하고, AIDigestDesk가 workspace
 Desk가 아니라 linked 독립 운영 항목으로 404를 반환하는지도 확인한다.
 
-장기적으로는 EC2 배포 스택을 이 저장소의 `deploy/stack` 기준으로 수렴시키는 것이 좋다.
-이 작업은 다른 서비스 컨테이너까지 영향이 있으므로 별도 배포 윈도우에서 진행해야 한다.
+`deploy/stack`은 2026-06-22 KST에 로컬 Docker host 기준 `pnpm deploy`로 전체 빌드/기동/헬스체크를
+통과했다. 운영 EC2가 여전히 복사된 build context를 쓰는 경우에는 이 저장소의 `deploy/stack`
+체크아웃 기준으로 수렴시키는 작업이 남는다. 이 작업은 다른 서비스 컨테이너까지 영향이 있으므로
+별도 배포 윈도우에서 진행해야 한다.

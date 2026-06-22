@@ -39,7 +39,14 @@ cd ~/WebstormProjects/deskcloud/deploy/stack
 ./gen-env.sh && ./deploy.sh
 ```
 
-전체 14개 Desk 를 로컬 Docker Desktop/Colima VM 에서 한 번에 검증할 때는 `./deploy.sh` 를 권장합니다.
+모노레포 루트에서는 같은 검증을 pnpm 스크립트로 실행할 수 있습니다.
+
+```bash
+pnpm run verify:local-stack   # compose config + 기존 이미지 재기동 + gateway health
+pnpm deploy                   # 이미지 빌드 + 순차 기동 + 전체 health
+```
+
+전체 14개 API 서비스를 로컬 Docker Desktop/Colima VM 에서 한 번에 검증할 때는 `./deploy.sh` 를 권장합니다.
 서비스를 하나씩 띄우고 각 컨테이너 내부 `/health` 준비 상태를 기다리므로, raw
 `docker compose up -d --build` 보다 첫 부팅 피크를 다루기 쉽습니다. Colima 기준 전체 스택 검증은
 20 GB VM 메모리에서 확인했습니다:
