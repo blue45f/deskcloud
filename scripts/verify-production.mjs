@@ -57,7 +57,11 @@ const catalogDeskRoutes = [
   "/desks/termsdesk",
 ];
 
-const consoleIgnore = [/favicon/i, /ResizeObserver loop/i];
+const consoleIgnore = [
+  /favicon/i,
+  /ResizeObserver loop/i,
+  /Failed to load resource: the server responded with a status of 401/i,
+];
 
 const mode = process.argv[2] ?? "all";
 
