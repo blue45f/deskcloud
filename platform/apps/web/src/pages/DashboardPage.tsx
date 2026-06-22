@@ -791,7 +791,8 @@ function IntegrationVerificationPanel({ tenant }: { tenant?: TenantDto }) {
                   {audit.workspaceDeskIds.join(', ')}
                 </p>
                 <p>
-                  <strong className="text-text">Linked:</strong> {audit.linkedDeskIds.join(', ')}
+                  <strong className="text-text">Linked:</strong>{' '}
+                  {audit.linkedDeskIds.length > 0 ? audit.linkedDeskIds.join(', ') : '없음'}
                 </p>
               </div>
             </div>

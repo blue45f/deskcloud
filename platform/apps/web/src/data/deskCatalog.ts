@@ -296,15 +296,6 @@ export const DESK_OPERATIONS: Readonly<Record<string, DeskOperations>> = {
     config: ['session TTL', 'password policy', 'allowed origins', 'JWT audience'],
     operatorTasks: ['사용자 상태 확인', '세션 정책 변경', '로그인 실패 분석'],
   }),
-  aidigestdesk: ops('aidigestdesk', {
-    gatewayPath: '/aidigest',
-    primaryMetric: 'events',
-    billingDriver:
-      '소스 스냅샷, 업데이트 후보, 뉴스레터 내보내기, 편집 워크벤치 작업을 이벤트로 집계합니다.',
-    config: ['source schedule', 'content snapshot', 'editorial pipeline', 'Pages base path'],
-    operatorTasks: ['공식 소스 스냅샷', '업데이트 후보 검수', '뉴스레터/런북 내보내기'],
-    recommendedPlan: 'pro',
-  }),
   filedesk: ops('filedesk', {
     gatewayPath: '/file',
     primaryMetric: 'storage_mb',
@@ -376,33 +367,6 @@ function readiness(value: Partial<DeskReadiness>): DeskReadiness {
 }
 
 export const DESK_READINESS: Readonly<Record<string, DeskReadiness>> = {
-  aidigestdesk: readiness({
-    summary:
-      'AIDigestDesk는 독립 콘텐츠 포털 성격이 강해 자체 운영 콘솔과 편집 흐름을 유지합니다. DeskCloud는 가입회사/빌링/서비스 도메인 상태와 사용량 지표만 공통으로 관측합니다.',
-    controlPlane: 'DeskCloud tenant 설정 + aidigestdesk 자체 포털 관리자 콘솔',
-    dataPlane:
-      'desks/aidigestdesk Vite 포털, @aidigestdesk/content 콘텐츠 파이프라인, 소스 스냅샷 큐',
-    checks: [
-      {
-        label: '독립 콘솔 가동',
-        description:
-          'AIDigestDesk 내부 /admin 진입이 가능하고 에디터 승인 흐름이 정상 작동해야 합니다.',
-        status: 'watch',
-      },
-      {
-        label: '소스 스냅샷 큐',
-        description:
-          '공식 출처 해시 변화와 업데이트 후보 생성이 실패 없이 운영 지표에 반영되는지 확인합니다.',
-        status: 'ready',
-      },
-      {
-        label: '뉴스레터/런북 내보내기',
-        description:
-          'export run 산출물이 운영 채널(메일/스토리지)로 정합성 있게 전달되는지 점검합니다.',
-        status: 'needs_config',
-      },
-    ],
-  }),
   'seo-gateway': readiness({
     summary: SEO_GATEWAY_WORKSPACE.readinessSummary,
     controlPlane: SEO_GATEWAY_WORKSPACE.controlPlane,
@@ -1041,59 +1005,6 @@ export const DESK_DETAILS: Readonly<Record<string, DeskDetails>> = {
     domainIsolation:
       'AuthDesk는 allowed origin과 JWT audience로 도메인별 인증 경계를 만듭니다. 같은 회사 테넌트의 여러 앱이 같은 사용자 풀을 공유할 수 있지만, 토큰 사용처는 audience로 제한합니다.',
   }),
-  aidigestdesk: details({
-    summary:
-      'AIDigestDesk는 AI/LLM 업데이트와 벤치마크를 큐레이션하는 콘텐츠 Desk입니다. 앱과 패키지 레이어는 기존 운영 방식을 유지하며, 내부 /admin 경로로 소스 큐레이션, 후보 심사, export run 을 운영합니다. DeskCloud에서는 가입회사 키 발급, 사용량 집계, service origin 관리를 관측 레이어로 확인합니다.',
-    bestFor: [
-      'AI/LLM 업데이트 한국어 큐레이션',
-      '공식 문서·벤치마크 소스 모니터링',
-      '주간 뉴스레터와 직군별 플레이북 운영',
-    ],
-    dataModel: [
-      {
-        name: 'ModelCatalog',
-        description: '모델, 제공사, 기능, 비용, 벤치마크, 사용처를 묶은 콘텐츠 카탈로그입니다.',
-      },
-      {
-        name: 'SourceSnapshot',
-        description: '공식 문서와 벤치마크 출처의 URL, 해시, 확인 상태, 실패 정보를 보관합니다.',
-      },
-      {
-        name: 'EditorialCandidate',
-        description:
-          '수집, 검토, 한국어 요약, 게시 준비, 게시 단계로 움직이는 업데이트 후보입니다.',
-      },
-      {
-        name: 'ExportRun',
-        description:
-          '뉴스레터 Markdown, 소스 모니터 CSV, 편집 파이프라인 JSON 내보내기 기록입니다.',
-      },
-    ],
-    adminGuide: [
-      {
-        title: '공식 소스 스냅샷',
-        description:
-          '주요 모델 공식 문서와 벤치마크 페이지를 확인하고 본문 해시 변화와 실패 상태를 점검합니다.',
-      },
-      {
-        title: '업데이트 후보 검수',
-        description:
-          '수집된 후보를 한국어 요약, 출처 확인, 게시 준비 단계로 옮기고 중복/날짜/상태 규칙을 확인합니다.',
-      },
-      {
-        title: '뉴스레터와 런북 내보내기',
-        description:
-          '주간 요약 Markdown, 소스 모니터 CSV, 스냅샷 Runbook을 내려받아 편집/운영 채널에 배포합니다.',
-      },
-    ],
-    integrationGuide: [
-      'AIDigestDesk 내부 운영 콘솔에서 /admin 진입 경로가 정상 동작하는지 확인합니다.',
-      'packages/content의 catalog, sourceSnapshots, translatedNews 데이터 계약을 빌드 파이프라인에서 점검합니다.',
-      '내부 워크플로와 DeskCloud 서비스 origin/usage 지표의 정합성을 함께 모니터링합니다.',
-    ],
-    domainIsolation:
-      'AIDigestDesk는 공개 콘텐츠 포털 성격이므로 운영 경계는 서비스 도메인 기반 origin 허용과 내부 편집 워크플로 권한으로 분리합니다. 같은 회사에서 다수의 도메인을 쓰더라도 큐레이션 소스/후보 상태는 origin와 내부 권한으로 관리됩니다.',
-  }),
   filedesk: details({
     summary:
       'FileDesk는 범용 파일 업로드, 공개/비공개 가시성, signed URL 다운로드를 제공하는 스토리지 Desk입니다. MediaDesk가 이미지 변환에 초점을 맞춘다면 FileDesk는 문서, 첨부, 백오피스 파일처럼 원본 파일 보관과 접근 제어에 집중합니다.',
@@ -1269,15 +1180,6 @@ app.get('/render', async (req, reply) => {
   const html = await render({ url, pool: browserPool })
   return reply.type('text/html').send(html)
 })`
-  }
-
-  if (desk.id === 'aidigestdesk') {
-    return `import { getSourceSnapshotCandidates, modelProfiles, translatedArticles } from '@aidigestdesk/content'
-
-const latestUpdates = translatedArticles.slice(0, 5)
-const sourceQueue = getSourceSnapshotCandidates().slice(0, 10)
-
-console.log(modelProfiles.length, latestUpdates, sourceQueue)`
   }
 
   if (desk.id === 'remote-devtools') {
@@ -1498,19 +1400,6 @@ export const DESK_CATALOG: readonly DeskEntry[] = [
     sdkVar: 'auth',
     sdkUsage: 'const { user, token } = await auth.login({ email, password })',
     metrics: ['회원', '세션', 'JWT'],
-  },
-  {
-    id: 'aidigestdesk',
-    name: 'AIDigestDesk',
-    tagline: 'AI/LLM 업데이트 큐레이션',
-    what: '주요 AI/LLM의 공식 업데이트, 벤치마크, 기능 비교, 한국어 강좌와 직군별 플레이북을 큐레이션하고 편집실 워크플로로 운영합니다.',
-    icon: Sparkles,
-    tone: 'accent',
-    status: 'live',
-    metrics: ['소스 스냅샷', '업데이트 후보', '뉴스레터', '플레이북'],
-    integrationMode: 'linked',
-    integrationPackage: '@aidigestdesk/content',
-    sourceRepositoryUrl: 'https://github.com/blue45f/aidigestdesk',
   },
   {
     id: 'filedesk',

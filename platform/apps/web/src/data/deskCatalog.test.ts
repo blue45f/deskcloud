@@ -24,7 +24,8 @@ describe('DeskCloud catalog contracts', () => {
     const ids = PRODUCT_DESKS.map((desk) => desk.id)
 
     expect(new Set(ids).size).toBe(ids.length)
-    expect(ids.length).toBeGreaterThanOrEqual(17)
+    expect(ids.length).toBeGreaterThanOrEqual(16)
+    expect(ids).not.toContain('aidigestdesk')
 
     for (const desk of PRODUCT_DESKS) {
       expect(DESK_OPERATIONS).toHaveProperty(desk.id)
@@ -86,22 +87,24 @@ describe('DeskCloud catalog contracts', () => {
     }
   })
 
+  it('keeps AIDigestDesk out of the SaaS product catalog', () => {
+    const ids = PRODUCT_DESKS.map((desk) => desk.id)
+
+    expect(ids).not.toContain('aidigestdesk')
+    expect(DESK_OPERATIONS).not.toHaveProperty('aidigestdesk')
+    expect(DESK_DETAILS).not.toHaveProperty('aidigestdesk')
+    expect(DESK_READINESS).not.toHaveProperty('aidigestdesk')
+  })
+
   it('serves workspace Desk snippets from integrated runtime boundaries', () => {
-    const aiDigest = PRODUCT_DESKS.find((desk) => desk.id === 'aidigestdesk')
     const seoGateway = PRODUCT_DESKS.find((desk) => desk.id === 'seo-gateway')
     const remoteDevtools = PRODUCT_DESKS.find((desk) => desk.id === 'remote-devtools')
 
-    expect(aiDigest).toBeDefined()
     expect(seoGateway).toBeDefined()
     expect(remoteDevtools).toBeDefined()
 
-    const aiDigestSnippet = sdkSnippet(aiDigest!)
     const seoSnippet = sdkSnippet(seoGateway!)
     const remoteSnippet = sdkSnippet(remoteDevtools!)
-
-    expect(aiDigest?.name).toBe('AIDigestDesk')
-    expect(aiDigestSnippet).toContain('@aidigestdesk/content')
-    expect(aiDigestSnippet).toContain('getSourceSnapshotCandidates')
 
     expect(seoGateway?.name).toBe('SEOGatewayDesk')
     expect(seoSnippet).toContain('@heejun/spa-seo-gateway-core')

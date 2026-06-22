@@ -12,7 +12,7 @@ describe('platform integration verification audit', () => {
     const audit = buildPlatformIntegrationAudit()
 
     expect(audit.productDeskCount).toBe(PRODUCT_DESKS.length)
-    expect(audit.productDeskCount).toBeGreaterThanOrEqual(17)
+    expect(audit.productDeskCount).toBeGreaterThanOrEqual(16)
     expect(audit.verifiedDeskCount).toBe(PRODUCT_DESKS.length)
     expect(audit.failedDeskCount).toBe(0)
     expect(audit.criticalIssues).toEqual([])
@@ -99,10 +99,9 @@ describe('platform integration verification audit', () => {
     ).toContain('X-Admin-Token')
   })
 
-  it('keeps special integration boundaries explicit for TermsDesk, AIDigestDesk, and workspace Desks', () => {
+  it('keeps special integration boundaries explicit for TermsDesk and workspace Desks', () => {
     const audit = buildPlatformIntegrationAudit()
     const termsdesk = audit.deskChecks.find((check) => check.id === 'termsdesk')
-    const aiDigest = audit.deskChecks.find((check) => check.id === 'aidigestdesk')
     const seoGateway = audit.deskChecks.find((check) => check.id === 'seo-gateway')
     const remoteDevtools = audit.deskChecks.find((check) => check.id === 'remote-devtools')
 
@@ -110,9 +109,8 @@ describe('platform integration verification audit', () => {
     expect(audit.termsDeskExpertsUrl).toBe('https://3.107.235.143.nip.io/experts')
     expect(termsdesk?.runtimeBoundary).toBe('external runtime:https://3.107.235.143.nip.io')
 
-    expect(aiDigest?.mode).toBe('linked')
-    expect(aiDigest?.runtimeBoundary).toContain('https://github.com/blue45f/aidigestdesk')
-    expect(audit.linkedDeskIds).toEqual(['aidigestdesk'])
+    expect(audit.deskChecks.map((check) => check.id)).not.toContain('aidigestdesk')
+    expect(audit.linkedDeskIds).toEqual([])
 
     expect(seoGateway?.mode).toBe('workspace')
     expect(remoteDevtools?.mode).toBe('workspace')

@@ -224,10 +224,6 @@ function collectContractIssues(desk: DeskEntry): string[] {
   if (desk.id === 'termsdesk' && desk.liveUrl !== TERMSDESK_RUNTIME) {
     issues.push('TermsDesk 의뢰 중계 런타임 URL이 문서 기준과 다릅니다.')
   }
-  if (desk.id === 'aidigestdesk' && mode !== 'linked') {
-    issues.push('AIDigestDesk는 SaaS Desk가 아니라 linked 독립 운영 항목이어야 합니다.')
-  }
-
   return issues
 }
 

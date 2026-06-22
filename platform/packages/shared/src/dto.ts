@@ -92,7 +92,7 @@ export interface InquiryListDto<T extends InquiryDto = InquiryDto> {
  * 일별 버킷(daily_visits)을 합산해 오늘/전체를 모두 돌려준다. 키 인증 없이 읽힌다.
  */
 export interface VisitStatsDto {
-  /** 집계 대상 앱 식별자(예: 'aidigestdesk'). */
+  /** 집계 대상 앱 식별자(예: 'termsdesk'). */
   appId: string
   /** 집계 기준 일자('YYYY-MM-DD', UTC). */
   day: string
