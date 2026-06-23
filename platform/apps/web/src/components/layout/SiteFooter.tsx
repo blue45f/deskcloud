@@ -61,9 +61,29 @@ export function SiteFooter() {
             </nav>
           ))}
         </div>
-        <div className="mt-10 flex flex-col gap-2 border-t border-border pt-6 text-xs text-text-subtle sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} DeskCloud · @desk/platform</p>
-          <p>결제는 TEST/STUB 모드 — 실제 청구가 발생하지 않습니다.</p>
+        <div className="mt-10 border-t border-border pt-8 text-[11px] text-text-subtle space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4 leading-relaxed">
+            <div>
+              <p className="font-semibold text-text-muted">상호: 에이치준랩스</p>
+              <p>대표자: 김희준 | 개인정보보호책임자: 김희준</p>
+            </div>
+            <div>
+              <p>사업자등록번호: 355-07-03473</p>
+              <p>주소: 서울특별시 송파구 가락로34길 13, 101호(방이동)</p>
+            </div>
+            <div>
+              <p>이메일: blue45f@gmail.com</p>
+              <p>전화번호: 010-3873-4197</p>
+            </div>
+            <div>
+              <p>호스팅 서비스: Vercel (Frontend)</p>
+              <p>플랫폼 형태: 멀티테넌트 SaaS 플랫폼 모노레포</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {new Date().getFullYear()} DeskCloud · @desk/platform. All rights reserved.</p>
+            <p>결제는 TEST/STUB 모드 — 실제 청구가 발생하지 않습니다.</p>
+          </div>
         </div>
       </div>
     </footer>
