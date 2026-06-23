@@ -81,7 +81,7 @@ export function SiteFooter() {
             </div>
           </div>
           <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <p>© {new Date().getFullYear()} DeskCloud · @desk/platform. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} DeskCloud (Beta) · @desk/platform. All rights reserved.</p>
             <p>결제는 TEST/STUB 모드 — 실제 청구가 발생하지 않습니다.</p>
           </div>
         </div>
