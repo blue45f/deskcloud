@@ -11,13 +11,16 @@
 
 - **desk-platform** — 스탠드얼론 없음. `deskcloud/platform` 이 단독 캐노니컬(정합 완료).
   추가 동기화 부담 없음.
-- **remote-devtools** — 스탠드얼론 `blue45f/remote-devtools` 활동 중·AHEAD.
-  `deskcloud/desks/remote-devtools` 는 stale 캡처. 파일 차이 약 3717개이지만 **대부분이
-  vendored `devtools-frontend` 벌크**이고, 실제 의미 있는 소스 변경은 약 50~100개
-  (예: `google-sheets.service`, client `Landing`/`ReplayTab`/`locales` 등).
-- **termsdesk** — 스탠드얼론 `blue45f/termsdesk` 활동 중·AHEAD.
-  `deskcloud/desks/termsdesk` 는 약 32파일 차이(api public 핸들러·web UX·PWA `sw`/`manifest`·docs).
-  **`apps/web/src/config/` 는 deskcloud 전용 파일이므로 동기화 시 보존 대상.**
+- **remote-devtools** — **이미 정합(2026-06-24 적대적 검증)**. raw 차이 ~3717개 중 ~98%가
+  vendored `devtools-frontend` Chrome 포크(standalone 4753 vs deskcloud 4692). 노이즈 제거 후
+  실소스 56개는 **전부 prettier 포맷 · 통합 shim(base-path/@desk 리네임) · dependabot 버전드리프트**.
+  실기능(a11y·DeskCloud 위젯·seed·ReplayComments 마이그·policies→termsdesk)은 deskcloud에 이미
+  존재하고, `SessionPreviewCard.test`는 deskcloud가 오히려 AHEAD. **동기화 백로그 없음**
+  (raw 오버레이하면 통합 shim 퇴행). 스탠드얼론 신규 커밋은 사실상 dependabot뿐.
+- **termsdesk** — **이미 정합(2026-06-24 적대적 검증)**. 27파일 차이는 전부 통합 어댑테이션
+  (base-path · `apps/web/src/config/urls.ts` shim · scoped manifest/SW)이고, 스탠드얼론의 실제 변경
+  (`05409fc` seed-admin fix)은 deskcloud에 byte-identical. verify GREEN(api 103/103·web 47/47).
+  **동기화 불필요**(`apps/web/src/config/` 보존 대상).
 - **aidigestdesk** — 별도 플랫폼(GH Pages / Toss in-app, SaaS 빌링 없음).
   **이번 커밋에서 트리에서 제거**했고, 캐노니컬은 스탠드얼론 `blue45f/aidigestdesk` 단독 운영.
 
@@ -31,16 +34,18 @@
 
 ## 2. 단계별 실행 (각 단계 독립 출하·롤백 가능)
 
-### Phase 0 — 드리프트 최종 동기화 (이번 세션 일부 완료)
+### Phase 0 — 드리프트 점검 (완료: 동기화 백로그 없음)
 
 - ✅ `aidigestdesk` 제거(별도 플랫폼, 스탠드얼론 단독).
 - ✅ 실행 플랜 문서화(이 문서).
-- ⬜ **termsdesk 먼저**(차이 32파일로 작고 안전). 표준 절차:
-  스탠드얼론 working tree를 `deskcloud/desks/termsdesk` 위에 **오버레이하되 deskcloud
-  전용 파일(`apps/web/src/config/` 등)은 보존**한다. 그 다음 verify.
-- ⬜ **remote-devtools 는 신중하게**. vendored `devtools-frontend` 벌크는 건너뛰고
-  실소스 ~50~100개만 오버레이한다(동일하게 deskcloud 전용 파일 보존).
-- 게이트: 각 동기화 후 `pnpm build && typecheck && lint && test` (test는 `--concurrency=1`).
+- ✅ **termsdesk 드리프트 검증** — 차이 27파일 전부 통합 shim, 실내용 이미 정합 → 동기화 불필요(verify GREEN).
+- ✅ **remote-devtools 드리프트 검증** — raw 3717개 중 98% vendored 포크, 실소스 56개 전부
+  포맷/shim/dependabot → 동기화 불필요(deskcloud가 일부 AHEAD).
+- **교훈**: 큰 raw diff는 "standalone-ahead"가 아니라 **vendored 벌크 + 통합 shim + dependabot 노이즈**다.
+  동기화 전 반드시 diff 분류(내용 vs shim)할 것 — raw 오버레이는 통합을 퇴행시킨다.
+- **재구성**: 따라서 Phase 0의 진짜 과제는 "코드 머지"가 아니라 **거버넌스**다. 스탠드얼론 레포에
+  신규 작업(주로 dependabot)이 계속 쌓이면 deskcloud가 시간이 지나며 뒤처진다. 결정: 신규 개발을
+  deskcloud로 단일화(스탠드얼론은 동결/자동머지만) → Phase 1 배포 재배선 → archive.
 
 ### Phase 1 — 배포 재배선
 
