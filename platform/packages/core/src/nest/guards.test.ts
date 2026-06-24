@@ -87,6 +87,49 @@ describe('AdminTokenGuard', () => {
       true
     )
   })
+
+  it('appIds 스코프 토큰은 허용된 앱만 통과(다른 앱은 403, 전역 토큰은 모든 앱)', () => {
+    const appGuard = new AdminTokenGuard({
+      adminToken: 'legacy',
+      adminAccounts: [
+        {
+          id: 'picky-ops',
+          label: 'Picky Ops',
+          role: 'operator',
+          scopes: ['inquiries:read', 'inquiries:write'],
+          token: 'picky-token',
+          appIds: ['picky'],
+        },
+      ],
+    })
+    // 허용된 앱(대소문자 무관) → 통과
+    expect(
+      appGuard.canActivate(
+        ctxOf({ headers: { 'x-admin-token': 'picky-token' }, params: { appId: 'picky' } })
+      )
+    ).toBe(true)
+    expect(
+      appGuard.canActivate(
+        ctxOf({ headers: { 'x-admin-token': 'picky-token' }, params: { appId: 'PICKY' } })
+      )
+    ).toBe(true)
+    // 다른 앱 → 403
+    expect(() =>
+      appGuard.canActivate(
+        ctxOf({ headers: { 'x-admin-token': 'picky-token' }, params: { appId: 'promptmarket' } })
+      )
+    ).toThrow(ForbiddenException)
+    // appId 라우트가 아니면(앱 스코프 토큰) → 403
+    expect(() =>
+      appGuard.canActivate(ctxOf({ headers: { 'x-admin-token': 'picky-token' }, params: {} }))
+    ).toThrow(ForbiddenException)
+    // 전역(legacy) 토큰은 appId 무관 통과
+    expect(
+      appGuard.canActivate(
+        ctxOf({ headers: { 'x-admin-token': 'legacy' }, params: { appId: 'anything' } })
+      )
+    ).toBe(true)
+  })
 })
 
 describe('SecretKeyGuard', () => {

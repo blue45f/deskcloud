@@ -27,6 +27,12 @@ export interface AdminAccount {
   role: AdminRole
   scopes: readonly AdminScope[]
   token: string
+  /**
+   * 이 토큰이 관리할 수 있는 앱(appId) 허용목록. 비어있거나 없으면 모든 앱(전역).
+   * appId 라우트(`/api/v1/apps/:appId/...`)에서 가드가 라우트의 appId 와 대조한다.
+   * appId 슬러그는 소문자로 정규화해 비교한다.
+   */
+  appIds?: readonly string[]
 }
 
 export type AuthenticatedAdminAccount = Omit<AdminAccount, 'token'>

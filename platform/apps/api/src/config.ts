@@ -51,10 +51,21 @@ function parseAdminScopes(value: string): AdminScope[] {
   return scopes.length > 0 ? scopes : ['inquiries:read']
 }
 
+/** appId 허용목록 파싱(+ 구분, 소문자 정규화). 비어있으면 undefined(전역). */
+function parseAdminAppIds(value: string | undefined): string[] | undefined {
+  if (!value?.trim()) return undefined
+  const appIds = value
+    .split('+')
+    .map((appId) => appId.trim().toLowerCase())
+    .filter(Boolean)
+  return appIds.length > 0 ? appIds : undefined
+}
+
 /**
  * ADMIN_ACCOUNTS 형식:
- *   id|label|role|scope+scope|token;id|label|role|scope|token
+ *   id|label|role|scope+scope|token|app+app;id|label|role|scope|token
  *
+ * 6번째 필드(app+app)는 선택 — 있으면 해당 appId 들만 관리(앱 스코프 토큰), 없으면 전역.
  * 토큰 원문은 환경변수에만 두고, 앱은 메모리에서 비교한다.
  */
 export function parseAdminAccounts(raw: string | undefined): AdminAccount[] {
@@ -65,7 +76,7 @@ export function parseAdminAccounts(raw: string | undefined): AdminAccount[] {
     .map((entry) => entry.trim())
     .filter(Boolean)
     .forEach((entry, index) => {
-      const [id, label, role, scopes, token] = entry.split('|').map((part) => part.trim())
+      const [id, label, role, scopes, token, appIds] = entry.split('|').map((part) => part.trim())
       if (!id || !label || !token) {
         console.warn(`[env] ADMIN_ACCOUNTS ${index + 1}번째 항목을 파싱하지 못해 건너뜁니다.`)
         return
@@ -76,6 +87,7 @@ export function parseAdminAccounts(raw: string | undefined): AdminAccount[] {
         role: parseAdminRole(role),
         scopes: parseAdminScopes(scopes),
         token,
+        appIds: parseAdminAppIds(appIds),
       })
     })
   return accounts

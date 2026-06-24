@@ -37,4 +37,29 @@ describe('parseAdminAccounts', () => {
       },
     ])
   })
+
+  it('parses optional 6th field as appId allowlist (lowercased), absent → global', () => {
+    expect(
+      parseAdminAccounts(
+        'picky|Picky Ops|operator|inquiries:read+inquiries:write|picky-token|Picky+Demo;glob|Global|owner|admin:*|g-token'
+      )
+    ).toEqual([
+      {
+        id: 'picky',
+        label: 'Picky Ops',
+        role: 'operator',
+        scopes: ['inquiries:read', 'inquiries:write'],
+        token: 'picky-token',
+        appIds: ['picky', 'demo'],
+      },
+      {
+        id: 'glob',
+        label: 'Global',
+        role: 'owner',
+        scopes: ['admin:*'],
+        token: 'g-token',
+        appIds: undefined,
+      },
+    ])
+  })
 })

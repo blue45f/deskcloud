@@ -20,7 +20,20 @@ import {
 
 interface AdminRequest {
   headers: Record<string, unknown>
+  params?: Record<string, unknown>
   [ADMIN_CONTEXT_KEY]?: AuthenticatedAdminAccount
+}
+
+/**
+ * 토큰 계정이 라우트의 appId 를 관리할 수 있는지 검사.
+ * account.appIds 가 비어있으면 전역(모든 앱). 있으면 라우트 appId(소문자) 가 포함돼야 한다.
+ * appId 라우트가 아닌데 appIds 제한이 있으면(=앱 스코프 토큰의 비앱 라우트 접근) 거부한다.
+ */
+function isAppAllowed(account: AdminAccount, appIdParam: unknown): boolean {
+  const allow = account.appIds
+  if (!allow || allow.length === 0) return true
+  const appId = typeof appIdParam === 'string' ? appIdParam.trim().toLowerCase() : ''
+  return appId.length > 0 && allow.includes(appId)
 }
 
 function constantTimeEqual(left: string, right: string): boolean {
@@ -71,6 +84,9 @@ export class AdminTokenGuard implements CanActivate {
     }
     if (!hasRequiredScope(account, this.requiredScopes)) {
       throw new ForbiddenException('요청한 어드민 작업 권한이 없습니다')
+    }
+    if (!isAppAllowed(account, req.params?.appId)) {
+      throw new ForbiddenException('이 앱에 대한 어드민 권한이 없습니다')
     }
     const { token: _token, ...safeAccount } = account
     req[ADMIN_CONTEXT_KEY] = safeAccount
