@@ -6,7 +6,7 @@
     "remote-devtools": "299MB 벤더 Chromium 포크 — 격리(filter-repo invert-paths). sibling 유지.",
     "deskcloud-sdk": "발행 @heejun/deskcloud — published artifact, sibling 유지.",
     "deskcloud-deploy": "배포 하네스(compose+Caddy+secrets) — sibling 유지.",
-    "aidigestdesk": "일반 운영형 서비스로 판단되어 monorepo 통합 경계에서 제외. 독립 런타임/운영 경로는 별도 관리.",
+    "aidigestdesk": "별도 플랫폼(GH Pages / Toss in-app, SaaS 빌링 없음) — monorepo 트리에서 제거됨. 캐노니컬은 스탠드얼론 blue45f/aidigestdesk; 독립 런타임/운영 경로로 단독 운영.",
     "@heejun/web-config-preset": "DeskCloud 외 더 넓은 소비자 — external 유지."
   },
   "imported": [
