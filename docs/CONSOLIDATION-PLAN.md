@@ -47,10 +47,22 @@
   신규 작업(주로 dependabot)이 계속 쌓이면 deskcloud가 시간이 지나며 뒤처진다. 결정: 신규 개발을
   deskcloud로 단일화(스탠드얼론은 동결/자동머지만) → Phase 1 배포 재배선 → archive.
 
-### Phase 1 — 배포 재배선
+### Phase 1 — 배포 재배선 + 컷오버 (2026-06-24 일부 실행)
 
 - 각 Vercel/Render 프로젝트를 **deskcloud 루트 + Root Directory**(앱별 경로)로 재설정.
 - 앱당 1개씩 **프리뷰 검증 후 prod 스왑**. 한 번에 전부 바꾸지 않는다(롤백 폭 최소화).
+
+**컷오버 현황(라이브 서빙 검증 후 실행):**
+
+- ✅ **desk-platform** — `desk-platform.vercel.app`은 deskcloud 빌드가 포털 서빙(`/termsdesk/` 임베드가
+  deskcloud 빌드 증거). 스탠드얼론 `blue45f/desk-platform` **archive 완료**(고아 origin).
+- ✅ **termsdesk** — deskcloud가 `desk-platform.vercel.app/termsdesk/` 진짜 앱 라이브 서빙(전용 번들·딥라우트 200),
+  스탠드얼론 Vercel은 죽음(404). 스탠드얼론 `blue45f/termsdesk` **archive 완료**.
+- ⏸ **remote-devtools** — **컷오버 보류**. `/remote-devtools/`는 false-200(포털 shell, 전용 번들 없음) =
+  deskcloud가 rdt 프론트를 서빙하지 않음. 실서비스는 `remote-devtools.vercel.app` + Render 백엔드뿐.
+  선행조건: ①deskcloud 빌드에 rdt 프론트 임베드(`build:platform-web-with-termsdesk` 패턴) ②rdt 백엔드를
+  deskcloud에서 라이브 배포(현 `deploy/stack`은 로컬 검증만). 그 전엔 스탠드얼론 유지.
+- 되돌리기: archive는 `gh repo unarchive`로 복원 가능.
 
 ### Phase 2 — control-plane 중복 제거
 
@@ -71,11 +83,11 @@
 
 ## 3. 사용자 결정/게이트 (되돌리기 어려움 — 명시 승인 후 실행)
 
-| 게이트                      | 내용                                                     | 트리거                 |
-| --------------------------- | -------------------------------------------------------- | ---------------------- |
-| 스탠드얼론 레포 archive     | desk-platform/remote-devtools/termsdesk origin 레포 동결 | soak 1~2주 후          |
-| 라이브 도메인 스왑          | 프로덕션 도메인을 deskcloud 배포로 전환                  | Phase 1 프리뷰 검증 후 |
-| remote-devtools 백엔드 전환 | Render 백엔드로 이전                                     | 별도 승인              |
+| 게이트                      | 내용                                                                                  | 트리거                 |
+| --------------------------- | ------------------------------------------------------------------------------------- | ---------------------- |
+| 스탠드얼론 레포 archive     | desk-platform·termsdesk **archive 완료(2026-06-24)**; remote-devtools 보류(서빙 선행) | 일부 실행/보류         |
+| 라이브 도메인 스왑          | 프로덕션 도메인을 deskcloud 배포로 전환                                               | Phase 1 프리뷰 검증 후 |
+| remote-devtools 백엔드 전환 | Render 백엔드로 이전                                                                  | 별도 승인              |
 
 ## 4. 중복 제거 매트릭스 (공유 vs 네이티브)
 
