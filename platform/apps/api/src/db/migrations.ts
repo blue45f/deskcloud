@@ -125,4 +125,18 @@ CREATE INDEX IF NOT EXISTS idx_inquiries_app_origin_status_created
   ON inquiries (app_id, origin_host, status, created_at);
 `,
   },
+  {
+    name: '0006_favorites',
+    sql: /* sql */ `
+CREATE TABLE IF NOT EXISTS favorites (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  app_id text NOT NULL,
+  owner_key text NOT NULL,
+  items jsonb NOT NULL DEFAULT '[]'::jsonb,
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT favorites_app_owner_uq UNIQUE (app_id, owner_key)
+);
+CREATE INDEX IF NOT EXISTS idx_favorites_app ON favorites (app_id);
+`,
+  },
 ]

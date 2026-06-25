@@ -7,6 +7,7 @@ import { BillingModule } from './billing/billing.module'
 import { BootstrapService } from './bootstrap.service'
 import { AllExceptionsFilter } from './common/all-exceptions.filter'
 import { CoreModule } from './core/core.module'
+import { FavoritesModule } from './favorites/favorites.module'
 import { HealthModule } from './health/health.module'
 import { InquiriesModule } from './inquiries/inquiries.module'
 import { TenantsModule } from './tenants/tenants.module'
@@ -21,6 +22,7 @@ import { WorkspaceDesksModule } from './workspace-desks/workspace-desks.module'
     TenantsModule,
     BillingModule,
     InquiriesModule,
+    FavoritesModule,
     VisitsModule,
     WorkspaceDesksModule,
     HealthModule,

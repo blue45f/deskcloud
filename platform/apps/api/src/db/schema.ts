@@ -154,3 +154,22 @@ export const dailyVisits = pgTable(
     index('idx_daily_visits_app').on(t.appId),
   ]
 )
+
+/**
+ * 즐겨찾기 — owner(익명키/사용자 id)별 북마크 목록을 jsonb 로 통째 보관(웹·토스 공용).
+ * 항목 형태는 앱마다 달라(불투명) 서버는 배열만 저장한다. (app_id, owner_key) 1행.
+ */
+export const favorites = pgTable(
+  'favorites',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    appId: text('app_id').notNull(),
+    ownerKey: text('owner_key').notNull(),
+    items: jsonb('items').$type<unknown[]>().notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    unique('favorites_app_owner_uq').on(t.appId, t.ownerKey),
+    index('idx_favorites_app').on(t.appId),
+  ]
+)
