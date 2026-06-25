@@ -85,6 +85,8 @@ export interface InquiryListDto<T extends InquiryDto = InquiryDto> {
   items: T[]
   limit: number
   offset: number
+  /** 해당 appId(어드민은 status 필터 반영)의 전체 문의 수 — 페이지네이션·"더보기" 판정용. */
+  total: number
 }
 
 /**

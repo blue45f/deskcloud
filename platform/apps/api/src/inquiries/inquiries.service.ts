@@ -81,8 +81,11 @@ export class InquiriesService {
     const limit = clampLimit(query.limit)
     const offset = query.offset ?? 0
     // 공개 목록은 상태 필터를 받지 않는다(전체 노출, 트리아지는 어드민 전용).
-    const rows = await this.store.listByApp(appId, { limit, offset })
-    return { appId, items: rows.map(toPublicDto), limit, offset }
+    const [rows, total] = await Promise.all([
+      this.store.listByApp(appId, { limit, offset }),
+      this.store.countByApp(appId),
+    ])
+    return { appId, items: rows.map(toPublicDto), limit, offset, total }
   }
 
   /** 어드민 목록 — 회신 이메일·출처 URL 포함. status/originHost 로 필터 가능. */
@@ -93,13 +96,16 @@ export class InquiriesService {
     const appId = normalizeAppId(appIdRaw)
     const limit = clampLimit(query.limit)
     const offset = query.offset ?? 0
-    const rows = await this.store.listByApp(appId, {
-      limit,
-      offset,
-      status: query.status,
-      originHost: query.originHost,
-    })
-    return { appId, items: rows, limit, offset }
+    const [rows, total] = await Promise.all([
+      this.store.listByApp(appId, {
+        limit,
+        offset,
+        status: query.status,
+        originHost: query.originHost,
+      }),
+      this.store.countByApp(appId, { status: query.status, originHost: query.originHost }),
+    ])
+    return { appId, items: rows, limit, offset, total }
   }
 
   /** 상태 변경(어드민 트리아지) — 해당 appId 의 문의만 갱신(경로 appId 와 불일치 시 404). */

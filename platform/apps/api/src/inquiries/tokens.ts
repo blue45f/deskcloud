@@ -38,6 +38,8 @@ export interface InquiryStorePort {
   listByApp(appId: string, opts: ListInquiriesOptions): Promise<InquiryAdminDto[]>
   getById(id: string): Promise<InquiryAdminDto | null>
   updateStatus(id: string, status: InquiryStatus): Promise<InquiryAdminDto | null>
+  /** 앱별 전체 문의 수(status/originHost 필터 반영) — 페이지네이션 total 산출용. */
+  countByApp(appId: string, opts?: { status?: InquiryStatus; originHost?: string }): Promise<number>
 }
 
 /** 출처 URL → host[:port]. 잘못된 URL은 저장하지 않고 URL 원문만 보존한다. */
