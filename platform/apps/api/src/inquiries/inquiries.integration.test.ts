@@ -81,6 +81,7 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
     expect(res.inquiry).toBeUndefined()
     const list = await service.listPublic('rotifolk', {})
     expect(list.items).toHaveLength(0)
+    expect(list.total).toBe(0) // 빈 결과 — countByApp 의 `?? 0` 폴백 경로
   })
 
   it('appId 정규화·검증 — 대문자 소문자화, 잘못된 형식 거부', async () => {
@@ -131,6 +132,7 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
     await service.setStatus('rotifolk', created.inquiry!.id, 'resolved')
     const resolved = await service.listAdmin('rotifolk', { status: 'resolved' })
     expect(resolved.items).toHaveLength(1)
+    expect(resolved.total).toBe(1) // total 이 status 필터를 반영
     expect(resolved.items[0]!.status).toBe('resolved')
   })
 
@@ -155,6 +157,7 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
 
     const appDomain = await service.listAdmin('rotifolk', { originHost: 'app.example.com' })
     expect(appDomain.items.map((item) => item.title)).toEqual(['프로덕션 도메인'])
+    expect(appDomain.total).toBe(1) // total 이 originHost 필터를 반영
     expect(appDomain.items[0]!.originHost).toBe('app.example.com')
 
     const adminDomain = await service.listAdmin('rotifolk', {
@@ -172,6 +175,7 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
       status: 'resolved',
     })
     expect(resolvedInAdmin.items).toHaveLength(0)
+    expect(resolvedInAdmin.total).toBe(0) // status+originHost 조합 빈 매칭의 total 0
   })
 
   it('setStatus — 상태 변경 반영, 다른 appId 의 문의는 갱신 안 됨(null)', async () => {
