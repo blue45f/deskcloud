@@ -1,5 +1,5 @@
 import { type InquiryAdminDto, type InquiryStatus } from '@desk/shared'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 
 import { DatabaseService } from '../db/database.service'
 import { inquiries } from '../db/schema'
@@ -64,6 +64,21 @@ export class DrizzleInquiryStore implements InquiryStorePort {
       .limit(opts.limit)
       .offset(opts.offset)
     return rows.map(toAdminDto)
+  }
+
+  /** 앱별 전체 문의 수(status/originHost 필터 반영) — listByApp와 동일 필터. */
+  async countByApp(
+    appId: string,
+    opts?: { status?: InquiryStatus; originHost?: string }
+  ): Promise<number> {
+    const filters = [eq(inquiries.appId, appId)]
+    if (opts?.status) filters.push(eq(inquiries.status, opts.status))
+    if (opts?.originHost) filters.push(eq(inquiries.originHost, opts.originHost))
+    const rows = await this.dbs.db
+      .select({ value: count() })
+      .from(inquiries)
+      .where(and(...filters))
+    return Number(rows[0]?.value ?? 0)
   }
 
   async getById(id: string): Promise<InquiryAdminDto | null> {

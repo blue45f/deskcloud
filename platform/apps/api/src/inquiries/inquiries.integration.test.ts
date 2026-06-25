@@ -97,12 +97,14 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
     const roti = await service.listPublic('rotifolk', {})
     expect(roti.appId).toBe('rotifolk')
     expect(roti.items).toHaveLength(2)
+    expect(roti.total).toBe(2) // 앱별 전체 수(격리 반영)
     // 최신순(B 가 A 보다 뒤에 들어왔으므로 먼저).
     expect(roti.items[0]!.title).toBe('B')
     expect(roti.items.every((i) => !('contactEmail' in i))).toBe(true)
 
     const off = await service.listPublic('offhours', {})
     expect(off.items).toHaveLength(1)
+    expect(off.total).toBe(1)
     expect(off.items[0]!.title).toBe('C')
   })
 
@@ -111,6 +113,7 @@ describe('InquiriesService (PGlite, Drizzle store)', () => {
     const page = await service.listPublic('rotifolk', { limit: 2, offset: 0 })
     expect(page.items).toHaveLength(2)
     expect(page.limit).toBe(2)
+    expect(page.total).toBe(5) // 페이지(items)는 잘려도 total 은 전체 수
     const capped = await service.listPublic('rotifolk', { limit: 999 })
     expect(capped.limit).toBe(50)
   })
