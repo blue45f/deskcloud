@@ -14,6 +14,10 @@ packages:
   # desks/* — 동질/일반 Desk.  aidigestdesk는 별도 플랫폼이라 트리에서 제거됨
   # (스탠드얼론 blue45f/aidigestdesk 단독 운영; 워크스페이스/소스/런타임 미통합).
   - "desks/seo-gateway"
+  # seo-gateway 내부 패키지/앱 — 락파일 importer 와 일치해야 deps 가 설치된다(누락 시 cli·anthropic
+  # 의 @clack/prompts·@anthropic-ai/sdk 미설치로 frozen-lockfile CI typecheck 실패).
+  - "desks/seo-gateway/packages/*"
+  - "desks/seo-gateway/apps/*"
   - "desks/remote-devtools"
   - "desks/remote-devtools/client"
   - "desks/remote-devtools/sdk"
