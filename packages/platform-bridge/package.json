@@ -1,0 +1,67 @@
+{
+  "name": "@heejun/platform-bridge",
+  "version": "0.1.0",
+  "description": "웹 ↔ 토스인앱(AppsInToss) 공통 플랫폼 능력 추상화 — share·haptic·clipboard·외부링크·익명식별키·딥링크. headless(디자인시스템 무관), React 컨텍스트로 주입.",
+  "license": "MIT",
+  "author": "heejun",
+  "type": "module",
+  "sideEffects": false,
+  "keywords": [
+    "apps-in-toss",
+    "toss",
+    "platform-bridge",
+    "react",
+    "headless"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./toss": {
+      "types": "./dist/toss.d.ts",
+      "import": "./dist/toss.js",
+      "require": "./dist/toss.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "tsup"
+  },
+  "peerDependencies": {
+    "@apps-in-toss/web-framework": ">=2",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@apps-in-toss/web-framework": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@apps-in-toss/web-framework": "^2.9.1",
+    "@types/react": "^19.2.16",
+    "react": "^19.2.7",
+    "tsup": "^8.5.1",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "packageManager": "pnpm@11.4.0"
+}
