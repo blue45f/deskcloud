@@ -173,3 +173,28 @@ export const favorites = pgTable(
     index('idx_favorites_app').on(t.appId),
   ]
 )
+
+/**
+ * 커뮤니티 글 — 형제 앱의 채팅·게시판·댓글을 공개 REST 로 보관(키 인증 없음).
+ * kind 로 종류 구분(chat=채팅, board=게시판, comment=댓글). channel=채팅채널/게시판카테고리,
+ * parentId=댓글의 부모 글 id. authorKey=익명 멤버키(작성자 본인 삭제 판정). 자금 이동 없음.
+ */
+export const communityPosts = pgTable(
+  'community_posts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    appId: text('app_id').notNull(),
+    kind: text('kind').notNull(),
+    channel: text('channel'),
+    parentId: text('parent_id'),
+    title: text('title'),
+    author: text('author').notNull(),
+    authorKey: text('author_key').notNull(),
+    body: text('body').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index('idx_community_app_kind').on(t.appId, t.kind),
+    index('idx_community_parent').on(t.parentId),
+  ]
+)

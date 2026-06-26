@@ -6,6 +6,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { BillingModule } from './billing/billing.module'
 import { BootstrapService } from './bootstrap.service'
 import { AllExceptionsFilter } from './common/all-exceptions.filter'
+import { CommunityModule } from './community/community.module'
 import { CoreModule } from './core/core.module'
 import { FavoritesModule } from './favorites/favorites.module'
 import { HealthModule } from './health/health.module'
@@ -23,6 +24,7 @@ import { WorkspaceDesksModule } from './workspace-desks/workspace-desks.module'
     BillingModule,
     InquiriesModule,
     FavoritesModule,
+    CommunityModule,
     VisitsModule,
     WorkspaceDesksModule,
     HealthModule,

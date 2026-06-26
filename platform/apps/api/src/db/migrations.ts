@@ -139,4 +139,23 @@ CREATE TABLE IF NOT EXISTS favorites (
 CREATE INDEX IF NOT EXISTS idx_favorites_app ON favorites (app_id);
 `,
   },
+  {
+    name: '0007_community_posts',
+    sql: /* sql */ `
+CREATE TABLE IF NOT EXISTS community_posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  app_id text NOT NULL,
+  kind text NOT NULL,
+  channel text,
+  parent_id text,
+  title text,
+  author text NOT NULL,
+  author_key text NOT NULL,
+  body text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_community_app_kind ON community_posts (app_id, kind);
+CREATE INDEX IF NOT EXISTS idx_community_parent ON community_posts (parent_id);
+`,
+  },
 ]
